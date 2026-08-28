@@ -1,0 +1,8 @@
+<Project>
+    <Import Project="..\Directory.Build.props" />
+
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageId Condition="'$(PackageId)' == ''">Sashimi343.$(MSBuildProjectName)</PackageId>
+    </PropertyGroup>
+</Project>

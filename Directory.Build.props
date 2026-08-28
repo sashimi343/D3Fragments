@@ -1,0 +1,26 @@
+<Project>
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net8.0</TargetFrameworks>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        
+        <VersionPrefix>0.1.0</VersionPrefix>
+        
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/sashimi343/D3Fragments</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <AnalysisModeNaming>Minimum</AnalysisModeNaming>
+        <AnalysisModeMaintainability>Recommended</AnalysisModeMaintainability>
+        <AnalysisModeSecurity>All</AnalysisModeSecurity>
+        <AnalysisModeReliability>Recommended</AnalysisModeReliability>
+        <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    </PropertyGroup>
+
+</Project>

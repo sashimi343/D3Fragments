@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\D3Fragments\D3Fragments.csproj" />
+  </ItemGroup>
+
+</Project>
