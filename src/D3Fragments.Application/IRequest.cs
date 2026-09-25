@@ -23,15 +23,14 @@ public interface ICommand
 }
 
 /// <summary>
-///     <para xml:lang="en">A command that returns a <typeparamref name="TResponse"/> derived from <see cref="Result"/>.</para>
-///     <para xml:lang="ja"><see cref="Result"/>派生の<typeparamref name="TResponse"/>を返すCommand。</para>
+///     <para xml:lang="en">A command that returns <typeparamref name="TResponse"/> on success. Success/failure is not expressed via the response's type; a handler indicates failure by throwing (typically <see cref="DomainException"/>), and pipeline behaviors (<see cref="UnitOfWorkBehavior{TRequest, TResponse}"/>, <see cref="TransactionBehavior{TRequest, TResponse}"/>) decide whether to commit based solely on whether an exception propagated.</para>
+///     <para xml:lang="ja">成功時に<typeparamref name="TResponse"/>を返すCommand。成功・失敗は応答の型では表現しない。Handlerは失敗を例外（通常は<see cref="DomainException"/>）のスローで表現し、Pipeline Behavior（<see cref="UnitOfWorkBehavior{TRequest, TResponse}"/>、<see cref="TransactionBehavior{TRequest, TResponse}"/>）は例外が伝播したかどうかだけでCommit/Rollbackを判断する。</para>
 /// </summary>
 /// <typeparam name="TResponse">
-///     <para xml:lang="en">The type of the response. Must derive from <see cref="Result"/> so pipeline behaviors can inspect success or failure.</para>
-///     <para xml:lang="ja">応答の型。Pipeline Behaviorが成功・失敗を判定できるよう、<see cref="Result"/>派生である必要がある。</para>
+///     <para xml:lang="en">The type of the response produced on success.</para>
+///     <para xml:lang="ja">成功時に生成される応答の型。</para>
 /// </typeparam>
 public interface ICommand<TResponse> : IRequest<TResponse>, ICommand
-    where TResponse : Result
 {
 }
 

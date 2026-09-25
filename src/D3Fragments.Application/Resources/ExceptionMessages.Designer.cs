@@ -55,14 +55,5 @@ namespace D3Fragments.Application.Resources {
                 resourceCulture = value;
             }
         }
-
-        /// <summary>
-        ///   The response of a command must be a Result. に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string InvalidOperationException_CommandResponseMustBeResult {
-            get {
-                return ResourceManager.GetString("InvalidOperationException_CommandResponseMustBeResult", resourceCulture);
-            }
-        }
     }
 }

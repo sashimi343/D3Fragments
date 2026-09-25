@@ -144,8 +144,7 @@ public class EfUnitOfWorkTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             unitOfWork.ExecuteInTransactionAsync(
-                async ct => await unitOfWork.ExecuteInTransactionAsync(_ => Task.FromResult(0), _ => true, ct),
-                _ => true,
+                async ct => await unitOfWork.ExecuteInTransactionAsync(_ => Task.FromResult(0), ct),
                 CancellationToken.None));
     }
 }

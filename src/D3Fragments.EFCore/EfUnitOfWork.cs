@@ -46,7 +46,6 @@ public sealed class EfUnitOfWork<TContext>(
     /// <inheritdoc />
     public async Task<TResponse> ExecuteInTransactionAsync<TResponse>(
         Func<CancellationToken, Task<TResponse>> action,
-        Func<TResponse, bool> shouldCommit,
         CancellationToken cancellationToken)
     {
         if (_transaction is not null)
@@ -60,19 +59,14 @@ public sealed class EfUnitOfWork<TContext>(
         try
         {
             var response = await action(cancellationToken).ConfigureAwait(false);
-            if (!shouldCommit(response))
-            {
-                await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                DiscardChanges();
-                return response;
-            }
-
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             await CompleteDomainEventsAsync(cancellationToken).ConfigureAwait(false);
             return response;
         }
         catch
         {
+            // action が例外を投げた場合はここに来る。await using の transaction は
+            // Commit されていないまま Dispose されるため、EF Core が自動的にロールバックする。
             DiscardChanges();
             throw;
         }

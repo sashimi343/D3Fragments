@@ -27,8 +27,8 @@ public interface IUnitOfWork
     void DiscardChanges();
 
     /// <summary>
-    ///     <para xml:lang="en">Runs <paramref name="action"/> inside an explicit database transaction, committing when <paramref name="shouldCommit"/> returns <c>true</c> for the produced response and rolling back (discarding tracked changes) otherwise, including when an exception is thrown or the operation is canceled.</para>
-    ///     <para xml:lang="ja"><paramref name="action"/>を明示的なDBトランザクション内で実行する。生成された応答に対し<paramref name="shouldCommit"/>が<c>true</c>を返す場合はCommitし、それ以外（例外送出時・キャンセル時を含む）はRollbackして追跡中の変更も破棄する。</para>
+    ///     <para xml:lang="en">Runs <paramref name="action"/> inside an explicit database transaction, committing when it completes without throwing and rolling back (discarding tracked changes) when it throws or the operation is canceled. Failure is expressed solely through an exception propagating out of <paramref name="action"/>; there is no separate success/failure inspection of the produced response.</para>
+    ///     <para xml:lang="ja"><paramref name="action"/>を明示的なDBトランザクション内で実行する。例外を投げずに完了した場合はCommitし、例外送出時・キャンセル時はRollbackして追跡中の変更も破棄する。失敗は<paramref name="action"/>から伝播する例外のみで表現され、生成された応答自体の成功・失敗を別途判定することはない。</para>
     /// </summary>
     /// <typeparam name="TResponse">
     ///     <para xml:lang="en">The type of the response produced by <paramref name="action"/>.</para>
@@ -38,16 +38,11 @@ public interface IUnitOfWork
     ///     <para xml:lang="en">The operation to run inside the transaction.</para>
     ///     <para xml:lang="ja">トランザクション内で実行する処理。</para>
     /// </param>
-    /// <param name="shouldCommit">
-    ///     <para xml:lang="en">Determines, from the produced response, whether the transaction should be committed.</para>
-    ///     <para xml:lang="ja">生成された応答から、トランザクションをCommitすべきかどうかを判定する。</para>
-    /// </param>
     /// <param name="cancellationToken">
     ///     <para xml:lang="en">The cancellation token.</para>
     ///     <para xml:lang="ja">キャンセルトークン。</para>
     /// </param>
     Task<TResponse> ExecuteInTransactionAsync<TResponse>(
         Func<CancellationToken, Task<TResponse>> action,
-        Func<TResponse, bool> shouldCommit,
         CancellationToken cancellationToken);
 }

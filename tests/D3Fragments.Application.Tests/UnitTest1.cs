@@ -19,15 +19,17 @@ file sealed class FakeUnitOfWork : IUnitOfWork
 
     public async Task<TResponse> ExecuteInTransactionAsync<TResponse>(
         Func<CancellationToken, Task<TResponse>> action,
-        Func<TResponse, bool> shouldCommit,
         CancellationToken cancellationToken)
     {
-        var response = await action(cancellationToken);
-        if (!shouldCommit(response))
+        try
+        {
+            return await action(cancellationToken);
+        }
+        catch
         {
             DiscardChanges();
+            throw;
         }
-        return response;
     }
 }
 
@@ -36,6 +38,8 @@ internal sealed record NoopCommand : ICommand<Result>;
 internal sealed record NoopQuery : IQuery<Result>;
 
 internal sealed record TransactionalCommand : IRequest<Result>, ITransactionalCommand;
+
+internal sealed class DomainFailureException() : Exception("ng");
 
 public class UnitOfWorkBehaviorTests
 {
@@ -52,12 +56,13 @@ public class UnitOfWorkBehaviorTests
     }
 
     [Fact]
-    public async Task Command失敗時はDiscardChangesが呼ばれSaveChangesは呼ばれない()
+    public async Task Handlerが例外を投げた場合はDiscardChangesが呼ばれSaveChangesは呼ばれない()
     {
         var unitOfWork = new FakeUnitOfWork();
         var behavior = new UnitOfWorkBehavior<NoopCommand, Result>(unitOfWork);
 
-        await behavior.HandleAsync(new NoopCommand(), _ => Task.FromResult(Result.Failure(Error.Validation("ng"))), CancellationToken.None);
+        await Assert.ThrowsAsync<DomainFailureException>(() =>
+            behavior.HandleAsync(new NoopCommand(), _ => throw new DomainFailureException(), CancellationToken.None));
 
         Assert.False(unitOfWork.SaveChangesCalled);
         Assert.True(unitOfWork.DiscardChangesCalled);
@@ -96,12 +101,13 @@ public class TransactionBehaviorTests
     }
 
     [Fact]
-    public async Task ITransactionalCommandの場合は失敗時にDiscardChangesが呼ばれる()
+    public async Task ITransactionalCommandの場合はHandlerが例外を投げるとDiscardChangesが呼ばれる()
     {
         var unitOfWork = new FakeUnitOfWork();
         var behavior = new TransactionBehavior<TransactionalCommand, Result>(unitOfWork);
 
-        await behavior.HandleAsync(new TransactionalCommand(), _ => Task.FromResult(Result.Failure(Error.Validation("ng"))), CancellationToken.None);
+        await Assert.ThrowsAsync<DomainFailureException>(() =>
+            behavior.HandleAsync(new TransactionalCommand(), _ => throw new DomainFailureException(), CancellationToken.None));
 
         Assert.True(unitOfWork.DiscardChangesCalled);
     }

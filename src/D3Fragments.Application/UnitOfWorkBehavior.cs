@@ -3,8 +3,8 @@ using D3Fragments;
 namespace D3Fragments.Application;
 
 /// <summary>
-///     <para xml:lang="en">Saves the changes made by a successful command through <see cref="IUnitOfWork"/>. Does not save when the handler returns a failed <see cref="Result"/>, throws, or is canceled; in those cases the tracked changes are discarded. Queries are passed through unchanged.</para>
-///     <para xml:lang="ja">成功したCommandの変更を<see cref="IUnitOfWork"/>経由で保存するPipeline Behavior。Handlerが失敗の<see cref="Result"/>を返した場合、例外を送出した場合、キャンセルされた場合は保存せず、追跡中の変更を破棄する。Queryはそのまま通過させる。</para>
+///     <para xml:lang="en">Saves the changes made by a successful command through <see cref="IUnitOfWork"/>. Does not save when the handler throws (typically a <see cref="DomainException"/> for a domain-level failure) or is canceled; in those cases the tracked changes are discarded and the exception is rethrown. Queries are passed through unchanged.</para>
+///     <para xml:lang="ja">成功したCommandの変更を<see cref="IUnitOfWork"/>経由で保存するPipeline Behavior。Handlerが例外を送出した場合（ドメインレベルの失敗は通常<see cref="DomainException"/>）、キャンセルされた場合は保存せず、追跡中の変更を破棄して例外を再スローする。Queryはそのまま通過させる。</para>
 /// </summary>
 public sealed class UnitOfWorkBehavior<TRequest, TResponse>(
     IUnitOfWork unitOfWork)
@@ -25,17 +25,6 @@ public sealed class UnitOfWorkBehavior<TRequest, TResponse>(
         try
         {
             var response = await next(cancellationToken).ConfigureAwait(false);
-            if (response is not Result result)
-            {
-                throw new InvalidOperationException(ExceptionMessages.InvalidOperationException_CommandResponseMustBeResult);
-            }
-
-            if (result.IsFailure)
-            {
-                unitOfWork.DiscardChanges();
-                return response;
-            }
-
             await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return response;
         }
