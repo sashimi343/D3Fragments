@@ -123,4 +123,10 @@
   <data name="ArgumentException_MustBeUuidV7" xml:space="preserve">
     <value>値はUuidV7でなければなりません。</value>
   </data>
+  <data name="ArgumentException_EntityIdCannotBeDefault" xml:space="preserve">
+    <value>IDには既定値を指定できません。</value>
+  </data>
+  <data name="InvalidOperationException_ResultValueAccessedOnFailure" xml:space="preserve">
+    <value>失敗したResultから値を取得することはできません。エラー: {0}</value>
+  </data>
 </root>

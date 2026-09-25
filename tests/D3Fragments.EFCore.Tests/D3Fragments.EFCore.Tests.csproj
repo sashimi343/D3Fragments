@@ -9,6 +9,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\D3Fragments.EFCore\D3Fragments.EFCore.csproj" />
+    <ProjectReference Include="..\..\src\D3Fragments.Application\D3Fragments.Application.csproj" />
     <ProjectReference Include="..\..\src\D3Fragments\D3Fragments.csproj" />
   </ItemGroup>
 

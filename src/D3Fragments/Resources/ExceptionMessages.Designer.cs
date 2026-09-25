@@ -77,5 +77,23 @@ namespace D3Fragments.Resources {
                 return ResourceManager.GetString("ArgumentException_MustBeUuidV7", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   The ID must not be the default value. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string ArgumentException_EntityIdCannotBeDefault {
+            get {
+                return ResourceManager.GetString("ArgumentException_EntityIdCannotBeDefault", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Cannot access the value of a failed Result. Error: {0} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string InvalidOperationException_ResultValueAccessedOnFailure {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_ResultValueAccessedOnFailure", resourceCulture);
+            }
+        }
     }
 }
