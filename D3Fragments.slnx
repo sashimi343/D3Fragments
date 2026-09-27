@@ -4,11 +4,13 @@
     <Project Path="src/D3Fragments.EFCore/D3Fragments.EFCore.csproj" />
     <Project Path="src/D3Fragments.Testing/D3Fragments.Testing.csproj" />
     <Project Path="src/D3Fragments/D3Fragments.csproj" />
+    <Project Path="src/D3Fragments.Application/D3Fragments.Application.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/D3Fragments.AspNetCore.Tests/D3Fragments.AspNetCore.Tests.csproj" />
     <Project Path="tests/D3Fragments.EFCore.Tests/D3Fragments.EFCore.Tests.csproj" />
     <Project Path="tests/D3Fragments.Testing.Tests/D3Fragments.Testing.Tests.csproj" />
     <Project Path="tests/D3Fragments.Tests/D3Fragments.Tests.csproj" />
+    <Project Path="tests/D3Fragments.Application.Tests/D3Fragments.Application.Tests.csproj" />
   </Folder>
 </Solution>
