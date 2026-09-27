@@ -1,5 +1,30 @@
 # Separate Docs
 # A tool to split XML document comment files based on 'xml:lang' attribute.
+#
+# Source: https://github.com/from-dtx/SeparateDocs
+# Modified: build paths with Join-Path for cross-platform (Linux) support.
+#
+# MIT License
+#
+# Copyright (c) 2021 FROM / Kenji Yamazaki
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 Param( [parameter(mandatory)] $projectName,$outdir,$xmldocdir )
 
@@ -12,7 +37,7 @@ $langs = @("en", "ja")
 
 $script:ErrorActionPreference = 'Stop'
 
-$xmlpath = "${outdir}${projectName}.xml"
+$xmlpath = Join-Path $outdir "${projectName}.xml"
 Copy-Item ${xmlpath} "${xmlpath}.org"
 
 foreach( $dn in $langs ) {
@@ -39,7 +64,7 @@ foreach( $dn in $langs ) {
     else
     {
         # other into subfolder
-        $docfolder = "${xmldocdir}\${dn}"
+        $docfolder = Join-Path $xmldocdir $dn
     }
 
     if( !( Test-Path $docfolder ) )
@@ -47,7 +72,7 @@ foreach( $dn in $langs ) {
         mkdir $docfolder | Out-Null
     }
 
-    $outpath = "${docfolder}\${projectName}.xml"
+    $outpath = Join-Path $docfolder "${projectName}.xml"
     $xml.Save( $outpath )
     
     Write-Host "--> xml:lang='${dn}', ${outpath} done."
@@ -60,12 +85,12 @@ foreach( $dn in $langs ) {
     }
     else
     {
-        $feedbackDir = "${outdir}\${dn}"
+        $feedbackDir = Join-Path $outdir $dn
         if( !( Test-Path $feedbackDir ) )
         {
             mkdir $feedbackDir | Out-Null
         }
-        Copy-Item ${outpath} "${feedbackDir}\${projectName}.xml"
+        Copy-Item ${outpath} (Join-Path $feedbackDir "${projectName}.xml")
     }
 }
 

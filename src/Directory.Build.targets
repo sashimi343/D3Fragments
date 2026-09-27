@@ -1,0 +1,18 @@
+<Project>
+  <Import Project="..\Directory.Build.targets" />
+
+  <!-- xml:lang で多言語化した XML ドキュメントを en(既定) / ja に分離してパックする -->
+  <PropertyGroup Condition="'$(GenerateDocumentationFile)' == 'true'">
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddJaDocsToPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <Target Name="SeparateDocs" AfterTargets="Build" Condition="'$(GenerateDocumentationFile)' == 'true'">
+    <Exec Command="pwsh -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\scripts\SeparateDocs.ps1&quot; $(AssemblyName) &quot;$(OutDir.TrimEnd('\'))&quot; &quot;$(IntermediateOutputPath)SeparateDocs&quot;" />
+  </Target>
+
+  <Target Name="_AddJaDocsToPackage">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutDir)ja\$(AssemblyName).xml" PackagePath="lib/$(TargetFramework)/ja" />
+    </ItemGroup>
+  </Target>
+</Project>
