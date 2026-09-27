@@ -1,0 +1,16 @@
+<Project>
+  <!-- 配布は Package プロジェクトの Sashimi343.D3Fragments.Analyzers のみ。
+       src 側の Sashimi343.* 自動付与と衝突しないよう import 前に設定する -->
+  <PropertyGroup>
+    <PackageId>$(MSBuildProjectName)</PackageId>
+  </PropertyGroup>
+
+  <Import Project="..\Directory.Build.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+</Project>
