@@ -15,7 +15,9 @@ jobs:
         with:
           global-json-file: global.json
 
-      - run: dotnet test D3Fragments.slnx -c Release
+      - run: dotnet build D3Fragments.slnx -c Release
+
+      - run: dotnet test D3Fragments.slnx -c Release --no-build
 
       - run: dotnet pack D3Fragments.slnx -c Release --no-build -o artifacts
 
