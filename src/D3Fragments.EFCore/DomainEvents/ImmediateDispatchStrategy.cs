@@ -1,3 +1,5 @@
+using D3Fragments.Application;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace D3Fragments.EFCore.DomainEvents;

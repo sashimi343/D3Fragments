@@ -1,4 +1,4 @@
-namespace D3Fragments;
+namespace D3Fragments.Application;
 
 /// <summary>
 ///     <para xml:lang="en">Dispatches domain events.</para>

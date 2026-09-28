@@ -1,4 +1,4 @@
-namespace D3Fragments;
+namespace D3Fragments.Application;
 
 /// <summary>
 ///     <para xml:lang="en">Handles a domain event of type <typeparamref name="TEvent"/>.</para>
