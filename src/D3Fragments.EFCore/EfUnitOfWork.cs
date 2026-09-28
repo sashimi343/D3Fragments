@@ -1,4 +1,3 @@
-using D3Fragments;
 using D3Fragments.Application;
 using D3Fragments.EFCore.DomainEvents;
 

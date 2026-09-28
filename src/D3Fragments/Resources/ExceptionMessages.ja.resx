@@ -129,4 +129,13 @@
   <data name="InvalidOperationException_ResultValueAccessedOnFailure" xml:space="preserve">
     <value>失敗したResultから値を取得することはできません。エラー: {0}</value>
   </data>
+  <data name="EntityNotFoundException_DefaultMessage" xml:space="preserve">
+    <value>指定されたエンティティが見つかりません。</value>
+  </data>
+  <data name="EntityNotFoundException_EntityName" xml:space="preserve">
+    <value>指定された{0}が見つかりません。</value>
+  </data>
+  <data name="EntityNotFoundException_EntityNameAndOptionalMessage" xml:space="preserve">
+    <value>指定された{0}が見つかりません。{1}</value>
+  </data>
 </root>

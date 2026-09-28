@@ -1,7 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 
-using D3Fragments;
-
 namespace D3Fragments.Tests;
 
 public class ResultTests

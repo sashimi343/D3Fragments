@@ -61,6 +61,15 @@ namespace D3Fragments.Resources {
         }
         
         /// <summary>
+        ///   The ID must not be the default value. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string ArgumentException_EntityIdCannotBeDefault {
+            get {
+                return ResourceManager.GetString("ArgumentException_EntityIdCannotBeDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Guid is not UUID version 7. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string ArgumentException_GuidNotVersion7 {
@@ -77,16 +86,34 @@ namespace D3Fragments.Resources {
                 return ResourceManager.GetString("ArgumentException_MustBeUuidV7", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   The ID must not be the default value. に類似しているローカライズされた文字列を検索します。
+        ///   The specified entity is not found. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string ArgumentException_EntityIdCannotBeDefault {
+        internal static string EntityNotFoundException_DefaultMessage {
             get {
-                return ResourceManager.GetString("ArgumentException_EntityIdCannotBeDefault", resourceCulture);
+                return ResourceManager.GetString("EntityNotFoundException_DefaultMessage", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   The specified {0} is not found. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EntityNotFoundException_EntityName {
+            get {
+                return ResourceManager.GetString("EntityNotFoundException_EntityName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   The specified {0} is not found. {1} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EntityNotFoundException_EntityNameAndOptionalMessage {
+            get {
+                return ResourceManager.GetString("EntityNotFoundException_EntityNameAndOptionalMessage", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Cannot access the value of a failed Result. Error: {0} に類似しているローカライズされた文字列を検索します。
         /// </summary>

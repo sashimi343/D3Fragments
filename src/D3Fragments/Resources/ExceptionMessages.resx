@@ -129,4 +129,13 @@
   <data name="InvalidOperationException_ResultValueAccessedOnFailure" xml:space="preserve">
     <value>Cannot access the value of a failed Result. Error: {0}</value>
   </data>
+  <data name="EntityNotFoundException_DefaultMessage" xml:space="preserve">
+    <value>The specified entity is not found.</value>
+  </data>
+  <data name="EntityNotFoundException_EntityName" xml:space="preserve">
+    <value>The specified {0} is not found.</value>
+  </data>
+  <data name="EntityNotFoundException_EntityNameAndOptionalMessage" xml:space="preserve">
+    <value>The specified {0} is not found. {1}</value>
+  </data>
 </root>

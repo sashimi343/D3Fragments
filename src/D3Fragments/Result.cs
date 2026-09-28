@@ -97,6 +97,61 @@ public class Result
         }
         return Failure(CombineErrors(this, other));
     }
+
+    /// <summary>
+    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> built from the first error when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、最初のエラーから <see cref="DomainException"/> を生成してスローする。</para>
+    /// </summary>
+    /// <returns>
+    ///     <para xml:lang="en">This result if it is a success.</para>
+    ///     <para xml:lang="ja">成功している場合はこの結果。</para>
+    /// </returns>
+    /// <exception cref="DomainException">
+    ///     <para xml:lang="en">Thrown when this result is a failure.</para>
+    ///     <para xml:lang="ja">この結果が失敗している場合</para>
+    /// </exception>
+    public virtual Result ThrowIfFailure()
+    {
+        return IsFailure ? throw new DomainException(Errors[0]) : this;
+    }
+
+    /// <summary>
+    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> built from the first error when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、最初のエラーから <see cref="DomainException"/> を生成してスローする。</para>
+    /// </summary>
+    /// <param name="errorCode">
+    ///     <para xml:lang="en">The project-specific error code to associate with the exception.</para>
+    ///     <para xml:lang="ja">例外に関連付けるプロジェクト固有のエラーコード。</para>
+    /// </param>
+    /// <returns>
+    ///     <para xml:lang="en">This result if it is a success.</para>
+    ///     <para xml:lang="ja">成功している場合はこの結果。</para>
+    /// </returns>
+    /// <exception cref="DomainException">
+    ///     <para xml:lang="en">Thrown when this result is a failure.</para>
+    ///     <para xml:lang="ja">この結果が失敗している場合</para>
+    /// </exception>
+    public virtual Result ThrowIfFailure(string errorCode)
+    {
+        return IsFailure ? throw new DomainException(Errors[0]) { ErrorCode = errorCode } : this;
+    }
+
+    /// <summary>
+    ///    <para xml:lang="en">Throws an exception produced by <paramref name="exceptionFactory"/> when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、<paramref name="exceptionFactory"/> で生成された例外をスローする。</para>
+    /// </summary>
+    /// <param name="exceptionFactory">
+    ///     <para xml:lang="en">A function that produces an exception from the list of errors.</para>
+    ///     <para xml:lang="ja">エラー一覧から例外を生成する関数。</para>
+    /// </param>
+    /// <returns>
+    ///     <para xml:lang="en">This result if it is a success.</para>
+    ///     <para xml:lang="ja">成功している場合はこの結果。</para>
+    /// </returns>
+    public virtual Result ThrowIfFailure(Func<IReadOnlyList<Error>, Exception> exceptionFactory)
+    {
+        return IsFailure ? throw exceptionFactory(Errors) : this;
+    }
 }
 
 /// <summary>
@@ -178,16 +233,109 @@ public sealed class Result<T> : Result
     ///     <para xml:lang="en">Gets the value, or throws a <see cref="DomainException"/> when this result is a failure.</para>
     ///     <para xml:lang="ja">値を取得する。この結果が失敗の場合は <see cref="DomainException"/> をスローする。</para>
     /// </summary>
+    /// <returns>
+    ///    <para xml:lang="en">The value if this result is a success.</para>
+    ///    <para xml:lang="ja">この結果が成功の場合の値。</para>
+    /// </returns>
     /// <exception cref="DomainException">
     ///     <para xml:lang="en">Thrown when this result is a failure.</para>
     ///     <para xml:lang="ja">この結果が失敗の場合にスローされる。</para>
     /// </exception>
     public T GetValueOrThrow()
     {
-        if (IsSuccess)
-        {
-            return Value;
-        }
-        throw new DomainException(ErrorType.InvalidState, string.Format(ExceptionMessages.InvalidOperationException_ResultValueAccessedOnFailure, GetFirstErrorMessage()));
+        return IsSuccess ? Value : throw new DomainException(Errors[0]);
+    }
+
+    /// <summary>
+    ///    <para xml:lang="en">Gets the value, or throws a <see cref="DomainException"/> with the specified error code when this result is a failure.</para>
+    ///    <para xml:lang="ja">値を取得する。この結果が失敗の場合は指定したエラーコードを持つ <see cref="DomainException"/> をスローする。</para>
+    /// </summary>
+    /// <param name="errorCode">
+    ///    <para xml:lang="en">The project-specific error code to associate with the exception.</para>
+    ///    <para xml:lang="ja">例外に関連付けるプロジェクト固有のエラーコード。</para>
+    /// </param>
+    /// <returns>
+    ///    <para xml:lang="en">The value if this result is a success.</para>
+    ///    <para xml:lang="ja">この結果が成功の場合の値。</para>
+    /// </returns>
+    /// <exception cref="DomainException">
+    ///     <para xml:lang="en">Thrown when this result is a failure.</para>
+    ///     <para xml:lang="ja">この結果が失敗の場合にスローされる。</para>
+    /// </exception>
+    public T GetValueOrThrow(string errorCode)
+    {
+        return IsSuccess ? Value : throw new DomainException(Errors[0]) { ErrorCode = errorCode };
+    }
+
+    /// <summary>
+    ///    <para xml:lang="en">Gets the value, or throws an exception produced by <paramref name="exceptionFactory"/> when this result is a failure.</para>
+    ///    <para xml:lang="ja">値を取得する。この結果が失敗の場合は <paramref name="exceptionFactory"/> で生成された例外をスローする。</para>
+    /// </summary>
+    /// <param name="exceptionFactory">
+    ///     <para xml:lang="en">A factory function that produces an exception to throw when this result is a failure.</para>
+    ///     <para xml:lang="ja">この結果が失敗の場合にスローする例外を生成するファクトリ関数。</para>
+    /// </param>
+    /// <returns>
+    ///     <para xml:lang="en">The value if this result is a success.</para>
+    ///     <para xml:lang="ja">この結果が成功の場合の値。</para>
+    /// </returns>
+    public T GetValueOrThrow(Func<IReadOnlyList<Error>, Exception> exceptionFactory)
+    {
+        return IsSuccess ? Value : throw exceptionFactory(Errors);
+    }
+
+    /// <summary>
+    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> built from the first error when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、最初のエラーから <see cref="DomainException"/> を生成してスローする。</para>
+    /// </summary>
+    /// <returns>
+    ///     <para xml:lang="en">This result if it is a success.</para>
+    ///     <para xml:lang="ja">成功している場合はこの結果。</para>
+    /// </returns>
+    /// <exception cref="DomainException">
+    ///     <para xml:lang="en">Thrown when this result is a failure.</para>
+    ///     <para xml:lang="ja">この結果が失敗している場合</para>
+    /// </exception>
+    public override Result<T> ThrowIfFailure()
+    {
+        return IsFailure ? throw new DomainException(Errors[0]) : this;
+    }
+
+    /// <summary>
+    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> built from the first error when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、最初のエラーから <see cref="DomainException"/> を生成してスローする。</para>
+    /// </summary>
+    /// <param name="errorCode">
+    ///     <para xml:lang="en">The project-specific error code to associate with the exception.</para>
+    ///     <para xml:lang="ja">例外に関連付けるプロジェクト固有のエラーコード。</para>
+    /// </param>
+    /// <returns>
+    ///     <para xml:lang="en">This result if it is a success.</para>
+    ///     <para xml:lang="ja">成功している場合はこの結果。</para>
+    /// </returns>
+    /// <exception cref="DomainException">
+    ///     <para xml:lang="en">Thrown when this result is a failure.</para>
+    ///     <para xml:lang="ja">この結果が失敗している場合</para>
+    /// </exception>
+    public override Result<T> ThrowIfFailure(string errorCode)
+    {
+        return IsFailure ? throw new DomainException(Errors[0]) { ErrorCode = errorCode } : this;
+    }
+
+    /// <summary>
+    ///    <para xml:lang="en">Throws an exception produced by <paramref name="exceptionFactory"/> when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、<paramref name="exceptionFactory"/> で生成された例外をスローする。</para>
+    /// </summary>
+    /// <param name="exceptionFactory">
+    ///     <para xml:lang="en">A function that produces an exception from the list of errors.</para>
+    ///     <para xml:lang="ja">エラー一覧から例外を生成する関数。</para>
+    /// </param>
+    /// <returns>
+    ///     <para xml:lang="en">This result if it is a success.</para>
+    ///     <para xml:lang="ja">成功している場合はこの結果。</para>
+    /// </returns>
+    public override Result<T> ThrowIfFailure(Func<IReadOnlyList<Error>, Exception> exceptionFactory)
+    {
+        return IsFailure ? throw exceptionFactory(Errors) : this;
     }
 }

@@ -1,5 +1,3 @@
-using D3Fragments;
-
 namespace D3Fragments.Application;
 
 /// <summary>

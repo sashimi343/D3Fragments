@@ -1,6 +1,3 @@
-using D3Fragments.Application;
-using D3Fragments;
-
 namespace D3Fragments.Application.Tests;
 
 file sealed class FakeUnitOfWork : IUnitOfWork
