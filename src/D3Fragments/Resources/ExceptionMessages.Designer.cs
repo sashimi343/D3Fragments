@@ -122,5 +122,41 @@ namespace D3Fragments.Resources {
                 return ResourceManager.GetString("InvalidOperationException_ResultValueAccessedOnFailure", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   The key '{0}' is already defined in {1}. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TypeSafeEnum_DuplicateKey {
+            get {
+                return ResourceManager.GetString("TypeSafeEnum_DuplicateKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   The name '{0}' is already defined in {1}. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TypeSafeEnum_DuplicateName {
+            get {
+                return ResourceManager.GetString("TypeSafeEnum_DuplicateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   The key '{0}' is not defined in {1}. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TypeSafeEnum_UndefinedKey {
+            get {
+                return ResourceManager.GetString("TypeSafeEnum_UndefinedKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   The name '{0}' is not defined in {1}. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TypeSafeEnum_UndefinedName {
+            get {
+                return ResourceManager.GetString("TypeSafeEnum_UndefinedName", resourceCulture);
+            }
+        }
     }
 }

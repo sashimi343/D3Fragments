@@ -138,4 +138,16 @@
   <data name="EntityNotFoundException_EntityNameAndOptionalMessage" xml:space="preserve">
     <value>The specified {0} is not found. {1}</value>
   </data>
+  <data name="TypeSafeEnum_DuplicateKey" xml:space="preserve">
+    <value>The key '{0}' is already defined in {1}.</value>
+  </data>
+  <data name="TypeSafeEnum_DuplicateName" xml:space="preserve">
+    <value>The name '{0}' is already defined in {1}.</value>
+  </data>
+  <data name="TypeSafeEnum_UndefinedKey" xml:space="preserve">
+    <value>The key '{0}' is not defined in {1}.</value>
+  </data>
+  <data name="TypeSafeEnum_UndefinedName" xml:space="preserve">
+    <value>The name '{0}' is not defined in {1}.</value>
+  </data>
 </root>

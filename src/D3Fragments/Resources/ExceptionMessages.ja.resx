@@ -138,4 +138,16 @@
   <data name="EntityNotFoundException_EntityNameAndOptionalMessage" xml:space="preserve">
     <value>指定された{0}が見つかりません。{1}</value>
   </data>
+  <data name="TypeSafeEnum_DuplicateKey" xml:space="preserve">
+    <value>キー'{0}'は{1}ですでに定義されています。</value>
+  </data>
+  <data name="TypeSafeEnum_DuplicateName" xml:space="preserve">
+    <value>名前'{0}'は{1}ですでに定義されています。</value>
+  </data>
+  <data name="TypeSafeEnum_UndefinedKey" xml:space="preserve">
+    <value>キー'{0}'は{1}に定義されていません。</value>
+  </data>
+  <data name="TypeSafeEnum_UndefinedName" xml:space="preserve">
+    <value>名前'{0}'は{1}に定義されていません。</value>
+  </data>
 </root>
