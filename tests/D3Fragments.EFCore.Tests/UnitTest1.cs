@@ -7,7 +7,7 @@ namespace D3Fragments.EFCore.Tests;
 
 internal sealed record TestDomainEvent(DateTimeOffset OccurredAt) : IDomainEvent;
 
-internal sealed class TestEntity : EntityBase
+internal sealed class TestEntity : AggregateRoot
 {
     public TestEntity(int value, DateTimeOffset createdAt) : base(createdAt)
     {

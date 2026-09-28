@@ -34,16 +34,12 @@ public class EntityBaseTests
 {
     private sealed class TestEntity : EntityBase
     {
-        public TestEntity(DateTimeOffset createdAt) : base(createdAt)
-        {
-        }
     }
 
     [Fact]
     public void Equals_同じIDのエンティティは等しい()
     {
-        var now = DateTimeOffset.UtcNow;
-        var entity = new TestEntity(now);
+        var entity = new TestEntity();
 
         Assert.Equal(entity, entity);
     }
@@ -51,11 +47,24 @@ public class EntityBaseTests
     [Fact]
     public void Equals_異なるIDのエンティティは等しくない()
     {
-        var now = DateTimeOffset.UtcNow;
-        var entity1 = new TestEntity(now);
-        var entity2 = new TestEntity(now);
+        var entity1 = new TestEntity();
+        var entity2 = new TestEntity();
 
         Assert.NotEqual(entity1, entity2);
+    }
+}
+
+public class EntityTests
+{
+    private sealed class TestEntity(DateTimeOffset createdAt) : Entity(createdAt);
+
+    [Fact]
+    public void UpdatedAt_初期値はCreatedAtと同じ()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var entity = new TestEntity(now);
+
+        Assert.Equal(now, entity.UpdatedAt);
     }
 }
 
