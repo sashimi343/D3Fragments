@@ -73,6 +73,12 @@ public class Result
     public static List<Error> CombineErrors(params Result[] results) => CombineErrors(results.AsEnumerable());
 
     /// <summary>
+    ///     <para xml:lang="en">Combines the specified results into one. Succeeds only when all results succeeded; otherwise fails with all of their errors.</para>
+    ///     <para xml:lang="ja">引数の結果を1つにまとめる。すべて成功の場合のみ成功を返し、それ以外はすべてのエラーを含む失敗を返す。</para>
+    /// </summary>
+    public static Result Combine(params Result[] results) => new(CombineErrors(results));
+
+    /// <summary>
     ///     <para xml:lang="en">Converts this result into a <see cref="Result{T}"/>, producing the value via <paramref name="valueOnSuccess"/> when this result succeeded.</para>
     ///     <para xml:lang="ja">成功時に値を生成するファクトリ関数を使用して <see cref="Result{T}"/> に変換する。失敗時はエラー一覧を引き継いだ <see cref="Result{T}"/> を返す。</para>
     /// </summary>
@@ -99,8 +105,8 @@ public class Result
     }
 
     /// <summary>
-    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> built from the first error when this result is a failure.</para>
-    ///    <para xml:lang="ja">この結果が失敗している場合、最初のエラーから <see cref="DomainException"/> を生成してスローする。</para>
+    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> holding all errors when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、全エラーを保持する <see cref="DomainException"/> を生成してスローする。</para>
     /// </summary>
     /// <returns>
     ///     <para xml:lang="en">This result if it is a success.</para>
@@ -112,12 +118,12 @@ public class Result
     /// </exception>
     public virtual Result ThrowIfFailure()
     {
-        return IsFailure ? throw new DomainException(Errors[0]) : this;
+        return IsFailure ? throw new DomainException(Errors) : this;
     }
 
     /// <summary>
-    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> built from the first error when this result is a failure.</para>
-    ///    <para xml:lang="ja">この結果が失敗している場合、最初のエラーから <see cref="DomainException"/> を生成してスローする。</para>
+    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> holding all errors when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、全エラーを保持する <see cref="DomainException"/> を生成してスローする。</para>
     /// </summary>
     /// <param name="errorCode">
     ///     <para xml:lang="en">The project-specific error code to associate with the exception.</para>
@@ -133,7 +139,7 @@ public class Result
     /// </exception>
     public virtual Result ThrowIfFailure(string errorCode)
     {
-        return IsFailure ? throw new DomainException(Errors[0]) { ErrorCode = errorCode } : this;
+        return IsFailure ? throw new DomainException(Errors) { ErrorCode = errorCode } : this;
     }
 
     /// <summary>
@@ -243,7 +249,7 @@ public sealed class Result<T> : Result
     /// </exception>
     public T GetValueOrThrow()
     {
-        return IsSuccess ? Value : throw new DomainException(Errors[0]);
+        return IsSuccess ? Value : throw new DomainException(Errors);
     }
 
     /// <summary>
@@ -264,7 +270,7 @@ public sealed class Result<T> : Result
     /// </exception>
     public T GetValueOrThrow(string errorCode)
     {
-        return IsSuccess ? Value : throw new DomainException(Errors[0]) { ErrorCode = errorCode };
+        return IsSuccess ? Value : throw new DomainException(Errors) { ErrorCode = errorCode };
     }
 
     /// <summary>
@@ -285,8 +291,8 @@ public sealed class Result<T> : Result
     }
 
     /// <summary>
-    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> built from the first error when this result is a failure.</para>
-    ///    <para xml:lang="ja">この結果が失敗している場合、最初のエラーから <see cref="DomainException"/> を生成してスローする。</para>
+    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> holding all errors when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、全エラーを保持する <see cref="DomainException"/> を生成してスローする。</para>
     /// </summary>
     /// <returns>
     ///     <para xml:lang="en">This result if it is a success.</para>
@@ -298,12 +304,12 @@ public sealed class Result<T> : Result
     /// </exception>
     public override Result<T> ThrowIfFailure()
     {
-        return IsFailure ? throw new DomainException(Errors[0]) : this;
+        return IsFailure ? throw new DomainException(Errors) : this;
     }
 
     /// <summary>
-    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> built from the first error when this result is a failure.</para>
-    ///    <para xml:lang="ja">この結果が失敗している場合、最初のエラーから <see cref="DomainException"/> を生成してスローする。</para>
+    ///    <para xml:lang="en">Throws a <see cref="DomainException"/> holding all errors when this result is a failure.</para>
+    ///    <para xml:lang="ja">この結果が失敗している場合、全エラーを保持する <see cref="DomainException"/> を生成してスローする。</para>
     /// </summary>
     /// <param name="errorCode">
     ///     <para xml:lang="en">The project-specific error code to associate with the exception.</para>
@@ -319,7 +325,7 @@ public sealed class Result<T> : Result
     /// </exception>
     public override Result<T> ThrowIfFailure(string errorCode)
     {
-        return IsFailure ? throw new DomainException(Errors[0]) { ErrorCode = errorCode } : this;
+        return IsFailure ? throw new DomainException(Errors) { ErrorCode = errorCode } : this;
     }
 
     /// <summary>

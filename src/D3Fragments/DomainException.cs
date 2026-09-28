@@ -6,9 +6,11 @@ namespace D3Fragments;
 /// </summary>
 public class DomainException : Exception
 {
+    private readonly Error[]? _errors;
+
     /// <summary>
-    ///     <para xml:lang="en">Gets the category of the error that caused this exception.</para>
-    ///     <para xml:lang="ja">この例外の原因となったエラーの分類を取得する。</para>
+    ///     <para xml:lang="en">Gets the category of the error that caused this exception. When created from multiple errors, this is the category of the first one.</para>
+    ///     <para xml:lang="ja">この例外の原因となったエラーの分類を取得する。複数エラーから生成した場合は先頭エラーの分類。</para>
     /// </summary>
     public ErrorType ErrorType { get; }
 
@@ -17,6 +19,18 @@ public class DomainException : Exception
     ///    <para xml:lang="ja">この例外に関連付けられたプロジェクト固有のエラーコードを取得または設定する。</para>
     /// </summary>
     public string? ErrorCode { get; set; }
+
+    /// <summary>
+    ///    <para xml:lang="en">Gets or sets the key that identifies the target of the error (e.g. a field name in an API response or a UI control). When created from multiple errors, this is initialized with the target of the first one.</para>
+    ///    <para xml:lang="ja">エラーの対象を識別するキー（APIレスポンスの項目や画面コントロール等との紐づけ用）を取得または設定する。複数エラーから生成した場合は先頭エラーの値で初期化される。</para>
+    /// </summary>
+    public string? Target { get; set; }
+
+    /// <summary>
+    ///     <para xml:lang="en">Gets all errors that caused this exception. When created without a list of errors, returns a single error built from <see cref="ErrorType"/>, <see cref="Exception.Message"/>, <see cref="ErrorCode"/> and <see cref="Target"/>.</para>
+    ///     <para xml:lang="ja">この例外の原因となったすべてのエラーを取得する。エラー一覧を指定せずに生成した場合は、<see cref="ErrorType"/>・<see cref="Exception.Message"/>・<see cref="ErrorCode"/>・<see cref="Target"/>から組み立てた1件を返す。</para>
+    /// </summary>
+    public IReadOnlyList<Error> Errors => _errors ?? [GetDomainError()];
 
     /// <summary>
     ///     <para xml:lang="en">Initializes a new <see cref="DomainException"/>.</para>
@@ -57,23 +71,49 @@ public class DomainException : Exception
     }
 
     /// <summary>
-    ///     <para xml:lang="en">Initializes a new <see cref="DomainException"/> from a domain <see cref="Error"/>.</para>
-    ///     <para xml:lang="ja">ドメインエラーから新しい <see cref="DomainException"/> を初期化する。</para>
+    ///     <para xml:lang="en">Initializes a new <see cref="DomainException"/> from a domain <see cref="Error"/>, carrying over its <see cref="Error.Code"/> and <see cref="Error.Target"/>.</para>
+    ///     <para xml:lang="ja">ドメインエラーから新しい <see cref="DomainException"/> を初期化する。<see cref="Error.Code"/>・<see cref="Error.Target"/>も引き継ぐ。</para>
     /// </summary>
     /// <param name="error">
     ///     <para xml:lang="en">The domain error.</para>
     ///     <para xml:lang="ja">ドメインエラー。</para>
     /// </param>
-    public DomainException(Error error) : base(error.Message)
+    public DomainException(Error error) : this([error])
     {
-        ErrorType = error.Type;
     }
 
     /// <summary>
-    ///     <para xml:lang="en">Converts this exception back into a domain <see cref="Error"/>.</para>
-    ///     <para xml:lang="ja">この例外をドメインエラーに変換する。</para>
+    ///     <para xml:lang="en">Initializes a new <see cref="DomainException"/> from multiple domain errors. All errors are available via <see cref="Errors"/>; <see cref="ErrorType"/>, <see cref="Exception.Message"/>, <see cref="ErrorCode"/> and <see cref="Target"/> are taken from the first error.</para>
+    ///     <para xml:lang="ja">複数のドメインエラーから新しい <see cref="DomainException"/> を初期化する。全エラーは<see cref="Errors"/>で取得でき、<see cref="ErrorType"/>・<see cref="Exception.Message"/>・<see cref="ErrorCode"/>・<see cref="Target"/>は先頭エラーの値となる。</para>
     /// </summary>
-    public Error GetDomainError() => new(ErrorType, Message);
+    /// <param name="errors">
+    ///     <para xml:lang="en">The domain errors. Must contain at least one error.</para>
+    ///     <para xml:lang="ja">ドメインエラーの一覧。1件以上であること。</para>
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     <para xml:lang="en">Thrown when <paramref name="errors"/> is empty.</para>
+    ///     <para xml:lang="ja"><paramref name="errors"/>が空の場合にスローされる。</para>
+    /// </exception>
+    public DomainException(IReadOnlyList<Error> errors) : base(FirstOf(errors).Message)
+    {
+        _errors = [.. errors];
+        ErrorType = _errors[0].Type;
+        ErrorCode = _errors[0].Code;
+        Target = _errors[0].Target;
+    }
+
+    /// <summary>
+    ///     <para xml:lang="en">Converts this exception back into a single domain <see cref="Error"/> built from its representative values. Use <see cref="Errors"/> to get all errors.</para>
+    ///     <para xml:lang="ja">この例外の代表値からドメインエラー1件に変換する。全エラーを取得する場合は<see cref="Errors"/>を使用する。</para>
+    /// </summary>
+    public Error GetDomainError() => new(ErrorType, Message, ErrorCode, Target);
+
+    private static Error FirstOf(IReadOnlyList<Error> errors)
+    {
+        ArgumentNullException.ThrowIfNull(errors);
+        ArgumentOutOfRangeException.ThrowIfZero(errors.Count, nameof(errors));
+        return errors[0];
+    }
 }
 
 /// <summary>
