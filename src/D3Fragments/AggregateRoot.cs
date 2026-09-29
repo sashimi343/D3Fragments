@@ -28,6 +28,37 @@ public abstract class AggregateRoot<TId> : Entity<TId>, IHasDomainEvents
     /// </param>
     protected void AddDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
 
+    /// <summary>
+    ///     <para xml:lang="en">Issues a <see cref="DeletionToken{T}"/> for this aggregate. Call this from the aggregate's own deletion method after its deletion rules have passed.</para>
+    ///     <para xml:lang="ja">この集約の<see cref="DeletionToken{T}"/>を発行する。集約自身の削除メソッド内で、削除ルールを通過した後に呼び出す。</para>
+    /// </summary>
+    /// <typeparam name="T">
+    ///     <para xml:lang="en">The type of the aggregate. Inferred from <paramref name="self"/> when <see langword="this"/> is passed.</para>
+    ///     <para xml:lang="ja">集約の型。<paramref name="self"/>に<see langword="this"/>を渡すと推論される。</para>
+    /// </typeparam>
+    /// <param name="self">
+    ///     <para xml:lang="en">This aggregate instance. Pass <see langword="this"/>.</para>
+    ///     <para xml:lang="ja">この集約インスタンス。<see langword="this"/>を渡す。</para>
+    /// </param>
+    /// <returns>
+    ///     <para xml:lang="en">A token that allows this aggregate to be deleted.</para>
+    ///     <para xml:lang="ja">この集約の削除を許可するトークン。</para>
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    ///     <para xml:lang="en">Thrown when <paramref name="self"/> is not this instance.</para>
+    ///     <para xml:lang="ja"><paramref name="self"/>がこのインスタンス自身でない場合にスローされる。</para>
+    /// </exception>
+    protected DeletionToken<T> AllowDeletion<T>(T self)
+        where T : AggregateRoot<TId>
+    {
+        if (!ReferenceEquals(self, this))
+        {
+            throw new ArgumentException(ExceptionMessages.ArgumentException_DeletionTargetMustBeSelf, nameof(self));
+        }
+
+        return new DeletionToken<T>(self);
+    }
+
     /// <inheritdoc />
     IReadOnlyList<IDomainEvent> IHasDomainEvents.DomainEvents => _domainEvents;
 

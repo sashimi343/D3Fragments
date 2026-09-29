@@ -126,6 +126,9 @@
   <data name="ArgumentException_EntityIdCannotBeDefault" xml:space="preserve">
     <value>IDには既定値を指定できません。</value>
   </data>
+  <data name="ArgumentException_DeletionTargetMustBeSelf" xml:space="preserve">
+    <value>削除対象には集約自身を指定する必要があります。</value>
+  </data>
   <data name="InvalidOperationException_ResultValueAccessedOnFailure" xml:space="preserve">
     <value>失敗したResultから値を取得することはできません。エラー: {0}</value>
   </data>

@@ -126,6 +126,9 @@
   <data name="ArgumentException_EntityIdCannotBeDefault" xml:space="preserve">
     <value>The ID must not be the default value.</value>
   </data>
+  <data name="ArgumentException_DeletionTargetMustBeSelf" xml:space="preserve">
+    <value>The deletion target must be the aggregate itself.</value>
+  </data>
   <data name="InvalidOperationException_ResultValueAccessedOnFailure" xml:space="preserve">
     <value>Cannot access the value of a failed Result. Error: {0}</value>
   </data>

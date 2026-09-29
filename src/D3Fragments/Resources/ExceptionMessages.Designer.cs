@@ -61,6 +61,15 @@ namespace D3Fragments.Resources {
         }
         
         /// <summary>
+        ///   The deletion target must be the aggregate itself. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string ArgumentException_DeletionTargetMustBeSelf {
+            get {
+                return ResourceManager.GetString("ArgumentException_DeletionTargetMustBeSelf", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   The ID must not be the default value. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string ArgumentException_EntityIdCannotBeDefault {
