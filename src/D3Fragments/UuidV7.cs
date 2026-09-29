@@ -349,6 +349,30 @@ public readonly struct UuidV7 : IComparable, IComparable<UuidV7>, IEquatable<Uui
     public override int GetHashCode() => Value.GetHashCode();
 
     /// <summary>
+    ///     <para xml:lang="en">Determines whether two values are equal.</para>
+    ///     <para xml:lang="ja">2つの値が等しいかどうかを判定する。</para>
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(UuidV7 left, UuidV7 right) => left.Equals(right);
+
+    /// <summary>
+    ///     <para xml:lang="en">Determines whether two values are not equal.</para>
+    ///     <para xml:lang="ja">2つの値が等しくないかどうかを判定する。</para>
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(UuidV7 left, UuidV7 right) => !left.Equals(right);
+
+    /// <summary>
+    ///     <para xml:lang="en">Returns the string representation of this value in the "D" format (e.g. <c>0190b6d6-1e5a-7c3e-8f4a-0123456789ab</c>).</para>
+    ///     <para xml:lang="ja">この値を "D" 形式（例: <c>0190b6d6-1e5a-7c3e-8f4a-0123456789ab</c>）で表現した文字列を返す。</para>
+    /// </summary>
+    /// <returns>
+    ///     <para xml:lang="en">The string representation of this value.</para>
+    ///     <para xml:lang="ja">この値の文字列表現。</para>
+    /// </returns>
+    public override string ToString() => Value.ToString();
+
+    /// <summary>
     ///     <para xml:lang="en">Converts the value of this instance to its string representation by using the specified format and format provider.</para>
     ///     <para xml:lang="ja">指定した書式指定子と書式プロバイダーを使用して、このインスタンスの値を文字列表現に変換する。</para>
     /// </summary>
@@ -392,9 +416,7 @@ public readonly struct UuidV7 : IComparable, IComparable<UuidV7>, IEquatable<Uui
     ///     <para xml:lang="ja">書式化に成功した場合は <c>true</c>。それ以外の場合は <c>false</c>。</para>
     /// </returns>
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
-    {
-        throw new NotImplementedException();
-    }
+        => Value.TryFormat(destination, out charsWritten, format);
 
     /// <summary>
     ///     <para xml:lang="en">Tries to format the value of this instance into the provided UTF-8 byte span.</para>
@@ -421,9 +443,7 @@ public readonly struct UuidV7 : IComparable, IComparable<UuidV7>, IEquatable<Uui
     ///     <para xml:lang="ja">書式化に成功した場合は <c>true</c>。それ以外の場合は <c>false</c>。</para>
     /// </returns>
     public bool TryFormat(Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
-    {
-        throw new NotImplementedException();
-    }
+        => Value.TryFormat(utf8Destination, out bytesWritten, format);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsVersion7(Guid value)
