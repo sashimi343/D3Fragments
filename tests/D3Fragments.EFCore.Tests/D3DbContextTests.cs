@@ -108,12 +108,12 @@ public class D3DbContextTests
         await using (var dbContext = database.CreateContext())
         {
             dbContext.Members.AddRange(withOptional, withoutOptional);
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
         await using var readContext = database.CreateContext();
-        var loaded = await readContext.Members.SingleAsync(x => x.Id == withOptional.Id);
-        var loadedWithoutOptional = await readContext.Members.SingleAsync(x => x.Id == withoutOptional.Id);
+        var loaded = await readContext.Members.SingleAsync(x => x.Id == withOptional.Id, TestContext.Current.CancellationToken);
+        var loadedWithoutOptional = await readContext.Members.SingleAsync(x => x.Id == withoutOptional.Id, TestContext.Current.CancellationToken);
 
         Assert.Equal(Email.Create("a@example.com"), loaded.Email);
         Assert.Equal(Email.Create("sub@example.com"), loaded.SubEmail);
@@ -131,9 +131,9 @@ public class D3DbContextTests
         dbContext.Members.AddRange(
             new Member(Email.Create("a@example.com"), null, TestColor.Red, null, CreatedAt),
             new Member(Email.Create("b@other.test"), null, TestColor.Red, null, CreatedAt));
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var count = await dbContext.Members.CountAsync(x => x.Email.Value.Contains("example"));
+        var count = await dbContext.Members.CountAsync(x => x.Email.Value.Contains("example"), TestContext.Current.CancellationToken);
 
         Assert.Equal(1, count);
     }
@@ -159,7 +159,7 @@ public class D3DbContextTests
         await using (var dbContext = database.CreateContext(new FixedTimeProvider(CreatedAt.AddDays(1))))
         {
             dbContext.Members.Add(member);
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             // 新規作成時は CreatedAt のまま
             Assert.Equal(CreatedAt, member.UpdatedAt);
@@ -168,13 +168,13 @@ public class D3DbContextTests
         var updatedAt = CreatedAt.AddDays(2);
         await using (var dbContext = database.CreateContext(new FixedTimeProvider(updatedAt)))
         {
-            var loaded = await dbContext.Members.SingleAsync();
+            var loaded = await dbContext.Members.SingleAsync(TestContext.Current.CancellationToken);
             loaded.ChangeEmail(Email.Create("changed@example.com"));
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
         await using var readContext = database.CreateContext();
-        var reloaded = await readContext.Members.SingleAsync();
+        var reloaded = await readContext.Members.SingleAsync(TestContext.Current.CancellationToken);
         Assert.Equal(updatedAt, reloaded.UpdatedAt);
         Assert.Equal(CreatedAt, reloaded.CreatedAt);
     }
@@ -192,7 +192,7 @@ public class RepositoryBaseTests
         await using (var dbContext = database.CreateContext())
         {
             new MemberRepository(dbContext).Add(member);
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
         await using (var dbContext = database.CreateContext())
@@ -206,7 +206,7 @@ public class RepositoryBaseTests
             var loaded = await repository.FindAsync(member.Id, CancellationToken.None);
             Assert.NotNull(loaded);
             repository.Delete(loaded.Delete());
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
         await using (var dbContext = database.CreateContext())

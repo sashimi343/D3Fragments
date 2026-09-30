@@ -1,5 +1,6 @@
 using D3Fragments.Application;
 using D3Fragments.EFCore.DomainEvents;
+using D3Fragments.Testing;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -17,17 +18,6 @@ internal sealed class TestEntity : AggregateRoot
     public int Value { get; private set; }
 
     public void RaiseTestEvent(DateTimeOffset occurredAt) => AddDomainEvent(new TestDomainEvent(occurredAt));
-}
-
-internal sealed class SpyDomainEventDispatcher : IDomainEventDispatcher
-{
-    public List<IDomainEvent> DispatchedEvents { get; } = [];
-
-    public Task DispatchAsync(IDomainEvent domainEvent, CancellationToken cancellationToken)
-    {
-        DispatchedEvents.Add(domainEvent);
-        return Task.CompletedTask;
-    }
 }
 
 internal sealed class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
@@ -93,7 +83,7 @@ public class PagingExtensionsTests
         {
             dbContext.Entities.Add(new TestEntity(i, now));
         }
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var result = await dbContext.Entities.OrderBy(x => x.Value).ToPagedListAsync(pageNo: 2, pageSize: 2, CancellationToken.None);
 

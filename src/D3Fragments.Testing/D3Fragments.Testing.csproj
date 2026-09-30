@@ -2,6 +2,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\D3Fragments\D3Fragments.csproj" />
+    <ProjectReference Include="..\D3Fragments.Application\D3Fragments.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3.assert" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
   </ItemGroup>
 
 </Project>
