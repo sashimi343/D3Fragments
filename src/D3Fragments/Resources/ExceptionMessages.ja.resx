@@ -153,4 +153,7 @@
   <data name="TypeSafeEnum_UndefinedName" xml:space="preserve">
     <value>名前'{0}'は{1}に定義されていません。</value>
   </data>
+  <data name="JsonException_InvalidUuidV7" xml:space="preserve">
+    <value>UUID version 7として有効な値ではありません。</value>
+  </data>
 </root>

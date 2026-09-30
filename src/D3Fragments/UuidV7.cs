@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace D3Fragments;
 
@@ -10,7 +12,10 @@ namespace D3Fragments;
 /// <remarks>
 ///     <para xml:lang="en">This struct is a thin wrapper around the <see cref="Guid"/> type. This struct can only hold version 7 <see cref="Guid"/> values.</para>
 ///     <para xml:lang="ja">この構造体の実態は <see cref="Guid"/> 型の薄いラッパーである。version 7の <see cref="Guid"/> のみを保持できる。</para>
+///     <para xml:lang="en">In JSON, this struct is represented as a UUID string. Reading a string that is not a UUID version 7 throws a <see cref="JsonException"/>.</para>
+///     <para xml:lang="ja">JSONではUUID文字列として表現する。UUID version 7でない文字列を読み取った場合は<see cref="JsonException"/>をスローする。</para>
 /// </remarks>
+[JsonConverter(typeof(UuidV7JsonConverter))]
 public readonly struct UuidV7 : IComparable, IComparable<UuidV7>, IEquatable<UuidV7>, IParsable<UuidV7>, ISpanFormattable, ISpanParsable<UuidV7>, IUtf8SpanFormattable, IUtf8SpanParsable<UuidV7>
 {
     /// <summary>

@@ -153,4 +153,7 @@
   <data name="TypeSafeEnum_UndefinedName" xml:space="preserve">
     <value>The name '{0}' is not defined in {1}.</value>
   </data>
+  <data name="JsonException_InvalidUuidV7" xml:space="preserve">
+    <value>The value is not a valid UUID version 7.</value>
+  </data>
 </root>
