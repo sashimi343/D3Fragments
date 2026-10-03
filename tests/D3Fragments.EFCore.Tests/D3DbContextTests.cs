@@ -1,5 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 
+using D3Fragments.EFCore.DomainEvents;
+using D3Fragments.Testing;
+
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +25,7 @@ public sealed class Email : ValueObjectBase<Email, string>, IValueObject<Email, 
 
 internal sealed class Member : AggregateRoot
 {
-    public Member(Email email, Email? subEmail, TestColor color, UuidV7? referrerId, DateTimeOffset createdAt) : base(createdAt)
+    public Member(Email email, Email? subEmail, TestColor color, UuidV7? referrerId)
     {
         Email = email;
         SubEmail = subEmail;
@@ -31,7 +34,7 @@ internal sealed class Member : AggregateRoot
     }
 
     // EF Core用（Complex Typeはコンストラクタ引数にバインドできない）
-    private Member() : base(DateTimeOffset.MinValue)
+    private Member()
     {
         Email = null!;
         Color = null!;
@@ -66,11 +69,6 @@ internal sealed class MemberDbContext(DbContextOptions<MemberDbContext> options)
 
 internal sealed class MemberRepository(MemberDbContext dbContext) : RepositoryBase<MemberDbContext, Member>(dbContext);
 
-internal sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
-{
-    public override DateTimeOffset GetUtcNow() => now;
-}
-
 /// <summary>
 /// 1つのインメモリSQLiteデータベースを共有するDbContextを生成する（接続を閉じるとDBが消える）
 /// </summary>
@@ -85,10 +83,10 @@ internal sealed class SqliteTestDatabase : IDisposable
         dbContext.Database.EnsureCreated();
     }
 
-    public MemberDbContext CreateContext(TimeProvider? timeProvider = null) =>
+    public MemberDbContext CreateContext() =>
         new(new DbContextOptionsBuilder<MemberDbContext>()
             .UseSqlite(_connection)
-            .UseD3Fragments([typeof(TestColor).Assembly], timeProvider)
+            .UseD3Fragments([typeof(TestColor).Assembly])
             .Options);
 
     public void Dispose() => _connection.Dispose();
@@ -96,15 +94,13 @@ internal sealed class SqliteTestDatabase : IDisposable
 
 public class D3DbContextTests
 {
-    private static readonly DateTimeOffset CreatedAt = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
-
     [Fact]
     public async Task UuidV7_TypeSafeEnum_ValueObjectを保存して復元できる()
     {
         using var database = new SqliteTestDatabase();
         var referrerId = UuidV7.NewUuidV7();
-        var withOptional = new Member(Email.Create("a@example.com"), Email.Create("sub@example.com"), TestColor.Red, referrerId, CreatedAt);
-        var withoutOptional = new Member(Email.Create("b@example.com"), null, TestColor.Red, null, CreatedAt);
+        var withOptional = new Member(Email.Create("a@example.com"), Email.Create("sub@example.com"), TestColor.Red, referrerId);
+        var withoutOptional = new Member(Email.Create("b@example.com"), null, TestColor.Red, null);
         await using (var dbContext = database.CreateContext())
         {
             dbContext.Members.AddRange(withOptional, withoutOptional);
@@ -129,8 +125,8 @@ public class D3DbContextTests
         using var database = new SqliteTestDatabase();
         await using var dbContext = database.CreateContext();
         dbContext.Members.AddRange(
-            new Member(Email.Create("a@example.com"), null, TestColor.Red, null, CreatedAt),
-            new Member(Email.Create("b@other.test"), null, TestColor.Red, null, CreatedAt));
+            new Member(Email.Create("a@example.com"), null, TestColor.Red, null),
+            new Member(Email.Create("b@other.test"), null, TestColor.Red, null));
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var count = await dbContext.Members.CountAsync(x => x.Email.Value.Contains("example"), TestContext.Current.CancellationToken);
@@ -155,18 +151,19 @@ public class D3DbContextTests
     public async Task 変更したエンティティのUpdatedAtが保存時に更新される()
     {
         using var database = new SqliteTestDatabase();
-        var member = new Member(Email.Create("a@example.com"), null, TestColor.Red, null, CreatedAt);
-        await using (var dbContext = database.CreateContext(new FixedTimeProvider(CreatedAt.AddDays(1))))
+        var member = new Member(Email.Create("a@example.com"), null, TestColor.Red, null);
+        var createdAt = member.CreatedAt;
+        await using (var dbContext = database.CreateContext())
         {
             dbContext.Members.Add(member);
             await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             // 新規作成時は CreatedAt のまま
-            Assert.Equal(CreatedAt, member.UpdatedAt);
+            Assert.Equal(createdAt, member.UpdatedAt);
         }
 
-        var updatedAt = CreatedAt.AddDays(2);
-        await using (var dbContext = database.CreateContext(new FixedTimeProvider(updatedAt)))
+        var before = DateTimeOffset.UtcNow;
+        await using (var dbContext = database.CreateContext())
         {
             var loaded = await dbContext.Members.SingleAsync(TestContext.Current.CancellationToken);
             loaded.ChangeEmail(Email.Create("changed@example.com"));
@@ -175,20 +172,94 @@ public class D3DbContextTests
 
         await using var readContext = database.CreateContext();
         var reloaded = await readContext.Members.SingleAsync(TestContext.Current.CancellationToken);
-        Assert.Equal(updatedAt, reloaded.UpdatedAt);
-        Assert.Equal(CreatedAt, reloaded.CreatedAt);
+        Assert.InRange(reloaded.UpdatedAt, before, DateTimeOffset.UtcNow);
+        Assert.Equal(createdAt, reloaded.CreatedAt);
+    }
+
+    [Fact]
+    public void Versionが同時実行トークンに設定される()
+    {
+        using var database = new SqliteTestDatabase();
+        using var dbContext = database.CreateContext();
+        var entityType = dbContext.Model.FindEntityType(typeof(Member))!;
+
+        Assert.True(entityType.FindProperty(nameof(Member.Version))!.IsConcurrencyToken);
+    }
+
+    [Fact]
+    public async Task 変更したエンティティのVersionが保存時に加算される()
+    {
+        using var database = new SqliteTestDatabase();
+        var member = new Member(Email.Create("a@example.com"), null, TestColor.Red, null);
+        await using (var dbContext = database.CreateContext())
+        {
+            dbContext.Members.Add(member);
+            await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            // 新規作成時は加算しない
+            Assert.Equal(0, member.Version);
+
+            member.ChangeEmail(Email.Create("changed@example.com"));
+            await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        }
+
+        await using var readContext = database.CreateContext();
+        Assert.Equal(1, (await readContext.Members.SingleAsync(TestContext.Current.CancellationToken)).Version);
+    }
+
+    [Fact]
+    public async Task 他のコンテキストで先に更新されていると保存時に競合を検出する()
+    {
+        using var database = new SqliteTestDatabase();
+        await using (var dbContext = database.CreateContext())
+        {
+            dbContext.Members.Add(new Member(Email.Create("a@example.com"), null, TestColor.Red, null));
+            await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        }
+
+        await using var first = database.CreateContext();
+        await using var second = database.CreateContext();
+        var firstMember = await first.Members.SingleAsync(TestContext.Current.CancellationToken);
+        var secondMember = await second.Members.SingleAsync(TestContext.Current.CancellationToken);
+
+        firstMember.ChangeEmail(Email.Create("first@example.com"));
+        await first.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        secondMember.ChangeEmail(Email.Create("second@example.com"));
+        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => second.SaveChangesAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task EfUnitOfWorkは競合をConflictOccurredExceptionに変換する()
+    {
+        using var database = new SqliteTestDatabase();
+        await using (var dbContext = database.CreateContext())
+        {
+            dbContext.Members.Add(new Member(Email.Create("a@example.com"), null, TestColor.Red, null));
+            await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        }
+
+        await using var first = database.CreateContext();
+        await using var second = database.CreateContext();
+        var secondMember = await second.Members.SingleAsync(TestContext.Current.CancellationToken);
+        (await first.Members.SingleAsync(TestContext.Current.CancellationToken)).ChangeEmail(Email.Create("first@example.com"));
+        await first.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        secondMember.ChangeEmail(Email.Create("second@example.com"));
+        var unitOfWork = new EfUnitOfWork<MemberDbContext>(second, new ImmediateDispatchStrategy(new SpyDomainEventDispatcher()));
+
+        var ex = await Assert.ThrowsAsync<ConflictOccurredException>(() => unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken));
+        Assert.IsType<DbUpdateConcurrencyException>(ex.InnerException);
     }
 }
 
 public class RepositoryBaseTests
 {
-    private static readonly DateTimeOffset CreatedAt = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
-
     [Fact]
     public async Task 追加_取得_件数_存在確認_削除ができる()
     {
         using var database = new SqliteTestDatabase();
-        var member = new Member(Email.Create("a@example.com"), null, TestColor.Red, null, CreatedAt);
+        var member = new Member(Email.Create("a@example.com"), null, TestColor.Red, null);
         await using (var dbContext = database.CreateContext())
         {
             new MemberRepository(dbContext).Add(member);

@@ -10,6 +10,10 @@ namespace D3Fragments.EFCore;
 ///     <para xml:lang="en">The <see cref="IUnitOfWork"/> implementation backed by an EF Core <see cref="DbContext"/>. Connects Unit of Work semantics with <see cref="IDomainEventDispatchStrategy"/>: domain events are captured before save, prepared (e.g. persisted as Outbox rows) before <c>SaveChangesAsync</c>, and dispatched only after a successful commit.</para>
 ///     <para xml:lang="ja">EF Coreの<see cref="DbContext"/>に基づく<see cref="IUnitOfWork"/>実装。Unit of Workのセマンティクスと<see cref="IDomainEventDispatchStrategy"/>を接続する。ドメインイベントは保存前に捕捉され、<c>SaveChangesAsync</c>の前に準備（Outbox行としての永続化等）され、Commit成功後にのみディスパッチされる。</para>
 /// </summary>
+/// <remarks>
+///     <para xml:lang="en">An optimistic concurrency conflict on save (<see cref="DbUpdateConcurrencyException"/>) is converted to <see cref="ConflictOccurredException"/>.</para>
+///     <para xml:lang="ja">保存時の楽観的同時実行制御の競合（<see cref="DbUpdateConcurrencyException"/>）は<see cref="ConflictOccurredException"/>に変換する。</para>
+/// </remarks>
 /// <typeparam name="TContext">
 ///     <para xml:lang="en">The type of the <see cref="DbContext"/>.</para>
 ///     <para xml:lang="ja"><see cref="DbContext"/>の型。</para>
@@ -32,7 +36,15 @@ public sealed class EfUnitOfWork<TContext>(
 
         await dispatchStrategy.PrepareAsync(dbContext, newEvents, cancellationToken).ConfigureAwait(false);
 
-        var affectedRows = await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        int affectedRows;
+        try
+        {
+            affectedRows = await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            throw new ConflictOccurredException(ex, ExceptionMessages.ConflictOccurredException_ConcurrencyConflict);
+        }
 
         if (_transaction is null)
         {

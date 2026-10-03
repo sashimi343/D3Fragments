@@ -56,15 +56,17 @@ public class EntityBaseTests
 
 public class EntityTests
 {
-    private sealed class TestEntity(DateTimeOffset createdAt) : Entity(createdAt);
+    private sealed class TestEntity : Entity;
 
     [Fact]
-    public void UpdatedAt_初期値はCreatedAtと同じ()
+    public void CreatedAt_UpdatedAt_生成時のシステム日時が設定される()
     {
-        var now = DateTimeOffset.UtcNow;
-        var entity = new TestEntity(now);
+        var before = DateTimeOffset.UtcNow;
+        var entity = new TestEntity();
+        var after = DateTimeOffset.UtcNow;
 
-        Assert.Equal(now, entity.UpdatedAt);
+        Assert.InRange(entity.CreatedAt, before, after);
+        Assert.Equal(entity.CreatedAt, entity.UpdatedAt);
     }
 }
 

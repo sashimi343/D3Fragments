@@ -7,8 +7,8 @@ namespace D3Fragments.Testing;
 ///     <para xml:lang="ja">テストで使用する固定の基準時刻を提供する。</para>
 /// </summary>
 /// <remarks>
-///     <para xml:lang="en">Use <see cref="Now"/> for the <c>createdAt</c> argument of entities created in tests, so that the test data matches the time of <see cref="CreateProvider"/>.</para>
-///     <para xml:lang="ja">テストで生成するエンティティの<c>createdAt</c>引数に<see cref="Now"/>を使用すると、テストデータの時刻が<see cref="CreateProvider"/>の時刻と一致する。</para>
+///     <para xml:lang="en">Use <see cref="Now"/> for timestamps with domain meaning in test data (e.g. the occurrence time of a domain event), so that the test data matches the time of <see cref="CreateProvider"/>. <c>CreatedAt</c>/<c>UpdatedAt</c> are audit fields recorded with the system time and cannot be fixed.</para>
+///     <para xml:lang="ja">テストデータのドメイン上意味のある日時（ドメインイベントの発生日時等）に<see cref="Now"/>を使用すると、テストデータの時刻が<see cref="CreateProvider"/>の時刻と一致する。<c>CreatedAt</c>/<c>UpdatedAt</c>はシステム日時で自動記録される監査項目のため固定できない。</para>
 /// </remarks>
 public static class TestTime
 {

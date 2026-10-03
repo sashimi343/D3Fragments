@@ -10,9 +10,9 @@ internal sealed record OrderCanceled(DateTimeOffset OccurredAt) : IDomainEvent;
 
 internal sealed class Order : AggregateRoot
 {
-    public Order(DateTimeOffset createdAt) : base(createdAt)
+    public Order(DateTimeOffset placedAt)
     {
-        AddDomainEvent(new OrderPlaced(createdAt));
+        AddDomainEvent(new OrderPlaced(placedAt));
     }
 }
 

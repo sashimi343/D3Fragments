@@ -61,6 +61,9 @@
   <data name="InvalidOperationException_TransactionAlreadyStarted" xml:space="preserve">
     <value>A transaction cannot be nested within another transaction.</value>
   </data>
+  <data name="ConflictOccurredException_ConcurrencyConflict" xml:space="preserve">
+    <value>The data has been updated by another process. Reload the data and try again.</value>
+  </data>
   <data name="Error_PageNoMustBeAtLeastStartPageNo" xml:space="preserve">
     <value>The page number must be {0} or greater.</value>
   </data>

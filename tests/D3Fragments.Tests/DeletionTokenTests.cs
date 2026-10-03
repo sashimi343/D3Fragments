@@ -2,7 +2,7 @@ namespace D3Fragments.Tests;
 
 public class DeletionTokenTests
 {
-    private sealed class TestAggregate(DateTimeOffset createdAt) : AggregateRoot(createdAt)
+    private sealed class TestAggregate : AggregateRoot
     {
         public DeletionToken<TestAggregate> Delete() => AllowDeletion(this);
 
@@ -12,7 +12,7 @@ public class DeletionTokenTests
     [Fact]
     public void AllowDeletion_自身を渡すと自身を保持するトークンを発行する()
     {
-        var aggregate = new TestAggregate(DateTimeOffset.UtcNow);
+        var aggregate = new TestAggregate();
 
         var token = aggregate.Delete();
 
@@ -22,8 +22,8 @@ public class DeletionTokenTests
     [Fact]
     public void AllowDeletion_自身以外を渡すと例外をスローする()
     {
-        var aggregate = new TestAggregate(DateTimeOffset.UtcNow);
-        var other = new TestAggregate(DateTimeOffset.UtcNow);
+        var aggregate = new TestAggregate();
+        var other = new TestAggregate();
 
         Assert.Throws<ArgumentException>(() => aggregate.DeleteOther(other));
     }

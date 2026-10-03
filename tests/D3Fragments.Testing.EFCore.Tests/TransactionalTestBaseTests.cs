@@ -16,7 +16,7 @@ public sealed record OrderPlaced(UuidV7 OrderId, DateTimeOffset OccurredAt) : ID
 
 public sealed class Order : AggregateRoot
 {
-    private Order(string name, DateTimeOffset createdAt) : base(createdAt)
+    private Order(string name)
     {
         Name = name;
     }
@@ -25,7 +25,7 @@ public sealed class Order : AggregateRoot
 
     public static Order Place(string name)
     {
-        var order = new Order(name, TestTime.Now);
+        var order = new Order(name);
         order.AddDomainEvent(new OrderPlaced(order.Id, TestTime.Now));
         return order;
     }

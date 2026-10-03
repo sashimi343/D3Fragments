@@ -57,6 +57,15 @@ namespace D3Fragments.EFCore.Resources {
         }
 
         /// <summary>
+        ///   The data has been updated by another process. Reload the data and try again. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string ConflictOccurredException_ConcurrencyConflict {
+            get {
+                return ResourceManager.GetString("ConflictOccurredException_ConcurrencyConflict", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   A transaction cannot be nested within another transaction. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string InvalidOperationException_TransactionAlreadyStarted {

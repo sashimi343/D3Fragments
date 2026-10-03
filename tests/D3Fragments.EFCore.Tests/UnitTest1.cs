@@ -10,7 +10,7 @@ internal sealed record TestDomainEvent(DateTimeOffset OccurredAt) : IDomainEvent
 
 internal sealed class TestEntity : AggregateRoot
 {
-    public TestEntity(int value, DateTimeOffset createdAt) : base(createdAt)
+    public TestEntity(int value)
     {
         Value = value;
     }
@@ -78,10 +78,9 @@ public class PagingExtensionsTests
     public async Task ToPagedListAsync_指定したページのデータを返す()
     {
         await using var dbContext = TestDbContextFactory.Create();
-        var now = DateTimeOffset.UtcNow;
         for (var i = 0; i < 5; i++)
         {
-            dbContext.Entities.Add(new TestEntity(i, now));
+            dbContext.Entities.Add(new TestEntity(i));
         }
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -123,7 +122,7 @@ public class EfUnitOfWorkTests
         await using var dbContext = TestDbContextFactory.Create();
         var dispatcher = new SpyDomainEventDispatcher();
         var unitOfWork = new EfUnitOfWork<TestDbContext>(dbContext, new ImmediateDispatchStrategy(dispatcher));
-        var entity = new TestEntity(1, DateTimeOffset.UtcNow);
+        var entity = new TestEntity(1);
         entity.RaiseTestEvent(DateTimeOffset.UtcNow);
         dbContext.Entities.Add(entity);
 
@@ -138,7 +137,7 @@ public class EfUnitOfWorkTests
         await using var dbContext = TestDbContextFactory.Create();
         var dispatcher = new SpyDomainEventDispatcher();
         var unitOfWork = new EfUnitOfWork<TestDbContext>(dbContext, new ImmediateDispatchStrategy(dispatcher));
-        dbContext.Entities.Add(new TestEntity(1, DateTimeOffset.UtcNow));
+        dbContext.Entities.Add(new TestEntity(1));
 
         unitOfWork.DiscardChanges();
 

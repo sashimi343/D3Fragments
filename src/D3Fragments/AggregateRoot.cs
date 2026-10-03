@@ -13,8 +13,8 @@ public abstract class AggregateRoot<TId> : Entity<TId>, IHasDomainEvents
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 
-    /// <inheritdoc cref="Entity{TId}(TId, DateTimeOffset)" />
-    protected AggregateRoot(TId id, DateTimeOffset createdAt) : base(id, createdAt)
+    /// <inheritdoc cref="Entity{TId}(TId)" />
+    protected AggregateRoot(TId id) : base(id)
     {
     }
 
@@ -72,8 +72,8 @@ public abstract class AggregateRoot<TId> : Entity<TId>, IHasDomainEvents
 /// </summary>
 public abstract class AggregateRoot : AggregateRoot<UuidV7>
 {
-    /// <inheritdoc cref="Entity(DateTimeOffset)" />
-    protected AggregateRoot(DateTimeOffset createdAt) : base(UuidV7.NewUuidV7(), createdAt)
+    /// <inheritdoc cref="Entity()" />
+    protected AggregateRoot() : base(UuidV7.NewUuidV7())
     {
     }
 }

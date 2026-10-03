@@ -121,7 +121,7 @@ public void 注文をキャンセルするとイベントが発火する()
 1. 集約ごとに `XxxTestFactory` を作成し、引数はすべて省略可能にして妥当な既定値を持たせる。テストでは検証に関係する値だけを指定する
 2. 関連する集約・エンティティまでオブジェクトグラフを結線して生成し、`SeedAsync` 1回で登録できるようにする
 3. 一意制約のある値は `TestData.Unique("DEV")`（`DEV-1`、`DEV-2`…）で自動採番する。並列実行されるテスト同士の衝突を防ぐ
-4. `createdAt` などの時刻は `TestTime.Now` を使用する。`TimeProvider` が必要な箇所には `TestTime.CreateProvider()` を渡す
+4. ドメイン上意味のある時刻（注文日時等）は `TestTime.Now` を使用する。`TimeProvider` が必要な箇所には `TestTime.CreateProvider()` を渡す。`CreatedAt` / `UpdatedAt` はシステム日時で自動記録される監査項目のため固定できない。検証する場合は範囲（`Assert.InRange`）で確認する
 5. 特定の状態の集約（キャンセル済み、返却済みなど）は、ドメインのメソッドを順に呼び出す `CreateCanceled()` のようなメソッドとして提供する。リフレクションで内部状態を書き換えない（不変条件を満たさないデータでテストすることになるため）
 
 ```csharp

@@ -61,6 +61,9 @@
   <data name="InvalidOperationException_TransactionAlreadyStarted" xml:space="preserve">
     <value>トランザクションをネストすることはできません。</value>
   </data>
+  <data name="ConflictOccurredException_ConcurrencyConflict" xml:space="preserve">
+    <value>データは他の処理によって更新されています。データを再読み込みしてから再度実行してください。</value>
+  </data>
   <data name="Error_PageNoMustBeAtLeastStartPageNo" xml:space="preserve">
     <value>ページ番号は{0}以上である必要があります。</value>
   </data>
