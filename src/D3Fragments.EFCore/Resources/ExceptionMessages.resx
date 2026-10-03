@@ -73,4 +73,10 @@
   <data name="Error_PageSizeExceedsMaximum" xml:space="preserve">
     <value>The page size must not exceed {0}.</value>
   </data>
+  <data name="ArgumentException_AssembliesEmpty" xml:space="preserve">
+    <value>At least one assembly must be specified.</value>
+  </data>
+  <data name="InvalidOperationException_DuplicateRepositoryImplementation" xml:space="preserve">
+    <value>Multiple implementations were found for the repository interface {0}: {1}, {2}.</value>
+  </data>
 </root>

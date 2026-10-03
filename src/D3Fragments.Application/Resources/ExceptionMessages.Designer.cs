@@ -55,5 +55,14 @@ namespace D3Fragments.Application.Resources {
                 resourceCulture = value;
             }
         }
+
+        /// <summary>
+        ///   At least one assembly must be specified. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string ArgumentException_AssembliesEmpty {
+            get {
+                return ResourceManager.GetString("ArgumentException_AssembliesEmpty", resourceCulture);
+            }
+        }
     }
 }

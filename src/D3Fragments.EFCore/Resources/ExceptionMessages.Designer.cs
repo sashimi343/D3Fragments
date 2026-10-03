@@ -100,5 +100,23 @@ namespace D3Fragments.EFCore.Resources {
                 return ResourceManager.GetString("Error_PageSizeExceedsMaximum", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   At least one assembly must be specified. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string ArgumentException_AssembliesEmpty {
+            get {
+                return ResourceManager.GetString("ArgumentException_AssembliesEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Multiple implementations were found for the repository interface {0}: {1}, {2}. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string InvalidOperationException_DuplicateRepositoryImplementation {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_DuplicateRepositoryImplementation", resourceCulture);
+            }
+        }
     }
 }
