@@ -3,8 +3,6 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <OutputType>Exe</OutputType>
-    <!-- テスト未実装の間、0件実行（終了コード8）を失敗扱いにしない -->
-    <TestingPlatformCommandLineArguments>$(TestingPlatformCommandLineArguments) --ignore-exit-code 8</TestingPlatformCommandLineArguments>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +17,12 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- テスト対象コードのコンパイルに使う参照（実行中のランタイムの参照をそのまま使う） -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\..\src\D3Fragments.Application\D3Fragments.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

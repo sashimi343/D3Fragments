@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DFR0001_Title" xml:space="preserve">
+    <value>Architecture reference violation (project reference)</value>
+  </data>
+  <data name="DFR0001_MessageFormat" xml:space="preserve">
+    <value>Assembly '{1}' in the {0} layer must not reference assembly '{3}' in the {2} layer</value>
+  </data>
+  <data name="DFR0002_Title" xml:space="preserve">
+    <value>Architecture reference violation (module reference)</value>
+  </data>
+  <data name="DFR0002_MessageFormat" xml:space="preserve">
+    <value>'{1}' ({0}) must not reference '{3}' ({2})</value>
+  </data>
+  <data name="DFR0003_Title" xml:space="preserve">
+    <value>Entity classes should not have public setters</value>
+  </data>
+  <data name="DFR0003_MessageFormat" xml:space="preserve">
+    <value>Member '{1}' of entity '{0}' can be modified from outside the class. Change the state of the entity through methods</value>
+  </data>
+  <data name="DFR0004_Title" xml:space="preserve">
+    <value>Do not define repository methods that retrieve part of an aggregate</value>
+  </data>
+  <data name="DFR0004_MessageFormat" xml:space="preserve">
+    <value>The return type of repository method '{0}' contains entity '{2}', which is not the aggregate root '{1}'</value>
+  </data>
+  <data name="DFR0005_Title" xml:space="preserve">
+    <value>Do not define repository methods that update part of an aggregate</value>
+  </data>
+  <data name="DFR0005_MessageFormat" xml:space="preserve">
+    <value>Parameter '{1}' of repository method '{0}' contains entity '{3}', which is not the aggregate root '{2}'</value>
+  </data>
+  <data name="DFR0006_Title" xml:space="preserve">
+    <value>Do not expose constructors of TypeSafeEnum types outside the class</value>
+  </data>
+  <data name="DFR0006_MessageFormat" xml:space="preserve">
+    <value>'{0}' allows values of TypeSafeEnum type '{1}' to be created outside the class</value>
+  </data>
+  <data name="DFR0007_Title" xml:space="preserve">
+    <value>Specify the declaring type itself for the self-referencing type parameter TSelf</value>
+  </data>
+  <data name="DFR0007_MessageFormat" xml:space="preserve">
+    <value>The type argument TSelf of '{1}' is '{2}'. Specify the declaring type '{0}'</value>
+  </data>
+  <data name="DFR0008_Title" xml:space="preserve">
+    <value>Define TypeSafeEnum values as static readonly fields</value>
+  </data>
+  <data name="DFR0008_MessageFormat" xml:space="preserve">
+    <value>Define values of TypeSafeEnum type '{0}' as static readonly fields</value>
+  </data>
+  <data name="DFR0009_Title" xml:space="preserve">
+    <value>Entities should not expose mutable collections</value>
+  </data>
+  <data name="DFR0009_MessageFormat" xml:space="preserve">
+    <value>Member '{1}' of entity '{0}' exposes mutable collection type '{2}'</value>
+  </data>
+  <data name="DFR0010_Title" xml:space="preserve">
+    <value>Value objects should not have public setters</value>
+  </data>
+  <data name="DFR0010_MessageFormat" xml:space="preserve">
+    <value>Member '{1}' of value object '{0}' can be modified from outside the class. Value objects should be immutable</value>
+  </data>
+</root>

@@ -20,6 +20,7 @@
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)D3Fragments.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(OutputPath)D3Fragments.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)ja\D3Fragments.Analyzers.resources.dll" PackagePath="analyzers/dotnet/cs/ja" />
     </ItemGroup>
   </Target>
 

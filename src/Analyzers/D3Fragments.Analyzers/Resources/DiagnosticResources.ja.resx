@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DFR0001_Title" xml:space="preserve">
+    <value>アーキテクチャ参照違反（プロジェクト間参照）</value>
+  </data>
+  <data name="DFR0001_MessageFormat" xml:space="preserve">
+    <value>{0} 層のアセンブリ '{1}' から {2} 層のアセンブリ '{3}' への参照は許可されていません</value>
+  </data>
+  <data name="DFR0002_Title" xml:space="preserve">
+    <value>アーキテクチャ参照違反（モジュール間参照）</value>
+  </data>
+  <data name="DFR0002_MessageFormat" xml:space="preserve">
+    <value>'{1}' ({0}) から '{3}' ({2}) への参照は許可されていません</value>
+  </data>
+  <data name="DFR0003_Title" xml:space="preserve">
+    <value>エンティティクラスは公開セッターをもつべきではありません</value>
+  </data>
+  <data name="DFR0003_MessageFormat" xml:space="preserve">
+    <value>エンティティ '{0}' のメンバー '{1}' はクラス外部から変更できます。エンティティの状態はメソッドで変更してください</value>
+  </data>
+  <data name="DFR0004_Title" xml:space="preserve">
+    <value>集約の一部を取得するリポジトリメソッドを定義しないでください</value>
+  </data>
+  <data name="DFR0004_MessageFormat" xml:space="preserve">
+    <value>リポジトリメソッド '{0}' の戻り値の型に、集約ルート '{1}' 以外のエンティティ '{2}' が含まれています</value>
+  </data>
+  <data name="DFR0005_Title" xml:space="preserve">
+    <value>集約の一部を更新するリポジトリメソッドを定義しないでください</value>
+  </data>
+  <data name="DFR0005_MessageFormat" xml:space="preserve">
+    <value>リポジトリメソッド '{0}' の引数 '{1}' の型に、集約ルート '{2}' 以外のエンティティ '{3}' が含まれています</value>
+  </data>
+  <data name="DFR0006_Title" xml:space="preserve">
+    <value>TypeSafeEnum型のコンストラクタをクラス外部に公開しないでください</value>
+  </data>
+  <data name="DFR0006_MessageFormat" xml:space="preserve">
+    <value>'{0}' により、TypeSafeEnum 型 '{1}' の値をクラス外部から生成できます</value>
+  </data>
+  <data name="DFR0007_Title" xml:space="preserve">
+    <value>自己参照型パラメーター TSelf には宣言している型自身を指定してください</value>
+  </data>
+  <data name="DFR0007_MessageFormat" xml:space="preserve">
+    <value>'{1}' の型引数 TSelf に '{2}' が指定されています。宣言している型 '{0}' を指定してください</value>
+  </data>
+  <data name="DFR0008_Title" xml:space="preserve">
+    <value>TypeSafeEnum の値は static readonly フィールドで定義してください</value>
+  </data>
+  <data name="DFR0008_MessageFormat" xml:space="preserve">
+    <value>TypeSafeEnum 型 '{0}' の値は static readonly フィールドで定義してください</value>
+  </data>
+  <data name="DFR0009_Title" xml:space="preserve">
+    <value>エンティティは変更可能なコレクションを公開すべきではありません</value>
+  </data>
+  <data name="DFR0009_MessageFormat" xml:space="preserve">
+    <value>エンティティ '{0}' のメンバー '{1}' が変更可能なコレクション型 '{2}' を公開しています</value>
+  </data>
+  <data name="DFR0010_Title" xml:space="preserve">
+    <value>値オブジェクトは公開セッターをもつべきではありません</value>
+  </data>
+  <data name="DFR0010_MessageFormat" xml:space="preserve">
+    <value>値オブジェクト '{0}' のメンバー '{1}' はクラス外部から変更できます。値オブジェクトは不変にしてください</value>
+  </data>
+</root>

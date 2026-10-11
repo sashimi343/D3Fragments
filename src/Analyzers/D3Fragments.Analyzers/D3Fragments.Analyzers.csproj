@@ -4,4 +4,15 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="D3Fragments.Analyzers.CodeFixes" />
+    <InternalsVisibleTo Include="D3Fragments.Analyzers.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 規則の追加・変更履歴（RS2008 リリース追跡） -->
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+  </ItemGroup>
+
 </Project>

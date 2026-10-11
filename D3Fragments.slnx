@@ -1,24 +1,24 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/D3Fragments.Application/D3Fragments.Application.csproj" />
     <Project Path="src/D3Fragments.AspNetCore/D3Fragments.AspNetCore.csproj" />
     <Project Path="src/D3Fragments.EFCore/D3Fragments.EFCore.csproj" />
     <Project Path="src/D3Fragments.Testing.EFCore/D3Fragments.Testing.EFCore.csproj" />
     <Project Path="src/D3Fragments.Testing/D3Fragments.Testing.csproj" />
     <Project Path="src/D3Fragments/D3Fragments.csproj" />
-    <Project Path="src/D3Fragments.Application/D3Fragments.Application.csproj" />
   </Folder>
   <Folder Name="/src/Analyzers/">
-    <Project Path="src/Analyzers/D3Fragments.Analyzers/D3Fragments.Analyzers.csproj" />
     <Project Path="src/Analyzers/D3Fragments.Analyzers.CodeFixes/D3Fragments.Analyzers.CodeFixes.csproj" />
     <Project Path="src/Analyzers/D3Fragments.Analyzers.Package/D3Fragments.Analyzers.Package.csproj" />
+    <Project Path="src/Analyzers/D3Fragments.Analyzers/D3Fragments.Analyzers.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/D3Fragments.Analyzers.Tests/D3Fragments.Analyzers.Tests.csproj" />
+    <Project Path="tests/D3Fragments.Application.Tests/D3Fragments.Application.Tests.csproj" />
     <Project Path="tests/D3Fragments.AspNetCore.Tests/D3Fragments.AspNetCore.Tests.csproj" />
     <Project Path="tests/D3Fragments.EFCore.Tests/D3Fragments.EFCore.Tests.csproj" />
     <Project Path="tests/D3Fragments.Testing.EFCore.Tests/D3Fragments.Testing.EFCore.Tests.csproj" />
     <Project Path="tests/D3Fragments.Testing.Tests/D3Fragments.Testing.Tests.csproj" />
     <Project Path="tests/D3Fragments.Tests/D3Fragments.Tests.csproj" />
-    <Project Path="tests/D3Fragments.Application.Tests/D3Fragments.Application.Tests.csproj" />
-    <Project Path="tests/D3Fragments.Analyzers.Tests/D3Fragments.Analyzers.Tests.csproj" />
   </Folder>
 </Solution>
