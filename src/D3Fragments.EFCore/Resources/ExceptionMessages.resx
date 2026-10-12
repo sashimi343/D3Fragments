@@ -61,6 +61,9 @@
   <data name="InvalidOperationException_TransactionAlreadyStarted" xml:space="preserve">
     <value>A transaction cannot be nested within another transaction.</value>
   </data>
+  <data name="InvalidOperationException_BeforeCommitDispatchLimitExceeded" xml:space="preserve">
+    <value>Domain events were still raised after {0} rounds of before-commit dispatching. Before-commit domain event handlers may be raising events cyclically. Events raised in the last round: {1}</value>
+  </data>
   <data name="ConflictOccurredException_ConcurrencyConflict" xml:space="preserve">
     <value>The data has been updated by another process. Reload the data and try again.</value>
   </data>

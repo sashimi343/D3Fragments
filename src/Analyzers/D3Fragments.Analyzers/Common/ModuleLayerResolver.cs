@@ -27,7 +27,7 @@ internal sealed class ModuleLayerResolver
             (ModuleLayerType.Application_RequestExecutor, ArchitectureLayerType.Application,
                 t => IsClass(t) && t.Implements(knownTypes.IRequestExecutor)),
             (ModuleLayerType.Application_DomainEventHandler, ArchitectureLayerType.Application,
-                t => IsClass(t) && t.Implements(knownTypes.IDomainEventHandler)),
+                t => IsClass(t) && (t.Implements(knownTypes.IBeforeCommitDomainEventHandler) || t.Implements(knownTypes.IAfterCommitDomainEventHandler))),
             (ModuleLayerType.Domain_Entity, ArchitectureLayerType.Domain,
                 t => IsClass(t) && t.InheritsFrom(knownTypes.EntityBase)),
             (ModuleLayerType.Domain_ValueObject, ArchitectureLayerType.Domain,

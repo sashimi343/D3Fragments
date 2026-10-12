@@ -74,7 +74,7 @@ ASP.NET Coreの[PageBase](https://learn.microsoft.com/en-us/dotnet/api/microsoft
 
 #### Application_DomainEventHandler
 
-`D3Fragments.Application.IDomainEventHandler<in TEvent>` インターフェースを直接、または間接的に実装したクラスです。
+`D3Fragments.Application.IBeforeCommitDomainEventHandler<in TEvent>` または `D3Fragments.Application.IAfterCommitDomainEventHandler<in TEvent>` インターフェースを直接、または間接的に実装したクラスです。
 
 #### Application_Other
 

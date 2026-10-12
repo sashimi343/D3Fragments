@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 using Xunit;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace D3Fragments.Testing.EFCore;
 
@@ -51,7 +53,12 @@ public abstract class TransactionalTestBase<TDbContext, TFixture> : IAsyncLifeti
         ArgumentNullException.ThrowIfNull(fixture);
         Fixture = fixture;
         DbContext = fixture.CreateDbContext();
-        UnitOfWork = new EfUnitOfWork<TDbContext>(DbContext, new ImmediateDispatchStrategy(_dispatcher));
+        UnitOfWork = new EfUnitOfWork<TDbContext>(
+            DbContext,
+            _dispatcher,
+            new ImmediateDispatchStrategy(_dispatcher),
+            NullLogger<EfUnitOfWork<TDbContext>>.Instance,
+            Options.Create(new D3FragmentsApplicationOptions()));
     }
 
     /// <summary>
@@ -73,10 +80,10 @@ public abstract class TransactionalTestBase<TDbContext, TFixture> : IAsyncLifeti
     protected IUnitOfWork UnitOfWork { get; }
 
     /// <summary>
-    ///     <para xml:lang="en">Gets the domain events dispatched by <see cref="UnitOfWork"/> in dispatch order.</para>
-    ///     <para xml:lang="ja"><see cref="UnitOfWork"/>が発火したドメインイベントを発火順に取得する。</para>
+    ///     <para xml:lang="en">Gets the domain events that <see cref="UnitOfWork"/> saved and dispatched to the after-commit handlers, in dispatch order. Domain event handlers are not invoked.</para>
+    ///     <para xml:lang="ja"><see cref="UnitOfWork"/>が保存し、Commit後のハンドラーへディスパッチしたドメインイベントを、ディスパッチ順に取得する。ドメインイベントハンドラーは呼び出さない。</para>
     /// </summary>
-    protected IReadOnlyList<IDomainEvent> DispatchedEvents => _dispatcher.DispatchedEvents;
+    protected IReadOnlyList<IDomainEvent> DispatchedEvents => _dispatcher.AfterCommitEvents;
 
     /// <inheritdoc/>
     public virtual async ValueTask InitializeAsync()

@@ -18,6 +18,10 @@ internal sealed class TestEntity : AggregateRoot
     public int Value { get; private set; }
 
     public void RaiseTestEvent(DateTimeOffset occurredAt) => AddDomainEvent(new TestDomainEvent(occurredAt));
+
+    public void Raise(IDomainEvent domainEvent) => AddDomainEvent(domainEvent);
+
+    public void ChangeValue(int value) => Value = value;
 }
 
 internal sealed class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
@@ -111,49 +115,5 @@ public class TypeSafeEnumConverterTests
 
         Assert.Equal(1, converter.ConvertToProvider(TestColor.Red));
         Assert.Same(TestColor.Red, converter.ConvertFromProvider(1));
-    }
-}
-
-public class EfUnitOfWorkTests
-{
-    [Fact]
-    public async Task SaveChangesAsync_保存成功後にドメインイベントがディスパッチされる()
-    {
-        await using var dbContext = TestDbContextFactory.Create();
-        var dispatcher = new SpyDomainEventDispatcher();
-        var unitOfWork = new EfUnitOfWork<TestDbContext>(dbContext, new ImmediateDispatchStrategy(dispatcher));
-        var entity = new TestEntity(1);
-        entity.RaiseTestEvent(DateTimeOffset.UtcNow);
-        dbContext.Entities.Add(entity);
-
-        await unitOfWork.SaveChangesAsync(CancellationToken.None);
-
-        Assert.Single(dispatcher.DispatchedEvents);
-    }
-
-    [Fact]
-    public async Task DiscardChanges_追跡中の変更が破棄される()
-    {
-        await using var dbContext = TestDbContextFactory.Create();
-        var dispatcher = new SpyDomainEventDispatcher();
-        var unitOfWork = new EfUnitOfWork<TestDbContext>(dbContext, new ImmediateDispatchStrategy(dispatcher));
-        dbContext.Entities.Add(new TestEntity(1));
-
-        unitOfWork.DiscardChanges();
-
-        Assert.Empty(dbContext.ChangeTracker.Entries());
-    }
-
-    [Fact]
-    public async Task ExecuteInTransactionAsync_トランザクションのネストは例外になる()
-    {
-        await using var dbContext = TestDbContextFactory.Create();
-        var dispatcher = new SpyDomainEventDispatcher();
-        IUnitOfWork unitOfWork = new EfUnitOfWork<TestDbContext>(dbContext, new ImmediateDispatchStrategy(dispatcher));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            unitOfWork.ExecuteInTransactionAsync(
-                async ct => await unitOfWork.ExecuteInTransactionAsync(_ => Task.FromResult(0), ct),
-                CancellationToken.None));
     }
 }

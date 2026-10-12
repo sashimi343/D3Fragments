@@ -25,6 +25,7 @@ public class D3FragmentsEFCoreServiceCollectionExtensionsTests
     private static ServiceCollection CreateServices(Action<IServiceCollection>? configure = null)
     {
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddScoped<IDomainEventDispatcher, SpyDomainEventDispatcher>();
         configure?.Invoke(services);
         services.AddD3FragmentsEFCore<MemberDbContext>(

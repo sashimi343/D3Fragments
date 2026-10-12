@@ -80,13 +80,19 @@ public class DomainEventAssertTests
     }
 
     [Fact]
-    public async Task SpyDomainEventDispatcher_発火したイベントを記録する()
+    public async Task SpyDomainEventDispatcher_ディスパッチしたイベントを段階ごとに記録する()
     {
-        IDomainEventDispatcher dispatcher = new SpyDomainEventDispatcher();
+        var spy = new SpyDomainEventDispatcher();
+        IDomainEventDispatcher dispatcher = spy;
 
-        await dispatcher.DispatchAsync(new OrderPlaced(TestTime.Now), TestContext.Current.CancellationToken);
+        await dispatcher.DispatchBeforeCommitAsync(new OrderPlaced(TestTime.Now), TestContext.Current.CancellationToken);
 
-        DomainEventAssert.Raised<OrderPlaced>(((SpyDomainEventDispatcher)dispatcher).DispatchedEvents);
+        DomainEventAssert.Raised<OrderPlaced>(spy.BeforeCommitEvents);
+        Assert.Empty(spy.AfterCommitEvents);
+
+        await dispatcher.DispatchAfterCommitAsync(new OrderPlaced(TestTime.Now));
+
+        DomainEventAssert.Raised<OrderPlaced>(spy.AfterCommitEvents);
     }
 }
 

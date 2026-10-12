@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 namespace D3Fragments.EFCore.DomainEvents;
 
 /// <summary>
-///     <para xml:lang="en">Dispatches domain events synchronously and in-process, immediately after the transaction commits. Delivery is not persisted, so a dispatch failure after commit is not retried; use an Outbox-based strategy when guaranteed delivery is required.</para>
-///     <para xml:lang="ja">トランザクションのCommit直後、同期的にインプロセスでドメインイベントをディスパッチする戦略。配信は永続化されないため、Commit後のディスパッチ失敗は再試行されない。確実な配信が必要な場合はOutboxベースの戦略を使用すること。</para>
+///     <para xml:lang="en">Delivers domain events to <see cref="IAfterCommitDomainEventHandler{TEvent}"/> in-process, immediately after the transaction commits. Delivery is not persisted, so a handler failure is only logged and is not retried, and the handlers are not invoked if the process stops after the commit.</para>
+///     <para xml:lang="ja">トランザクションのCommit直後、インプロセスでドメインイベントを<see cref="IAfterCommitDomainEventHandler{TEvent}"/>へ配信する戦略。配信は永続化されないため、ハンドラーの失敗はログに出力するのみで再試行されず、Commit後にプロセスが停止した場合はハンドラーが呼び出されない。</para>
 /// </summary>
 public sealed class ImmediateDispatchStrategy(IDomainEventDispatcher dispatcher) : IDomainEventDispatchStrategy
 {
@@ -18,7 +18,7 @@ public sealed class ImmediateDispatchStrategy(IDomainEventDispatcher dispatcher)
     {
         foreach (var domainEvent in events)
         {
-            await dispatcher.DispatchAsync(domainEvent, cancellationToken).ConfigureAwait(false);
+            await dispatcher.DispatchAfterCommitAsync(domainEvent).ConfigureAwait(false);
         }
     }
 }

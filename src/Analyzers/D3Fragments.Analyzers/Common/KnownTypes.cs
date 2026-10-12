@@ -18,7 +18,8 @@ internal sealed class KnownTypes
         ICommand = compilation.GetTypeByMetadataName("D3Fragments.Application.ICommand");
         IRequestHandler = compilation.GetTypeByMetadataName("D3Fragments.Application.IRequestHandler`2");
         IRequestExecutor = compilation.GetTypeByMetadataName("D3Fragments.Application.IRequestExecutor`2");
-        IDomainEventHandler = compilation.GetTypeByMetadataName("D3Fragments.Application.IDomainEventHandler`1");
+        IBeforeCommitDomainEventHandler = compilation.GetTypeByMetadataName("D3Fragments.Application.IBeforeCommitDomainEventHandler`1");
+        IAfterCommitDomainEventHandler = compilation.GetTypeByMetadataName("D3Fragments.Application.IAfterCommitDomainEventHandler`1");
         ControllerBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.ControllerBase");
         PageBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.RazorPages.PageBase");
         IComponent = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.IComponent");
@@ -37,7 +38,8 @@ internal sealed class KnownTypes
     public INamedTypeSymbol? ICommand { get; }
     public INamedTypeSymbol? IRequestHandler { get; }
     public INamedTypeSymbol? IRequestExecutor { get; }
-    public INamedTypeSymbol? IDomainEventHandler { get; }
+    public INamedTypeSymbol? IBeforeCommitDomainEventHandler { get; }
+    public INamedTypeSymbol? IAfterCommitDomainEventHandler { get; }
     public INamedTypeSymbol? ControllerBase { get; }
     public INamedTypeSymbol? PageBase { get; }
     public INamedTypeSymbol? IComponent { get; }

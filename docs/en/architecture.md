@@ -74,7 +74,7 @@ A class that directly or indirectly implements the `D3Fragments.Application.IReq
 
 #### Application_DomainEventHandler
 
-A class that directly or indirectly implements the `D3Fragments.Application.IDomainEventHandler<in TEvent>` interface.
+A class that directly or indirectly implements the `D3Fragments.Application.IBeforeCommitDomainEventHandler<in TEvent>` or `D3Fragments.Application.IAfterCommitDomainEventHandler<in TEvent>` interface.
 
 #### Application_Other
 

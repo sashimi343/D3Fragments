@@ -7,8 +7,8 @@ namespace D3Fragments.Testing;
 ///     <para xml:lang="ja">発火したドメインイベントに対するアサーションを提供する。</para>
 /// </summary>
 /// <remarks>
-///     <para xml:lang="en">Pass an aggregate to verify the events it holds, or pass <see cref="SpyDomainEventDispatcher.DispatchedEvents"/> to verify the events dispatched after saving.</para>
-///     <para xml:lang="ja">集約を渡すと集約が保持するイベントを、<see cref="SpyDomainEventDispatcher.DispatchedEvents"/>を渡すと保存後に発火されたイベントを検証する。</para>
+///     <para xml:lang="en">Pass an aggregate to verify the events it holds, or pass <see cref="SpyDomainEventDispatcher.AfterCommitEvents"/> to verify the events dispatched after saving.</para>
+///     <para xml:lang="ja">集約を渡すと集約が保持するイベントを、<see cref="SpyDomainEventDispatcher.AfterCommitEvents"/>を渡すと保存後にディスパッチされたイベントを検証する。</para>
 /// </remarks>
 public static class DomainEventAssert
 {

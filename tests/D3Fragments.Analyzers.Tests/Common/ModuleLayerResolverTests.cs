@@ -21,7 +21,7 @@ public sealed class ModuleLayerResolverTests
             public Task<int> HandleAsync(GetShelf request, CancellationToken cancellationToken) => Task.FromResult(0);
         }
         public sealed record ShelfCreated(DateTimeOffset OccurredAt) : IDomainEvent;
-        public sealed class ShelfCreatedHandler : IDomainEventHandler<ShelfCreated>
+        public sealed class ShelfCreatedHandler : IBeforeCommitDomainEventHandler<ShelfCreated>
         {
             public Task HandleAsync(ShelfCreated domainEvent, CancellationToken cancellationToken) => Task.CompletedTask;
         }
@@ -48,7 +48,7 @@ public sealed class ModuleLayerResolverTests
         public sealed class Helper { }
 
         // 複数のモジュールレイヤーの条件に該当する（記載順で Application_DomainEventHandler が優先される）
-        public sealed class EntityAndHandler : Entity, IDomainEventHandler<ShelfCreated>
+        public sealed class EntityAndHandler : Entity, IAfterCommitDomainEventHandler<ShelfCreated>
         {
             public Task HandleAsync(ShelfCreated domainEvent, CancellationToken cancellationToken) => Task.CompletedTask;
         }

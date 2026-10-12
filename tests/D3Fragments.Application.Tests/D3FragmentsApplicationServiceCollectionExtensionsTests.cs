@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace D3Fragments.Application.Tests;
 
@@ -13,11 +15,20 @@ public class D3FragmentsApplicationServiceCollectionExtensionsTests
 
     public sealed record PingEvent(DateTimeOffset OccurredAt, List<string> Log) : IDomainEvent;
 
-    public sealed class PingEventHandler : IDomainEventHandler<PingEvent>
+    public sealed class PingBeforeCommitHandler : IBeforeCommitDomainEventHandler<PingEvent>
     {
         public Task HandleAsync(PingEvent domainEvent, CancellationToken cancellationToken)
         {
-            domainEvent.Log.Add(nameof(PingEventHandler));
+            domainEvent.Log.Add(nameof(PingBeforeCommitHandler));
+            return Task.CompletedTask;
+        }
+    }
+
+    public sealed class PingAfterCommitHandler : IAfterCommitDomainEventHandler<PingEvent>
+    {
+        public Task HandleAsync(PingEvent domainEvent, CancellationToken cancellationToken)
+        {
+            domainEvent.Log.Add(nameof(PingAfterCommitHandler));
             return Task.CompletedTask;
         }
     }
@@ -37,6 +48,7 @@ public class D3FragmentsApplicationServiceCollectionExtensionsTests
     private static ServiceCollection CreateServices()
     {
         var services = new ServiceCollection();
+        services.AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
         services.AddScoped<IUnitOfWork, NullUnitOfWork>();
         services.AddD3FragmentsApplication([typeof(D3FragmentsApplicationServiceCollectionExtensionsTests).Assembly]);
         return services;
@@ -74,9 +86,12 @@ public class D3FragmentsApplicationServiceCollectionExtensionsTests
         using var scope = provider.CreateScope();
         var domainEvent = new PingEvent(DateTimeOffset.UtcNow, []);
 
-        await scope.ServiceProvider.GetRequiredService<IDomainEventDispatcher>().DispatchAsync(domainEvent, CancellationToken.None);
+        var dispatcher = scope.ServiceProvider.GetRequiredService<IDomainEventDispatcher>();
 
-        Assert.Equal([nameof(PingEventHandler)], domainEvent.Log);
+        await dispatcher.DispatchBeforeCommitAsync(domainEvent, CancellationToken.None);
+        await dispatcher.DispatchAfterCommitAsync(domainEvent);
+
+        Assert.Equal([nameof(PingBeforeCommitHandler), nameof(PingAfterCommitHandler)], domainEvent.Log);
     }
 
     [Fact]

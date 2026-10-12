@@ -61,6 +61,9 @@
   <data name="InvalidOperationException_TransactionAlreadyStarted" xml:space="preserve">
     <value>トランザクションをネストすることはできません。</value>
   </data>
+  <data name="InvalidOperationException_BeforeCommitDispatchLimitExceeded" xml:space="preserve">
+    <value>Commit前のディスパッチを{0}回繰り返しても、ドメインイベントが発行され続けています。Commit前のドメインイベントハンドラーが循環してイベントを発行している可能性があります。最後に発行されたイベント: {1}</value>
+  </data>
   <data name="ConflictOccurredException_ConcurrencyConflict" xml:space="preserve">
     <value>データは他の処理によって更新されています。データを再読み込みしてから再度実行してください。</value>
   </data>

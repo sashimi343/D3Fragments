@@ -34,6 +34,8 @@ internal sealed record NoopCommand : ICommand<Result>;
 
 internal sealed record NoopQuery : IQuery<Result>;
 
+internal sealed record PlainRequest : IRequest<Result>;
+
 internal sealed record TransactionalCommand : IRequest<Result>, ITransactionalCommand;
 
 internal sealed class DomainFailureException() : Exception("ng");
@@ -75,6 +77,18 @@ public class UnitOfWorkBehaviorTests
 
         Assert.False(unitOfWork.SaveChangesCalled);
         Assert.False(unitOfWork.DiscardChangesCalled);
+    }
+
+    // CommandとQueryのどちらのマーカーもない場合、変更が黙って失われないよう保存する
+    [Fact]
+    public async Task IRequestを直接実装したリクエストはCommandと同様に保存される()
+    {
+        var unitOfWork = new FakeUnitOfWork();
+        var behavior = new UnitOfWorkBehavior<PlainRequest, Result>(unitOfWork);
+
+        await behavior.HandleAsync(new PlainRequest(), _ => Task.FromResult(Result.Success()), CancellationToken.None);
+
+        Assert.True(unitOfWork.SaveChangesCalled);
     }
 }
 

@@ -33,6 +33,14 @@ public interface ICommand<TResponse> : IRequest<TResponse>, ICommand
 }
 
 /// <summary>
+///     <para xml:lang="en">Marker interface identifying a request as a query (a read-only request). <see cref="UnitOfWorkBehavior{TRequest, TResponse}"/> does not save changes for a query.</para>
+///     <para xml:lang="ja">リクエストがQuery（読み取り専用のリクエスト）であることを識別するマーカーインターフェース。<see cref="UnitOfWorkBehavior{TRequest, TResponse}"/>はQueryの変更を保存しない。</para>
+/// </summary>
+public interface IQuery
+{
+}
+
+/// <summary>
 ///     <para xml:lang="en">Marker interface for a read-only request that returns <typeparamref name="TResponse"/>.</para>
 ///     <para xml:lang="ja">読み取り専用のリクエストであることを識別する、<typeparamref name="TResponse"/>を返すマーカーインターフェース。</para>
 /// </summary>
@@ -40,7 +48,7 @@ public interface ICommand<TResponse> : IRequest<TResponse>, ICommand
 ///     <para xml:lang="en">The type of the response.</para>
 ///     <para xml:lang="ja">応答の型。</para>
 /// </typeparam>
-public interface IQuery<TResponse> : IRequest<TResponse>
+public interface IQuery<TResponse> : IRequest<TResponse>, IQuery
 {
 }
 

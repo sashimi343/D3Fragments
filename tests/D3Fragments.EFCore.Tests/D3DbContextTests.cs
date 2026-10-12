@@ -1,10 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 
+using D3Fragments.Application;
 using D3Fragments.EFCore.DomainEvents;
 using D3Fragments.Testing;
 
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace D3Fragments.EFCore.Tests;
 
@@ -246,7 +249,9 @@ public class D3DbContextTests
         await first.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         secondMember.ChangeEmail(Email.Create("second@example.com"));
-        var unitOfWork = new EfUnitOfWork<MemberDbContext>(second, new ImmediateDispatchStrategy(new SpyDomainEventDispatcher()));
+        var dispatcher = new SpyDomainEventDispatcher();
+        var unitOfWork = new EfUnitOfWork<MemberDbContext>(
+            second, dispatcher, new ImmediateDispatchStrategy(dispatcher), NullLogger<EfUnitOfWork<MemberDbContext>>.Instance, Options.Create(new D3FragmentsApplicationOptions()));
 
         var ex = await Assert.ThrowsAsync<ConflictOccurredException>(() => unitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken));
         Assert.IsType<DbUpdateConcurrencyException>(ex.InnerException);

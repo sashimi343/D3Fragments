@@ -66,6 +66,15 @@ namespace D3Fragments.EFCore.Resources {
         }
 
         /// <summary>
+        ///   Domain events were still raised after {0} rounds of before-commit dispatching. Before-commit domain event handlers may be raising events cyclically. Events raised in the last round: {1} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string InvalidOperationException_BeforeCommitDispatchLimitExceeded {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_BeforeCommitDispatchLimitExceeded", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   A transaction cannot be nested within another transaction. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string InvalidOperationException_TransactionAlreadyStarted {
