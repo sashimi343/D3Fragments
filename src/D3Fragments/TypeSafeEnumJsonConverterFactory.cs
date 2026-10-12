@@ -34,8 +34,6 @@ public enum TypeSafeEnumJsonFormat
 /// </example>
 public sealed class TypeSafeEnumJsonConverterFactory : JsonConverterFactory
 {
-    private readonly TypeSafeEnumJsonFormat _format;
-
     /// <summary>
     ///     <para xml:lang="en">Initializes a new factory that represents values by their key.</para>
     ///     <para xml:lang="ja">値をキーで表現するファクトリを初期化する。</para>
@@ -58,8 +56,14 @@ public sealed class TypeSafeEnumJsonConverterFactory : JsonConverterFactory
         {
             throw new ArgumentOutOfRangeException(nameof(format));
         }
-        _format = format;
+        Format = format;
     }
+
+    /// <summary>
+    ///     <para xml:lang="en">Gets the JSON representation of values.</para>
+    ///     <para xml:lang="ja">値のJSON表現を取得する。</para>
+    /// </summary>
+    public TypeSafeEnumJsonFormat Format { get; }
 
     /// <inheritdoc />
     public override bool CanConvert(Type typeToConvert) => FindKeyType(typeToConvert) is not null;
@@ -69,7 +73,7 @@ public sealed class TypeSafeEnumJsonConverterFactory : JsonConverterFactory
     {
         var keyType = FindKeyType(typeToConvert) ?? throw new ArgumentException(null, nameof(typeToConvert));
         var converterType = typeof(TypeSafeEnumJsonConverter<,>).MakeGenericType(typeToConvert, keyType);
-        return (JsonConverter?)Activator.CreateInstance(converterType, _format);
+        return (JsonConverter?)Activator.CreateInstance(converterType, Format);
     }
 
     // TypeSafeEnumBase<TSelf, TKey>の派生型で、かつ変換対象がTSelf自身の場合のみ対象とする

@@ -8,9 +8,15 @@ public class CsrfProtectionTests
 {
     private static async Task<int> SendAsync(string method, string path, string? header = null, Action<CsrfProtectionOptions>? configure = null)
     {
-        var services = new ServiceCollection().AddLogging().Configure(configure ?? (_ => { })).BuildServiceProvider();
+        var services = new ServiceCollection().AddLogging()
+            .Configure<CsrfProtectionOptions>(o =>
+            {
+                o.BypassPaths.Add("/webhook");
+                configure?.Invoke(o);
+            })
+            .BuildServiceProvider();
         var app = new ApplicationBuilder(services);
-        app.UseCsrfProtection("/webhook");
+        app.UseCsrfProtection();
         app.Run(context =>
         {
             context.Response.StatusCode = StatusCodes.Status200OK;
@@ -33,6 +39,7 @@ public class CsrfProtectionTests
     [InlineData("GET")]
     [InlineData("HEAD")]
     [InlineData("OPTIONS")]
+    [InlineData("TRACE")]
     public async Task 安全なメソッドは検証しない(string method)
     {
         Assert.Equal(StatusCodes.Status200OK, await SendAsync(method, "/api"));

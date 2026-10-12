@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/D3Fragments.Application/D3Fragments.Application.csproj" />
+    <Project Path="src/D3Fragments.AspNetCore.OpenApi/D3Fragments.AspNetCore.OpenApi.csproj" />
     <Project Path="src/D3Fragments.AspNetCore/D3Fragments.AspNetCore.csproj" />
     <Project Path="src/D3Fragments.EFCore/D3Fragments.EFCore.csproj" />
     <Project Path="src/D3Fragments.Testing.EFCore/D3Fragments.Testing.EFCore.csproj" />
@@ -15,6 +16,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/D3Fragments.Analyzers.Tests/D3Fragments.Analyzers.Tests.csproj" />
     <Project Path="tests/D3Fragments.Application.Tests/D3Fragments.Application.Tests.csproj" />
+    <Project Path="tests/D3Fragments.AspNetCore.OpenApi.Tests/D3Fragments.AspNetCore.OpenApi.Tests.csproj" />
     <Project Path="tests/D3Fragments.AspNetCore.Tests/D3Fragments.AspNetCore.Tests.csproj" />
     <Project Path="tests/D3Fragments.EFCore.Tests/D3Fragments.EFCore.Tests.csproj" />
     <Project Path="tests/D3Fragments.Testing.EFCore.Tests/D3Fragments.Testing.EFCore.Tests.csproj" />

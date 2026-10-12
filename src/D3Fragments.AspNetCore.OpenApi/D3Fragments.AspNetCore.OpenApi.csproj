@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- ソースジェネレーターと同様にbuildアセット（InterceptorsNamespacesの設定）も利用側へ伝播させる。伝播しないとAddOpenApiの呼び出しでCS9137になる -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" PrivateAssets="none" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\D3Fragments.AspNetCore\D3Fragments.AspNetCore.csproj" />
+  </ItemGroup>
+
+</Project>
