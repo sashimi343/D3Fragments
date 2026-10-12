@@ -72,4 +72,10 @@
   <data name="DFR0010_MessageFormat" xml:space="preserve">
     <value>値オブジェクト '{0}' のメンバー '{1}' はクラス外部から変更できます。値オブジェクトは不変にしてください</value>
   </data>
+  <data name="CodeFix_MakeSetterPrivate" xml:space="preserve">
+    <value>セッターを private にする</value>
+  </data>
+  <data name="CodeFix_MakeConstructorPrivate" xml:space="preserve">
+    <value>コンストラクタを private にする</value>
+  </data>
 </root>

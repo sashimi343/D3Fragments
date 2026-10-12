@@ -8,7 +8,7 @@ namespace D3Fragments.Analyzers.Tests;
 // 規則の仕様（docs/{lang}/analyzers/DFRxxxx.md）と診断記述子の整合性を検証する
 public sealed partial class DocumentationConsistencyTests
 {
-    public static TheoryData<string> Languages => ["ja"];
+    public static TheoryData<string> Languages => ["en", "ja"];
 
     private static readonly DiagnosticDescriptor[] Descriptors = typeof(DiagnosticDescriptors)
         .GetFields(BindingFlags.Public | BindingFlags.Static)

@@ -72,4 +72,10 @@
   <data name="DFR0010_MessageFormat" xml:space="preserve">
     <value>Member '{1}' of value object '{0}' can be modified from outside the class. Value objects should be immutable</value>
   </data>
+  <data name="CodeFix_MakeSetterPrivate" xml:space="preserve">
+    <value>Make the setter private</value>
+  </data>
+  <data name="CodeFix_MakeConstructorPrivate" xml:space="preserve">
+    <value>Make the constructor private</value>
+  </data>
 </root>

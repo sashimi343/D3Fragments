@@ -22,6 +22,8 @@ internal sealed class KnownTypes
         ControllerBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.ControllerBase");
         PageBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.RazorPages.PageBase");
         IComponent = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.IComponent");
+        ICollection = compilation.GetSpecialType(SpecialType.System_Collections_Generic_ICollection_T);
+        IDictionary = compilation.GetTypeByMetadataName("System.Collections.Generic.IDictionary`2");
     }
 
     public INamedTypeSymbol? ArchitectureLayerAttribute { get; }
@@ -39,6 +41,8 @@ internal sealed class KnownTypes
     public INamedTypeSymbol? ControllerBase { get; }
     public INamedTypeSymbol? PageBase { get; }
     public INamedTypeSymbol? IComponent { get; }
+    public INamedTypeSymbol ICollection { get; }
+    public INamedTypeSymbol? IDictionary { get; }
 
     public static KnownTypes Create(Compilation compilation) => new(compilation);
 }
