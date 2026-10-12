@@ -27,6 +27,7 @@ internal static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor DFR0008 = Create("DFR0008", DesignCategory);
     public static readonly DiagnosticDescriptor DFR0009 = Create("DFR0009", DesignCategory);
     public static readonly DiagnosticDescriptor DFR0010 = Create("DFR0010", DesignCategory);
+    public static readonly DiagnosticDescriptor DFR0011 = Create("DFR0011", ArchitectureCategory);
 
     private static DiagnosticDescriptor Create(string id, string category, params string[] customTags) =>
         new(

@@ -72,6 +72,12 @@
   <data name="DFR0010_MessageFormat" xml:space="preserve">
     <value>Member '{1}' of value object '{0}' can be modified from outside the class. Value objects should be immutable</value>
   </data>
+  <data name="DFR0011_Title" xml:space="preserve">
+    <value>Controllers should not inject domain classes through the constructor</value>
+  </data>
+  <data name="DFR0011_MessageFormat" xml:space="preserve">
+    <value>Controller '{0}' must not inject domain class '{1}' through its constructor</value>
+  </data>
   <data name="CodeFix_MakeSetterPrivate" xml:space="preserve">
     <value>Make the setter private</value>
   </data>

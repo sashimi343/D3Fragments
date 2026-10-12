@@ -72,6 +72,12 @@
   <data name="DFR0010_MessageFormat" xml:space="preserve">
     <value>値オブジェクト '{0}' のメンバー '{1}' はクラス外部から変更できます。値オブジェクトは不変にしてください</value>
   </data>
+  <data name="DFR0011_Title" xml:space="preserve">
+    <value>コントローラはドメイン層のクラスをコンストラクタで注入すべきではありません</value>
+  </data>
+  <data name="DFR0011_MessageFormat" xml:space="preserve">
+    <value>コントローラ '{0}' はドメイン層のクラス '{1}' をコンストラクタで注入すべきではありません</value>
+  </data>
   <data name="CodeFix_MakeSetterPrivate" xml:space="preserve">
     <value>セッターを private にする</value>
   </data>

@@ -28,6 +28,7 @@ public sealed class ModuleReferenceAnalyzer : DiagnosticAnalyzer
             ModuleLayerType.Application_RequestHandler,
             ModuleLayerType.Application_DomainEventHandler,
             ModuleLayerType.Domain_RepositoryInterface,
+            ModuleLayerType.Domain_DomainRule,
             ModuleLayerType.Infrastructure_RepositoryImplementation,
             ModuleLayerType.Infrastructure_Other,
         ],

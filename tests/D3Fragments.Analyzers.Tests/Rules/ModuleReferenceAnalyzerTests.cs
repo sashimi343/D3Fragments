@@ -105,6 +105,25 @@ public sealed class ModuleReferenceAnalyzerTests
     }
 
     [Fact]
+    public async Task ControllerReferencingDomainRule_ReportsDiagnostic()
+    {
+        const string source = Types + """
+            public sealed class ShelfRule : IDomainRule<Shelf>
+            {
+                public Result Check(Shelf context) => Result.Success();
+            }
+            public sealed class ShelvesController : ControllerBase
+            {
+                public Result Check(Shelf shelf) => new {|#0:ShelfRule|}().{|#1:Check|}(shelf);
+            }
+            """;
+
+        await Verifier.VerifyAsync(source, All,
+            Verifier.Diagnostic(DiagnosticDescriptors.DFR0002).WithLocation(0).WithArguments("Presentation_Controller", "ShelvesController", "Domain_DomainRule", "ShelfRule"),
+            Verifier.Diagnostic(DiagnosticDescriptors.DFR0002).WithLocation(1).WithArguments("Presentation_Controller", "ShelvesController", "Domain_DomainRule", "ShelfRule"));
+    }
+
+    [Fact]
     public async Task RepositoryInterfaceReferencingRequest_ReportsDiagnostic()
     {
         const string source = Types + """

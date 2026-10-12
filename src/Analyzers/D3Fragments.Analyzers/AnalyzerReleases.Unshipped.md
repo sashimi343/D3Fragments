@@ -15,3 +15,4 @@ DFR0007 | Design | Warning | DiagnosticDescriptors
 DFR0008 | Design | Warning | DiagnosticDescriptors
 DFR0009 | Design | Warning | DiagnosticDescriptors
 DFR0010 | Design | Warning | DiagnosticDescriptors
+DFR0011 | Architecture | Warning | DiagnosticDescriptors

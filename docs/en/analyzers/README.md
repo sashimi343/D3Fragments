@@ -66,3 +66,4 @@ using D3Fragments;
 | [DFR0008: Define TypeSafeEnum values as static readonly fields](DFR0008.md) | A value of `TypeSafeEnum<TSelf, TKey>` is defined by something other than a static readonly field. An exception due to a duplicate value definition or a replacement of a value can occur. |
 | [DFR0009: Entities should not expose mutable collections](DFR0009.md) | An entity class exposes a mutable collection. Even if the setter is not public, the state of the entity can be changed from outside through collection operations. |
 | [DFR0010: Value objects should not have public setters](DFR0010.md) | A value object defines a public setter. Value objects should be immutable. |
+| [DFR0011: Controllers should not inject domain classes through the constructor](DFR0011.md) | A controller injects a domain class (such as a domain service) through its constructor. Controllers should call the application layer through `IRequestExecutor<TRequest, TResponse>`. |
