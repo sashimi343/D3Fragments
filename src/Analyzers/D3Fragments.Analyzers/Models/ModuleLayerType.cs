@@ -11,6 +11,7 @@ internal enum ModuleLayerType
     Application_RequestHandler,
     Application_RequestExecutor,
     Application_DomainEventHandler,
+    Application_PipelineBehavior,
 
     Domain_Other,
     Domain_Entity,
@@ -20,4 +21,6 @@ internal enum ModuleLayerType
 
     Infrastructure_Other,
     Infrastructure_RepositoryImplementation,
+    Infrastructure_DbContext,
+    Infrastructure_UnitOfWork,
 }

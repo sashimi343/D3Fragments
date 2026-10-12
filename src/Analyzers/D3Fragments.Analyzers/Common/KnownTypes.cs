@@ -20,6 +20,13 @@ internal sealed class KnownTypes
         IRequestExecutor = compilation.GetTypeByMetadataName("D3Fragments.Application.IRequestExecutor`2");
         IBeforeCommitDomainEventHandler = compilation.GetTypeByMetadataName("D3Fragments.Application.IBeforeCommitDomainEventHandler`1");
         IAfterCommitDomainEventHandler = compilation.GetTypeByMetadataName("D3Fragments.Application.IAfterCommitDomainEventHandler`1");
+        IPipelineBehavior = compilation.GetTypeByMetadataName("D3Fragments.Application.IPipelineBehavior`2");
+        IUnitOfWork = compilation.GetTypeByMetadataName("D3Fragments.Application.IUnitOfWork");
+        DbContext = compilation.GetTypeByMetadataName("Microsoft.EntityFrameworkCore.DbContext");
+        DbSet = compilation.GetTypeByMetadataName("Microsoft.EntityFrameworkCore.DbSet`1");
+        DatabaseFacade = compilation.GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Infrastructure.DatabaseFacade");
+        IDbContextTransaction = compilation.GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction");
+        EntityFrameworkQueryableExtensions = compilation.GetTypeByMetadataName("Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions");
         ControllerBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.ControllerBase");
         PageBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.RazorPages.PageBase");
         IComponent = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.IComponent");
@@ -40,6 +47,13 @@ internal sealed class KnownTypes
     public INamedTypeSymbol? IRequestExecutor { get; }
     public INamedTypeSymbol? IBeforeCommitDomainEventHandler { get; }
     public INamedTypeSymbol? IAfterCommitDomainEventHandler { get; }
+    public INamedTypeSymbol? IPipelineBehavior { get; }
+    public INamedTypeSymbol? IUnitOfWork { get; }
+    public INamedTypeSymbol? DbContext { get; }
+    public INamedTypeSymbol? DbSet { get; }
+    public INamedTypeSymbol? DatabaseFacade { get; }
+    public INamedTypeSymbol? IDbContextTransaction { get; }
+    public INamedTypeSymbol? EntityFrameworkQueryableExtensions { get; }
     public INamedTypeSymbol? ControllerBase { get; }
     public INamedTypeSymbol? PageBase { get; }
     public INamedTypeSymbol? IComponent { get; }

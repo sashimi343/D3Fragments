@@ -13,6 +13,7 @@ public sealed class ModuleLayerResolverTests
         using D3Fragments;
         using D3Fragments.Application;
         using Microsoft.AspNetCore.Mvc;
+        using Microsoft.EntityFrameworkCore;
 
         public sealed class BooksController : ControllerBase { }
         public sealed record GetShelf(UuidV7 Id) : IQuery<int>;
@@ -45,6 +46,19 @@ public sealed class ModuleLayerResolverTests
             public abstract Task<int> CountAsync(CancellationToken cancellationToken);
             public abstract Task<bool> ExistsAsync(UuidV7 id, CancellationToken cancellationToken);
         }
+        public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+            where TRequest : IRequest<TResponse>
+        {
+            public int Order => 0;
+            public Task<TResponse> HandleAsync(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken) => next(cancellationToken);
+        }
+        public sealed class AppDbContext(DbContextOptions options) : DbContext(options) { }
+        public sealed class AppUnitOfWork : IUnitOfWork
+        {
+            public Task<int> SaveChangesAsync(CancellationToken cancellationToken) => Task.FromResult(0);
+            public void DiscardChanges() { }
+            public Task<TResponse> ExecuteInTransactionAsync<TResponse>(Func<CancellationToken, Task<TResponse>> action, CancellationToken cancellationToken) => action(cancellationToken);
+        }
         public sealed class Helper { }
 
         // 複数のモジュールレイヤーの条件に該当する（記載順で Application_DomainEventHandler が優先される）
@@ -63,6 +77,7 @@ public sealed class ModuleLayerResolverTests
     [InlineData("GetShelf", ArchitectureLayerType.Application, "Application_Request")]
     [InlineData("GetShelfHandler", ArchitectureLayerType.Application, "Application_RequestHandler")]
     [InlineData("ShelfCreatedHandler", ArchitectureLayerType.Application, "Application_DomainEventHandler")]
+    [InlineData("LoggingBehavior`2", ArchitectureLayerType.Application, "Application_PipelineBehavior")]
     [InlineData("Helper", ArchitectureLayerType.Application, "Application_Other")]
     [InlineData("Shelf", ArchitectureLayerType.Domain, "Domain_Entity")]
     [InlineData("ShelfName", ArchitectureLayerType.Domain, "Domain_ValueObject")]
@@ -70,6 +85,8 @@ public sealed class ModuleLayerResolverTests
     [InlineData("ShelfRule", ArchitectureLayerType.Domain, "Domain_DomainRule")]
     [InlineData("Helper", ArchitectureLayerType.Domain, "Domain_Other")]
     [InlineData("ShelfRepository", ArchitectureLayerType.Infrastructure, "Infrastructure_RepositoryImplementation")]
+    [InlineData("AppDbContext", ArchitectureLayerType.Infrastructure, "Infrastructure_DbContext")]
+    [InlineData("AppUnitOfWork", ArchitectureLayerType.Infrastructure, "Infrastructure_UnitOfWork")]
     [InlineData("Helper", ArchitectureLayerType.Infrastructure, "Infrastructure_Other")]
     public void Resolve_SingleLayerAssembly_ReturnsModuleLayerOfThatLayer(string typeName, ArchitectureLayerType layer, string expected) =>
         Assert.Equal(expected, Resolve(TestCompilation.Create(Source, layer), typeName));

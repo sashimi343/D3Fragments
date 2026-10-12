@@ -78,6 +78,24 @@
   <data name="DFR0011_MessageFormat" xml:space="preserve">
     <value>コントローラ '{0}' はドメイン層のクラス '{1}' をコンストラクタで注入すべきではありません</value>
   </data>
+  <data name="DFR0012_Title" xml:space="preserve">
+    <value>Pipeline Behavior 以外で保存・トランザクションを操作しないでください</value>
+  </data>
+  <data name="DFR0012_MessageFormat" xml:space="preserve">
+    <value>'{0}' から '{1}' を呼び出すべきではありません。保存とトランザクションの操作は Pipeline Behavior が行います</value>
+  </data>
+  <data name="DFR0013_Title" xml:space="preserve">
+    <value>エンティティに対して Update・Attach を呼び出さないでください</value>
+  </data>
+  <data name="DFR0013_MessageFormat" xml:space="preserve">
+    <value>'{0}' はキーが設定済みのエンティティ '{1}' を既存の行として扱います。追跡中の集約を変更し、新しいエンティティには Add を使用してください</value>
+  </data>
+  <data name="DFR0014_Title" xml:space="preserve">
+    <value>リポジトリで変更追跡を無効にしないでください</value>
+  </data>
+  <data name="DFR0014_MessageFormat" xml:space="preserve">
+    <value>リポジトリ '{0}' で '{1}' を呼び出すべきではありません。集約は変更追跡を有効にしたまま取得し、読み取り専用の問い合わせはクエリサービスに分離してください</value>
+  </data>
   <data name="CodeFix_MakeSetterPrivate" xml:space="preserve">
     <value>セッターを private にする</value>
   </data>

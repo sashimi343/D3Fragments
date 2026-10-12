@@ -22,7 +22,7 @@
   <ItemGroup>
     <!-- テスト対象コードのコンパイルに使う参照（実行中のランタイムの参照をそのまま使う） -->
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <ProjectReference Include="..\..\src\D3Fragments.Application\D3Fragments.Application.csproj" />
+    <ProjectReference Include="..\..\src\D3Fragments.EFCore\D3Fragments.EFCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

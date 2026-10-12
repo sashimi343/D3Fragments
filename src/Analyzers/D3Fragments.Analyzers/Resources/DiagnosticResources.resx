@@ -78,6 +78,24 @@
   <data name="DFR0011_MessageFormat" xml:space="preserve">
     <value>Controller '{0}' must not inject domain class '{1}' through its constructor</value>
   </data>
+  <data name="DFR0012_Title" xml:space="preserve">
+    <value>Do not save changes or control transactions outside pipeline behaviors</value>
+  </data>
+  <data name="DFR0012_MessageFormat" xml:space="preserve">
+    <value>'{0}' must not call '{1}'. Saving changes and controlling transactions are performed by the pipeline behaviors</value>
+  </data>
+  <data name="DFR0013_Title" xml:space="preserve">
+    <value>Do not call Update or Attach for entities</value>
+  </data>
+  <data name="DFR0013_MessageFormat" xml:space="preserve">
+    <value>'{0}' treats the entity '{1}', whose key is already set, as an existing row. Modify tracked aggregates and use Add for new entities</value>
+  </data>
+  <data name="DFR0014_Title" xml:space="preserve">
+    <value>Do not disable change tracking in repositories</value>
+  </data>
+  <data name="DFR0014_MessageFormat" xml:space="preserve">
+    <value>Repository '{0}' must not call '{1}'. Retrieve aggregates with change tracking enabled, and move read-only queries to a query service</value>
+  </data>
   <data name="CodeFix_MakeSetterPrivate" xml:space="preserve">
     <value>Make the setter private</value>
   </data>

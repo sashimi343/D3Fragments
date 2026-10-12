@@ -28,6 +28,8 @@ internal sealed class ModuleLayerResolver
                 t => IsClass(t) && t.Implements(knownTypes.IRequestExecutor)),
             (ModuleLayerType.Application_DomainEventHandler, ArchitectureLayerType.Application,
                 t => IsClass(t) && (t.Implements(knownTypes.IBeforeCommitDomainEventHandler) || t.Implements(knownTypes.IAfterCommitDomainEventHandler))),
+            (ModuleLayerType.Application_PipelineBehavior, ArchitectureLayerType.Application,
+                t => IsClass(t) && t.Implements(knownTypes.IPipelineBehavior)),
             (ModuleLayerType.Domain_Entity, ArchitectureLayerType.Domain,
                 t => IsClass(t) && t.InheritsFrom(knownTypes.EntityBase)),
             (ModuleLayerType.Domain_ValueObject, ArchitectureLayerType.Domain,
@@ -38,6 +40,10 @@ internal sealed class ModuleLayerResolver
                 t => IsClass(t) && t.Implements(knownTypes.IDomainRule)),
             (ModuleLayerType.Infrastructure_RepositoryImplementation, ArchitectureLayerType.Infrastructure,
                 t => IsClass(t) && t.Implements(knownTypes.IRepository)),
+            (ModuleLayerType.Infrastructure_DbContext, ArchitectureLayerType.Infrastructure,
+                t => IsClass(t) && t.InheritsFrom(knownTypes.DbContext)),
+            (ModuleLayerType.Infrastructure_UnitOfWork, ArchitectureLayerType.Infrastructure,
+                t => IsClass(t) && t.Implements(knownTypes.IUnitOfWork)),
         ];
     }
 

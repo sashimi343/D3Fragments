@@ -76,6 +76,10 @@ A class that directly or indirectly implements the `D3Fragments.Application.IReq
 
 A class that directly or indirectly implements the `D3Fragments.Application.IBeforeCommitDomainEventHandler<in TEvent>` or `D3Fragments.Application.IAfterCommitDomainEventHandler<in TEvent>` interface.
 
+#### Application_PipelineBehavior
+
+A class that directly or indirectly implements the `D3Fragments.Application.IPipelineBehavior<in TRequest, TResponse>` interface.
+
 #### Application_Other
 
 A class or interface in the application layer that does not fall under any of the above.
@@ -107,6 +111,14 @@ A class or interface in the domain layer that does not fall under any of the abo
 #### Infrastructure_RepositoryImplementation
 
 A class that directly or indirectly implements the `D3Fragments.IRepository<TAggregate, TId>` interface.
+
+#### Infrastructure_DbContext
+
+A class that directly or indirectly inherits the `Microsoft.EntityFrameworkCore.DbContext` class.
+
+#### Infrastructure_UnitOfWork
+
+A class that directly or indirectly implements the `D3Fragments.Application.IUnitOfWork` interface.
 
 #### Infrastructure_Other
 

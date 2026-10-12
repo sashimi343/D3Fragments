@@ -76,6 +76,10 @@ ASP.NET Coreの[PageBase](https://learn.microsoft.com/en-us/dotnet/api/microsoft
 
 `D3Fragments.Application.IBeforeCommitDomainEventHandler<in TEvent>` または `D3Fragments.Application.IAfterCommitDomainEventHandler<in TEvent>` インターフェースを直接、または間接的に実装したクラスです。
 
+#### Application_PipelineBehavior
+
+`D3Fragments.Application.IPipelineBehavior<in TRequest, TResponse>` インターフェースを直接、または間接的に実装したクラスです。
+
 #### Application_Other
 
 アプリケーション層のクラス・インターフェースのうち、上記のいずれにも該当しないクラス・インターフェースです。
@@ -107,6 +111,14 @@ ASP.NET Coreの[PageBase](https://learn.microsoft.com/en-us/dotnet/api/microsoft
 #### Infrastructure_RepositoryImplementation
 
 `D3Fragments.IRepository<TAggregate, TId>` インターフェースを直接、または間接的に実装したクラスです。
+
+#### Infrastructure_DbContext
+
+`Microsoft.EntityFrameworkCore.DbContext` クラスを直接、または間接的に継承したクラスです。
+
+#### Infrastructure_UnitOfWork
+
+`D3Fragments.Application.IUnitOfWork` インターフェースを直接、または間接的に実装したクラスです。
 
 #### Infrastructure_Other
 

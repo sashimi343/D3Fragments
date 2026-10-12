@@ -5,8 +5,8 @@ using Microsoft.CodeAnalysis.Testing;
 namespace D3Fragments.Analyzers.Tests.Helpers;
 
 /// <summary>
-///     <para xml:lang="en">References used to compile test code: the assemblies loaded by the running test (the .NET and ASP.NET Core runtimes, D3Fragments, and D3Fragments.Application).</para>
-///     <para xml:lang="ja">テスト対象コードのコンパイルに使う参照。実行中のテストが読み込むアセンブリ（.NET・ASP.NET Core ランタイム、D3Fragments、D3Fragments.Application）をそのまま使う。</para>
+///     <para xml:lang="en">References used to compile test code: the assemblies loaded by the running test (the .NET and ASP.NET Core runtimes, EF Core, D3Fragments, D3Fragments.Application, and D3Fragments.EFCore).</para>
+///     <para xml:lang="ja">テスト対象コードのコンパイルに使う参照。実行中のテストが読み込むアセンブリ（.NET・ASP.NET Core ランタイム、EF Core、D3Fragments、D3Fragments.Application、D3Fragments.EFCore）をそのまま使う。</para>
 /// </summary>
 internal static class TestReferences
 {

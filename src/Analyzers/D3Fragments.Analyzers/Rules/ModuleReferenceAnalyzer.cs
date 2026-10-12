@@ -30,6 +30,8 @@ public sealed class ModuleReferenceAnalyzer : DiagnosticAnalyzer
             ModuleLayerType.Domain_RepositoryInterface,
             ModuleLayerType.Domain_DomainRule,
             ModuleLayerType.Infrastructure_RepositoryImplementation,
+            ModuleLayerType.Infrastructure_DbContext,
+            ModuleLayerType.Infrastructure_UnitOfWork,
             ModuleLayerType.Infrastructure_Other,
         ],
         [ModuleLayerType.Application_Request] = [ModuleLayerType.Presentation_Controller, ModuleLayerType.Infrastructure_RepositoryImplementation],
