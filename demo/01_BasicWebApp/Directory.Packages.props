@@ -4,7 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- D3Fragments（ローカルフィード: ../../artifacts/packages） -->
+    <!-- D3Fragments -->
     <PackageVersion Include="Sashimi343.D3Fragments" Version="0.1.0" />
     <PackageVersion Include="Sashimi343.D3Fragments.Application" Version="0.1.0" />
     <PackageVersion Include="Sashimi343.D3Fragments.AspNetCore" Version="0.1.0" />
