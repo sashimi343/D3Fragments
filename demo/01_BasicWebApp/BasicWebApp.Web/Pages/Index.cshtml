@@ -1,0 +1,14 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "図書館デモ";
+}
+
+<div class="text-center">
+    <h1 class="display-5">D3Fragments 図書館デモ</h1>
+    <p>会員登録と資料登録から始め、貸出・予約・返却を試せます。</p>
+    <p><a asp-page="/Books/Index" class="btn btn-primary">資料一覧</a>
+       <a asp-page="/Members/Register" class="btn btn-outline-primary">会員登録</a>
+       <a asp-page="/Admin/Index" class="btn btn-outline-secondary">管理者（司書）</a></p>
+    <p class="alert alert-warning">ローカルで試すためのデモです。メールだけのログイン・管理者無認証のため公開運用しないでください。データは再起動で消えます。</p>
+</div>

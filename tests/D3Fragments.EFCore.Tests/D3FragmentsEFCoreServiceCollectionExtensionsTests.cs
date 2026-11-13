@@ -29,8 +29,8 @@ public class D3FragmentsEFCoreServiceCollectionExtensionsTests
         services.AddScoped<IDomainEventDispatcher, SpyDomainEventDispatcher>();
         configure?.Invoke(services);
         services.AddD3FragmentsEFCore<MemberDbContext>(
-            db => db.UseInMemoryDatabase(Guid.NewGuid().ToString()),
-            [typeof(D3DbContext).Assembly]);
+            [typeof(D3DbContext).Assembly],
+            db => db.UseInMemoryDatabase(Guid.NewGuid().ToString()));
         return services;
     }
 
@@ -90,11 +90,47 @@ public class D3FragmentsEFCoreServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void DbContextは指定した設定とD3Fragmentsの設定で構成される()
+    {
+        using var provider = CreateServices().BuildServiceProvider(validateScopes: true);
+        using var scope = provider.CreateScope();
+
+        var options = scope.ServiceProvider.GetRequiredService<DbContextOptions<MemberDbContext>>();
+
+        // D3Fragments の設定はプロバイダーではないため、プロバイダーは指定したものだけになる
+        Assert.Single(options.Extensions, x => x.Info.IsDatabaseProvider);
+        Assert.Contains(options.Extensions, x => x is D3FragmentsOptionsExtension);
+    }
+
+    [Fact]
+    public void 指定したアセンブリのRepositoryを走査して登録する()
+    {
+        // テストアセンブリには同じインターフェースの実装が複数あるため、走査されていれば重複として検出される
+        var services = new ServiceCollection();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            services.AddD3FragmentsEFCore<MemberDbContext>([typeof(MemberRepository).Assembly], db => db.UseInMemoryDatabase("x")));
+    }
+
+    [Fact]
+    public void 不正な引数は例外になる()
+    {
+        var services = new ServiceCollection();
+        Action<DbContextOptionsBuilder> configure = db => db.UseInMemoryDatabase("x");
+
+        Assert.Throws<ArgumentNullException>(() => ((IServiceCollection)null!).AddD3FragmentsEFCore<MemberDbContext>([typeof(D3DbContext).Assembly], configure));
+        Assert.Throws<ArgumentNullException>(() => services.AddD3FragmentsEFCore<MemberDbContext>(null!, configure));
+        Assert.Throws<ArgumentNullException>(() => services.AddD3FragmentsEFCore<MemberDbContext>([typeof(D3DbContext).Assembly], null!));
+        Assert.Throws<ArgumentNullException>(() => ((DbContextOptionsBuilder)null!).UseD3Fragments([]));
+        Assert.Throws<ArgumentNullException>(() => new DbContextOptionsBuilder().UseD3Fragments(null!));
+    }
+
+    [Fact]
     public void アセンブリが空の場合はArgumentExceptionをスローする()
     {
         var services = new ServiceCollection();
 
         Assert.Throws<ArgumentException>("assemblies", () =>
-            services.AddD3FragmentsEFCore<MemberDbContext>(db => db.UseInMemoryDatabase("x"), []));
+            services.AddD3FragmentsEFCore<MemberDbContext>([], db => db.UseInMemoryDatabase("x")));
     }
 }

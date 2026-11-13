@@ -43,10 +43,14 @@ public static class PagingExtensions
     ///     <para xml:lang="ja">許容する最大ページサイズ。既定値は<see cref="DefaultMaxPageSize"/>。</para>
     /// </param>
     /// <returns>
-    ///     <para xml:lang="en">A success result holding the requested page, or a failure result when <paramref name="pageNo"/> or <paramref name="pageSize"/> is invalid.</para>
-    ///     <para xml:lang="ja">成功時は要求されたページを保持する結果、<paramref name="pageNo"/>または<paramref name="pageSize"/>が不正な場合は失敗結果。</para>
+    ///     <para xml:lang="en">The requested page.</para>
+    ///     <para xml:lang="ja">要求されたページ。</para>
     /// </returns>
-    public static async Task<Result<Pager<T>>> ToPagedListAsync<T>(
+    /// <exception cref="DomainValidationException">
+    ///     <para xml:lang="en">Thrown when <paramref name="pageNo"/> or <paramref name="pageSize"/> is invalid.</para>
+    ///     <para xml:lang="ja"><paramref name="pageNo"/>または<paramref name="pageSize"/>が不正な場合。</para>
+    /// </exception>
+    public static async Task<Pager<T>> ToPagedListAsync<T>(
         this IQueryable<T> query,
         int pageNo,
         int pageSize,
@@ -55,26 +59,34 @@ public static class PagingExtensions
     {
         if (pageNo < IPager.StartPageNo)
         {
-            return Result<Pager<T>>.Failure(Error.Validation(string.Format(ExceptionMessages.Error_PageNoMustBeAtLeastStartPageNo, IPager.StartPageNo)));
+            throw new DomainValidationException(string.Format(ExceptionMessages.Error_PageNoMustBeAtLeastStartPageNo, IPager.StartPageNo));
         }
 
         if (pageSize <= 0)
         {
-            return Result<Pager<T>>.Failure(Error.Validation(ExceptionMessages.Error_PageSizeMustBePositive));
+            throw new DomainValidationException(ExceptionMessages.Error_PageSizeMustBePositive);
         }
 
         if (pageSize > maxPageSize)
         {
-            return Result<Pager<T>>.Failure(Error.Validation(string.Format(ExceptionMessages.Error_PageSizeExceedsMaximum, maxPageSize)));
+            throw new DomainValidationException(string.Format(ExceptionMessages.Error_PageSizeExceedsMaximum, maxPageSize));
+        }
+
+        // 読み飛ばす件数（(pageNo - 1) * pageSize）が int に収まるページ番号まで受け付ける
+        var maxPageNo = (int.MaxValue / pageSize) + IPager.StartPageNo;
+        if (pageNo > maxPageNo)
+        {
+            throw new DomainValidationException(string.Format(ExceptionMessages.Error_PageNoExceedsMaximum, maxPageNo));
         }
 
         var totalCount = await query.CountAsync(cancellationToken).ConfigureAwait(false);
         if (totalCount == 0)
         {
-            return Pager<T>.Empty(pageSize);
+            // 最終ページを超えた場合と同じく、指定したページ番号の空ページを返す
+            return new Pager<T>([], pageNo, pageSize, totalCount);
         }
 
-        var skip = checked((pageNo - 1) * pageSize);
+        var skip = (pageNo - IPager.StartPageNo) * pageSize;
         var items = await query.Skip(skip).Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false);
 
         return new Pager<T>(items, pageNo, pageSize, totalCount);

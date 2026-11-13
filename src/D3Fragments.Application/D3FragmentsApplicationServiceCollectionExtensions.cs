@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 
 using D3Fragments.Application.Resources;
@@ -45,6 +46,10 @@ public static class D3FragmentsApplicationServiceCollectionExtensions
     ///     <para xml:lang="en">Thrown when <paramref name="assemblies"/> is empty.</para>
     ///     <para xml:lang="ja"><paramref name="assemblies"/>が空の場合にスローされる。</para>
     /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///     <para xml:lang="en">Thrown when the request type of a handler implements neither or both of <see cref="ICommand"/> and <see cref="IQuery"/>.</para>
+    ///     <para xml:lang="ja">ハンドラーのリクエスト型が<see cref="ICommand"/>と<see cref="IQuery"/>のどちらも実装していない、または両方を実装している場合にスローされる。</para>
+    /// </exception>
     public static IServiceCollection AddD3FragmentsApplication(
         this IServiceCollection services,
         IEnumerable<Assembly> assemblies,
@@ -71,17 +76,22 @@ public static class D3FragmentsApplicationServiceCollectionExtensions
         services.TryAddEnumerable(ServiceDescriptor.Scoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>)));
         services.TryAddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 
-        var implementationTypes = targets
-            .SelectMany(x => x.DefinedTypes)
-            .Where(x => x is { IsAbstract: false, IsGenericTypeDefinition: false });
+        AddHandlers(services, targets.SelectMany(x => x.DefinedTypes));
 
-        foreach (var implementationType in implementationTypes)
+        return services;
+    }
+
+    // 検査をテストするため、走査対象の型を直接受け取れるようにしている
+    internal static void AddHandlers(IServiceCollection services, IEnumerable<Type> types)
+    {
+        foreach (var implementationType in types.Where(x => x is { IsAbstract: false, IsGenericTypeDefinition: false }))
         {
-            foreach (var serviceType in implementationType.ImplementedInterfaces.Where(x => x.IsGenericType))
+            foreach (var serviceType in implementationType.GetInterfaces().Where(x => x.IsGenericType))
             {
                 var definition = serviceType.GetGenericTypeDefinition();
                 if (definition == typeof(IRequestHandler<,>))
                 {
+                    EnsureCommandOrQuery(serviceType.GenericTypeArguments[0]);
                     services.TryAddScoped(serviceType, implementationType);
                 }
                 else if (definition == typeof(IBeforeCommitDomainEventHandler<>) || definition == typeof(IAfterCommitDomainEventHandler<>))
@@ -90,7 +100,17 @@ public static class D3FragmentsApplicationServiceCollectionExtensions
                 }
             }
         }
+    }
 
-        return services;
+    // UnitOfWorkBehaviorはIQuery以外を保存するため、どちらとも判別できないリクエストを登録時に拒否する
+    private static void EnsureCommandOrQuery(Type requestType)
+    {
+        if (typeof(ICommand).IsAssignableFrom(requestType) == typeof(IQuery).IsAssignableFrom(requestType))
+        {
+            throw new InvalidOperationException(string.Format(
+                CultureInfo.CurrentCulture,
+                ExceptionMessages.InvalidOperationException_RequestMustBeCommandOrQuery,
+                requestType));
+        }
     }
 }

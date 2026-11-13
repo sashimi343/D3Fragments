@@ -1,10 +1,22 @@
 using D3Fragments.Analyzers.Tests.Helpers;
+
 using Verifier = D3Fragments.Analyzers.Tests.Helpers.AnalyzerVerifier<D3Fragments.Analyzers.Rules.ControllerInjectionAnalyzer>;
 
 namespace D3Fragments.Analyzers.Tests.Rules;
 
 public sealed class ControllerInjectionAnalyzerTests
 {
+    [Fact]
+    public async Task PageModelInjectingDomainService_ReportsDiagnostic()
+    {
+        const string source = """
+            public sealed class BooksModel({|#0:IShelfPricing|} pricing) : Microsoft.AspNetCore.Mvc.RazorPages.PageModel { }
+            """;
+
+        await VerifyWithDomainAsync(source, Verifier.Diagnostic(DiagnosticDescriptors.DFR0011)
+            .WithLocation(0).WithArguments("BooksModel", "IShelfPricing"));
+    }
+
     // ドメイン層単独のアセンブリ。ドメインサービス・TypeSafeEnum は Domain_Other と判定される
     private const string DomainSource = """
         public sealed class Shelf : D3Fragments.AggregateRoot { }

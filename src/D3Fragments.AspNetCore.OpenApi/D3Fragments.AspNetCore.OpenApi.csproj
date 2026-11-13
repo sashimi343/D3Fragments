@@ -1,5 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <Description>OpenAPI integration for D3Fragments: describes D3Fragments types in generated OpenAPI documents.</Description>
+    <PackageTags>$(PackageTags);openapi</PackageTags>
+  </PropertyGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

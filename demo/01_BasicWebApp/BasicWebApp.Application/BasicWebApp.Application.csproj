@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\BasicWebApp.Domain\BasicWebApp.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Sashimi343.D3Fragments.Application" />
+    <PackageReference Include="Sashimi343.D3Fragments.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

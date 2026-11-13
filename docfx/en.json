@@ -1,0 +1,25 @@
+{
+  "metadata": [
+    {
+      "src": [{ "src": "../obj/docs/staging/en", "files": ["*.dll"] }],
+      "references": [{ "src": "../obj/docs/refs", "files": ["*.dll"] }],
+      "dest": "../docs/en/api"
+    }
+  ],
+  "build": {
+    "content": [{ "src": "../docs/en", "files": ["**/*.md", "**/*.yml"] }],
+    "resource": [{ "files": ["images/**"] }],
+    "output": "../_site/en",
+    "template": ["default", "modern"],
+    "globalMetadata": {
+      "_appTitle": "D3Fragments",
+      "_appName": "D3Fragments",
+      "_appLogoPath": "images/logo.svg",
+      "_appFaviconPath": "images/favicon.ico",
+      "_appFooter": "Copyright &copy; 2026 Kohei Kakimoto",
+      "_lang": "en",
+      "_enableSearch": true,
+      "_disableContribution": true
+    }
+  }
+}

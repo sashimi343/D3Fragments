@@ -1,11 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>Roslyn analyzers that report deviations from the D3Fragments design guidelines at build time.</Description>
+    <PackageTags>$(PackageTags);analyzers;roslyn</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Sashimi343.D3Fragments.Analyzers</PackageId>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <DevelopmentDependency>true</DevelopmentDependency>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <!-- ビルド出力を含めないため、シンボルパッケージは作らない -->
+    <IncludeSymbols>false</IncludeSymbols>
     <!-- lib/ を持たないアナライザー専用パッケージのため -->
     <NoWarn>$(NoWarn);NU5128</NoWarn>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToPackage</TargetsForTfmSpecificContentInPackage>

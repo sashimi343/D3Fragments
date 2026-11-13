@@ -76,10 +76,16 @@
   <data name="Error_PageSizeExceedsMaximum" xml:space="preserve">
     <value>ページサイズは{0}以下である必要があります。</value>
   </data>
+  <data name="Error_PageNoExceedsMaximum" xml:space="preserve">
+    <value>ページ番号は{0}以下である必要があります。</value>
+  </data>
   <data name="ArgumentException_AssembliesEmpty" xml:space="preserve">
     <value>アセンブリを1つ以上指定する必要があります。</value>
   </data>
   <data name="InvalidOperationException_DuplicateRepositoryImplementation" xml:space="preserve">
     <value>リポジトリインターフェース {0} の実装が複数見つかりました: {1}, {2}</value>
+  </data>
+  <data name="InvalidOperationException_ValueObjectMappedAsEntity" xml:space="preserve">
+    <value>値オブジェクト {0} がエンティティ型としてマッピングされています。OnModelCreatingでプロパティ（{1}）をComplexValueObjectで登録してください。</value>
   </data>
 </root>

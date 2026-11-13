@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Sashimi343.D3Fragments" />
+    <PackageReference Include="Sashimi343.D3Fragments.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

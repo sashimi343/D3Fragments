@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- D3Fragments（ローカルフィード: ../../artifacts/packages） -->
+    <PackageVersion Include="Sashimi343.D3Fragments" Version="0.1.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.Application" Version="0.1.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.AspNetCore" Version="0.1.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.EFCore" Version="0.1.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.Analyzers" Version="0.1.0" />
+
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.7" />
+    <!-- Microsoft.EntityFrameworkCore.Sqlite が推移的に参照する 2.1.11 の脆弱性（GHSA-2m69-gcr7-jv3q）回避 -->
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
+  </ItemGroup>
+</Project>

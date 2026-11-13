@@ -48,7 +48,7 @@ public abstract class AggregateRoot<TId> : Entity<TId>, IHasDomainEvents
     ///     <para xml:lang="en">Thrown when <paramref name="self"/> is not this instance.</para>
     ///     <para xml:lang="ja"><paramref name="self"/>がこのインスタンス自身でない場合にスローされる。</para>
     /// </exception>
-    protected DeletionToken<T> AllowDeletion<T>(T self)
+    protected DeletionToken<T> IssueDeletionToken<T>(T self)
         where T : AggregateRoot<TId>
     {
         if (!ReferenceEquals(self, this))

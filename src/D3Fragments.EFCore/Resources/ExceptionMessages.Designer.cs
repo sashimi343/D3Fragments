@@ -111,6 +111,15 @@ namespace D3Fragments.EFCore.Resources {
         }
 
         /// <summary>
+        ///   The page number must not exceed {0}. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Error_PageNoExceedsMaximum {
+            get {
+                return ResourceManager.GetString("Error_PageNoExceedsMaximum", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   At least one assembly must be specified. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string ArgumentException_AssembliesEmpty {
@@ -125,6 +134,15 @@ namespace D3Fragments.EFCore.Resources {
         internal static string InvalidOperationException_DuplicateRepositoryImplementation {
             get {
                 return ResourceManager.GetString("InvalidOperationException_DuplicateRepositoryImplementation", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   The value object {0} is mapped as an entity type. Register the property ({1}) with ComplexValueObject in OnModelCreating. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string InvalidOperationException_ValueObjectMappedAsEntity {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_ValueObjectMappedAsEntity", resourceCulture);
             }
         }
     }

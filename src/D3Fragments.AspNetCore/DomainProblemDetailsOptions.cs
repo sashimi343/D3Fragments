@@ -42,4 +42,19 @@ public sealed class DomainProblemDetailsOptions
     ///     <para xml:lang="ja">メンバー名。既定値は<see cref="DefaultErrorCodeKey"/>。エラーコードが<see langword="null"/>の場合、メンバーは出力しない。</para>
     /// </value>
     public string ErrorCodeKey { get; set; } = DefaultErrorCodeKey;
+
+    /// <summary>
+    ///     <para xml:lang="en">Gets the HTTP status code for <paramref name="errorType"/> from <see cref="StatusCodeMap"/>.</para>
+    ///     <para xml:lang="ja"><see cref="StatusCodeMap"/>から<paramref name="errorType"/>に対応するHTTPステータスコードを取得する。</para>
+    /// </summary>
+    /// <param name="errorType">
+    ///     <para xml:lang="en">The error type.</para>
+    ///     <para xml:lang="ja">エラーの種類。</para>
+    /// </param>
+    /// <returns>
+    ///     <para xml:lang="en">The mapped status code, or 400 (Bad Request) when <paramref name="errorType"/> is not in the mapping.</para>
+    ///     <para xml:lang="ja">対応するステータスコード。対応表に存在しない場合は400（Bad Request）。</para>
+    /// </returns>
+    public int GetStatusCode(ErrorType errorType) =>
+        StatusCodeMap.TryGetValue(errorType, out var statusCode) ? statusCode : StatusCodes.Status400BadRequest;
 }

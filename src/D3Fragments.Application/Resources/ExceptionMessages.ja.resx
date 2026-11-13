@@ -61,4 +61,7 @@
   <data name="ArgumentException_AssembliesEmpty" xml:space="preserve">
     <value>アセンブリを1つ以上指定する必要があります。</value>
   </data>
+  <data name="InvalidOperationException_RequestMustBeCommandOrQuery" xml:space="preserve">
+    <value>リクエスト型 {0} は ICommand&lt;TResponse&gt; または IQuery&lt;TResponse&gt; のどちらか一方を実装してください。</value>
+  </data>
 </root>

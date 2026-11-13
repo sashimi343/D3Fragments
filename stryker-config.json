@@ -1,0 +1,11 @@
+{
+  "stryker-config": {
+    "test-runner": "mtp",
+    "reporters": [ "html", "json", "progress" ],
+    "thresholds": {
+      "high": 80,
+      "low": 70,
+      "break": 0
+    }
+  }
+}

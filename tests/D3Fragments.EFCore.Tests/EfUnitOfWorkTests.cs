@@ -39,7 +39,10 @@ public sealed class EfUnitOfWorkTests
         private readonly SqliteConnection _connection = new("DataSource=:memory:");
         private readonly ServiceProvider _provider;
 
-        public Harness(Func<ChainEvent, CancellationToken, Task>? beforeCommit = null, Func<ChainEvent, CancellationToken, Task>? afterCommit = null)
+        public Harness(
+            Func<ChainEvent, CancellationToken, Task>? beforeCommit = null,
+            Func<ChainEvent, CancellationToken, Task>? afterCommit = null,
+            IDomainEventDispatchStrategy? strategy = null)
         {
             _connection.Open();
             DbContext = CreateContext();
@@ -58,7 +61,7 @@ public sealed class EfUnitOfWorkTests
 
             var options = Options.Create(new D3FragmentsApplicationOptions());
             var dispatcher = new DomainEventDispatcher(_provider, NullLogger<DomainEventDispatcher>.Instance, options);
-            UnitOfWork = new EfUnitOfWork<TestDbContext>(DbContext, dispatcher, new ImmediateDispatchStrategy(dispatcher), Logger, options);
+            UnitOfWork = new EfUnitOfWork<TestDbContext>(DbContext, dispatcher, strategy ?? new ImmediateDispatchStrategy(dispatcher), Logger, options);
         }
 
         public TestDbContext DbContext { get; }
@@ -256,5 +259,79 @@ public sealed class EfUnitOfWorkTests
         harness.UnitOfWork.DiscardChanges();
 
         Assert.Empty(harness.DbContext.ChangeTracker.Entries());
+    }
+
+    // Dispatch戦略に渡された内容を記録する
+    private sealed class RecordingStrategy : IDomainEventDispatchStrategy
+    {
+        public List<IReadOnlyList<IDomainEvent>> Prepared { get; } = [];
+
+        public List<IReadOnlyList<IDomainEvent>> DispatchedAfterCommit { get; } = [];
+
+        public Task PrepareAsync(DbContext dbContext, IReadOnlyList<IDomainEvent> events, CancellationToken cancellationToken)
+        {
+            Prepared.Add([.. events]);
+            return Task.CompletedTask;
+        }
+
+        public Task DispatchAfterCommitAsync(IReadOnlyList<IDomainEvent> events, CancellationToken cancellationToken)
+        {
+            DispatchedAfterCommit.Add([.. events]);
+            return Task.CompletedTask;
+        }
+    }
+
+    [Fact]
+    public async Task 保存_今回ディスパッチしたイベントをDispatch戦略の準備とCommit後の配信に渡す()
+    {
+        var strategy = new RecordingStrategy();
+        await using var harness = new Harness(strategy: strategy);
+        var entity = AddWithEvent(harness.DbContext, 1);
+        var domainEvent = Assert.Single(((IHasDomainEvents)entity).DomainEvents);
+
+        await harness.UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        Assert.Same(domainEvent, Assert.Single(Assert.Single(strategy.Prepared)));
+        Assert.Same(domainEvent, Assert.Single(Assert.Single(strategy.DispatchedAfterCommit)));
+        Assert.Empty(((IHasDomainEvents)entity).DomainEvents);
+    }
+
+    [Fact]
+    public async Task 保存_イベントがなければCommit後の配信を呼ばない()
+    {
+        var strategy = new RecordingStrategy();
+        await using var harness = new Harness(strategy: strategy);
+        harness.DbContext.Entities.Add(new TestEntity(1));
+
+        await harness.UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        Assert.Empty(Assert.Single(strategy.Prepared));
+        Assert.Empty(strategy.DispatchedAfterCommit);
+    }
+
+    [Fact]
+    public async Task トランザクション内_例外が発生した場合は追跡中の変更と未配信のイベントを破棄する()
+    {
+        var strategy = new RecordingStrategy();
+        await using var harness = new Harness(strategy: strategy);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            harness.UnitOfWork.ExecuteInTransactionAsync<int>(
+                async ct =>
+                {
+                    AddWithEvent(harness.DbContext, 1);
+                    await harness.UnitOfWork.SaveChangesAsync(ct);
+                    throw new InvalidOperationException();
+                },
+                CancellationToken.None));
+
+        Assert.Empty(harness.DbContext.ChangeTracker.Entries());
+
+        // 破棄したイベントが、後続の保存で配信されない
+        harness.DbContext.Entities.Add(new TestEntity(2));
+        await harness.UnitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        Assert.Empty(strategy.DispatchedAfterCommit);
+        Assert.Equal([2], await harness.SavedValuesAsync());
     }
 }

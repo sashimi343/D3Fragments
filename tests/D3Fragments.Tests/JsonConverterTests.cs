@@ -60,4 +60,45 @@ public class ValueObjectJsonConverterFactoryTests
 
         Assert.Contains("must be positive", ex.Message);
     }
+
+    // TSelf 以外の派生型（ValueObject を継承したクラス）は変換対象外であることの確認用
+    public class Code : ValueObjectBase<Code, string>, IValueObject<Code, string>
+    {
+        protected Code(string value) : base(value)
+        {
+        }
+
+        public static Code Create(string value) => new(value);
+
+        public static bool ValidateValue(string value, [NotNullWhen(false)] out string? errorMessage)
+        {
+            errorMessage = null;
+            return true;
+        }
+    }
+
+    public sealed class ProductCode(string value) : Code(value);
+
+    [Fact]
+    public void CanConvert_ValueObjectの定義型のみ変換対象とする()
+    {
+        var factory = new ValueObjectJsonConverterFactory();
+
+        Assert.True(factory.CanConvert(typeof(PositiveNumber)));
+        Assert.True(factory.CanConvert(typeof(Code)));
+        Assert.False(factory.CanConvert(typeof(ProductCode)));
+        Assert.False(factory.CanConvert(typeof(int)));
+    }
+
+    [Fact]
+    public void CreateConverter_変換対象外の型は例外になる()
+    {
+        Assert.Throws<ArgumentException>(() => new ValueObjectJsonConverterFactory().CreateConverter(typeof(int), JsonSerializerOptions.Default));
+    }
+
+    [Fact]
+    public void プリミティブ型に変換できない値はJsonExceptionになる()
+    {
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<PositiveNumber>("\"abc\"", Options));
+    }
 }

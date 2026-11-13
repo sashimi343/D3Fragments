@@ -64,5 +64,14 @@ namespace D3Fragments.Application.Resources {
                 return ResourceManager.GetString("ArgumentException_AssembliesEmpty", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   The request type {0} must implement exactly one of ICommand&lt;TResponse&gt; and IQuery&lt;TResponse&gt;. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string InvalidOperationException_RequestMustBeCommandOrQuery {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_RequestMustBeCommandOrQuery", resourceCulture);
+            }
+        }
     }
 }

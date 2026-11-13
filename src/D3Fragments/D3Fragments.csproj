@@ -1,4 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Building blocks for DDD domain models: aggregate roots, entities, value objects, type-safe enums, Result, and domain events.</Description>
+    <PackageTags>$(PackageTags);value-object;aggregate</PackageTags>
+  </PropertyGroup>
   <PropertyGroup>
     <AppDesignerFolder>Resources</AppDesignerFolder>
   </PropertyGroup>

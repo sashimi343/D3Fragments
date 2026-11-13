@@ -4,5 +4,21 @@
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId Condition="'$(PackageId)' == ''">Sashimi343.$(MSBuildProjectName)</PackageId>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Authors>sashimi343</Authors>
+        <PackageProjectUrl>https://sashimi343.github.io/D3Fragments/</PackageProjectUrl>
+        <!-- 各プロジェクトで $(PackageTags);... として追記する -->
+        <PackageTags>ddd;domain-driven-design;clean-architecture</PackageTags>
+        <!-- SourceLink でステップインできるよう、pdb をシンボルパッケージで配布する -->
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
+
+    <ItemGroup>
+        <!-- 元画像は assets/icon.svg -->
+        <None Include="$(MSBuildThisFileDirectory)..\assets\icon.png" Pack="true" PackagePath="\" Visible="false" />
+        <!-- リポジトリの README は相対リンクが NuGet 上で解決できないため、パッケージ用を別に持つ -->
+        <None Include="$(MSBuildThisFileDirectory)..\assets\nuget\README.md" Pack="true" PackagePath="\" Visible="false" />
+    </ItemGroup>
 </Project>

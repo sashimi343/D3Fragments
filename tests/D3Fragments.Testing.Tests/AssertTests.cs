@@ -56,6 +56,22 @@ public class ResultAssertTests
         Assert.Equal(ErrorType.Validation, ResultAssert.ContainsError(result, "必須").Type);
         Assert.ThrowsAny<XunitException>(() => ResultAssert.ContainsError(result, "長すぎます"));
     }
+
+    [Fact]
+    public void IsSuccess_値を持つ結果が失敗の場合は失敗する()
+    {
+        Assert.ThrowsAny<XunitException>(() => ResultAssert.IsSuccess(Result<int>.Failure(Error.Validation("e"))));
+    }
+
+    [Fact]
+    public void 各アサーション_nullの結果は例外になる()
+    {
+        Assert.Throws<ArgumentNullException>(() => ResultAssert.IsSuccess(null!));
+        Assert.Throws<ArgumentNullException>(() => ResultAssert.IsSuccess<int>(null!));
+        Assert.Throws<ArgumentNullException>(() => ResultAssert.IsFailure(null!));
+        Assert.Throws<ArgumentNullException>(() => ResultAssert.HasError(null!, ErrorType.Validation));
+        Assert.Throws<ArgumentNullException>(() => ResultAssert.ContainsError(null!, "e"));
+    }
 }
 
 public class DomainEventAssertTests
@@ -77,6 +93,19 @@ public class DomainEventAssertTests
         Assert.ThrowsAny<XunitException>(() => DomainEventAssert.Raised<OrderCanceled>(events));
         Assert.ThrowsAny<XunitException>(() => DomainEventAssert.Raised<OrderPlaced>(events));
         Assert.ThrowsAny<XunitException>(() => DomainEventAssert.NotRaised<OrderPlaced>(events));
+    }
+
+    [Fact]
+    public void NotRaised_集約が指定したイベントを保持している場合は失敗する()
+    {
+        Assert.ThrowsAny<XunitException>(() => DomainEventAssert.NotRaised<OrderPlaced>(new Order(TestTime.Now)));
+    }
+
+    [Fact]
+    public void 各アサーション_nullの集約は例外になる()
+    {
+        Assert.Throws<ArgumentNullException>(() => DomainEventAssert.Raised<OrderPlaced>((IHasDomainEvents)null!));
+        Assert.Throws<ArgumentNullException>(() => DomainEventAssert.NotRaised<OrderPlaced>((IHasDomainEvents)null!));
     }
 
     [Fact]

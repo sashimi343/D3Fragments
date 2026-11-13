@@ -174,6 +174,19 @@ public sealed class AggregateConcurrencyTests : IDisposable
         Assert.Equal((0, 0), await SavedVersionsAsync());
     }
 
+    [Fact]
+    public async Task 子エンティティが変更されていない場合_集約ルートは更新されない()
+    {
+        await using var dbContext = CreateContext();
+        await LoadOrderAsync(dbContext);
+        var product = await dbContext.Products.SingleAsync(TestContext.Current.CancellationToken);
+
+        product.ChangeStock(10);
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal((0, 1), await SavedVersionsAsync());
+    }
+
     // 子エンティティが他の集約をIDで参照する外部キー（親側にナビゲーションがない）はたどらない
     [Fact]
     public async Task 他の集約をIDで参照する外部キー_参照先の集約は更新されない()

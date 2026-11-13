@@ -120,4 +120,42 @@ public class D3FragmentsApplicationServiceCollectionExtensionsTests
 
         Assert.Throws<ArgumentException>("assemblies", () => services.AddD3FragmentsApplication([]));
     }
+
+    // 走査対象アセンブリに含めると他のテストの登録が失敗するため、AddHandlersに直接渡す
+    private sealed record PlainRequest : IRequest<int>;
+
+    private sealed record ValidQuery : IQuery<int>;
+
+    private sealed record AmbiguousRequest : ICommand<int>, IQuery<int>;
+
+    private sealed record LegacyTransactionalCommand : IRequest<int>, ITransactionalCommand;
+
+    private sealed class Handler<TRequest> : IRequestHandler<TRequest, int>
+        where TRequest : IRequest<int>
+    {
+        public Task<int> HandleAsync(TRequest request, CancellationToken cancellationToken) => Task.FromResult(0);
+    }
+
+    [Theory]
+    [InlineData(typeof(Handler<PlainRequest>))]
+    [InlineData(typeof(Handler<AmbiguousRequest>))]
+    public void CommandとQueryのどちらとも判別できないリクエストのハンドラーは登録時に例外を送出する(Type handlerType)
+    {
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            D3FragmentsApplicationServiceCollectionExtensions.AddHandlers(new ServiceCollection(), [handlerType]));
+
+        Assert.Contains(handlerType.GenericTypeArguments[0].FullName!, exception.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(typeof(Handler<ValidQuery>))]
+    [InlineData(typeof(Handler<LegacyTransactionalCommand>))]
+    public void CommandまたはQueryの一方だけを実装するリクエストのハンドラーは登録できる(Type handlerType)
+    {
+        var services = new ServiceCollection();
+
+        D3FragmentsApplicationServiceCollectionExtensions.AddHandlers(services, [handlerType]);
+
+        Assert.Contains(services, x => x.ImplementationType == handlerType);
+    }
 }

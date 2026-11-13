@@ -13,7 +13,7 @@ internal static class CodeFixVerifier<TAnalyzer, TCodeFix>
     where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFix : CodeFixProvider, new()
 {
-    public static Task VerifyAsync(string source, string fixedSource)
+    public static Task VerifyAsync(string source, string fixedSource, bool allowUnsafe = false)
     {
         var test = new CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier>
         {
@@ -22,6 +22,11 @@ internal static class CodeFixVerifier<TAnalyzer, TCodeFix>
             ReferenceAssemblies = TestReferences.None,
         };
         test.TestState.AdditionalReferences.AddRange(TestReferences.All);
+        if (allowUnsafe)
+        {
+            test.SolutionTransforms.Add((solution, projectId) =>
+                solution.WithProjectCompilationOptions(projectId, ((Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions)solution.GetProject(projectId)!.CompilationOptions!).WithAllowUnsafe(true)));
+        }
         // 修正後も残る診断（コード修正の対象外のフィールド等）を FixedCode のマークアップで検証できるようにする
         test.FixedState.MarkupHandling = MarkupMode.Allow;
         return test.RunAsync(TestContext.Current.CancellationToken);

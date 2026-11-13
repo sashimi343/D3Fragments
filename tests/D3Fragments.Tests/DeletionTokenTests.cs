@@ -4,13 +4,13 @@ public class DeletionTokenTests
 {
     private sealed class TestAggregate : AggregateRoot
     {
-        public DeletionToken<TestAggregate> Delete() => AllowDeletion(this);
+        public DeletionToken<TestAggregate> Delete() => IssueDeletionToken(this);
 
-        public DeletionToken<TestAggregate> DeleteOther(TestAggregate other) => AllowDeletion(other);
+        public DeletionToken<TestAggregate> DeleteOther(TestAggregate other) => IssueDeletionToken(other);
     }
 
     [Fact]
-    public void AllowDeletion_自身を渡すと自身を保持するトークンを発行する()
+    public void IssueDeletionToken_自身を渡すと自身を保持するトークンを発行する()
     {
         var aggregate = new TestAggregate();
 
@@ -20,7 +20,7 @@ public class DeletionTokenTests
     }
 
     [Fact]
-    public void AllowDeletion_自身以外を渡すと例外をスローする()
+    public void IssueDeletionToken_自身以外を渡すと例外をスローする()
     {
         var aggregate = new TestAggregate();
         var other = new TestAggregate();

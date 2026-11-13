@@ -1,5 +1,6 @@
 using D3Fragments.Analyzers.Common;
 using D3Fragments.Analyzers.Tests.Helpers;
+
 using Microsoft.CodeAnalysis;
 
 namespace D3Fragments.Analyzers.Tests.Common;
@@ -16,6 +17,8 @@ public sealed class ModuleLayerResolverTests
         using Microsoft.EntityFrameworkCore;
 
         public sealed class BooksController : ControllerBase { }
+        public abstract class BooksPage : Microsoft.AspNetCore.Mvc.RazorPages.PageModel { }
+        public sealed class BooksIndex : BooksPage { }
         public sealed record GetShelf(UuidV7 Id) : IQuery<int>;
         public sealed class GetShelfHandler : IRequestHandler<GetShelf, int>
         {
@@ -73,6 +76,8 @@ public sealed class ModuleLayerResolverTests
 
     [Theory]
     [InlineData("BooksController", ArchitectureLayerType.Presentation, "Presentation_Controller")]
+    [InlineData("BooksPage", ArchitectureLayerType.Presentation, "Presentation_Controller")]
+    [InlineData("BooksIndex", ArchitectureLayerType.Presentation, "Presentation_Controller")]
     [InlineData("Helper", ArchitectureLayerType.Presentation, "Presentation_Other")]
     [InlineData("GetShelf", ArchitectureLayerType.Application, "Application_Request")]
     [InlineData("GetShelfHandler", ArchitectureLayerType.Application, "Application_RequestHandler")]

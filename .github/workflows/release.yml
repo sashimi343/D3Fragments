@@ -6,7 +6,8 @@ on:
 
 permissions:
   contents: write # Create GitHub Release
-  id-token: write # Enable NuGet Trusted Publishing
+  pages: write    # Deploy documentation to GitHub Pages
+  id-token: write # Enable NuGet Trusted Publishing / verify the Pages deployment source
 
 jobs:
   release:
@@ -24,6 +25,16 @@ jobs:
 
       - run: dotnet test D3Fragments.slnx -c Release --no-build
 
+      # Build the documentation before publishing packages, so a broken doc build does not leave packages without docs
+      - run: dotnet tool restore
+
+      - run: ./scripts/BuildDocs.ps1
+        shell: pwsh
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
       - run: dotnet pack D3Fragments.slnx -c Release --no-build -p:Version=$VERSION -o artifacts
 
       - uses: NuGet/login@v1
@@ -36,3 +47,16 @@ jobs:
       - run: gh release create "$GITHUB_REF_NAME" artifacts/*.nupkg --draft --generate-notes $([[ "$VERSION" == *-* ]] && echo --prerelease)
         env:
           GH_TOKEN: ${{ github.token }}
+
+  deploy-docs:
+    needs: release
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

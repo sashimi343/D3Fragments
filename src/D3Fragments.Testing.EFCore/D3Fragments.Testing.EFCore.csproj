@@ -1,5 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <Description>Helpers for tests against a real database with Testcontainers and D3Fragments.EFCore.</Description>
+    <PackageTags>$(PackageTags);testing;testcontainers;efcore</PackageTags>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\D3Fragments.Testing\D3Fragments.Testing.csproj" />
     <ProjectReference Include="..\D3Fragments.EFCore\D3Fragments.EFCore.csproj" />

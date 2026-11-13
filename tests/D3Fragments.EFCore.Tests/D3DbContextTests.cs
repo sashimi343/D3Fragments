@@ -53,7 +53,7 @@ internal sealed class Member : AggregateRoot
 
     public void ChangeEmail(Email email) => Email = email;
 
-    public DeletionToken<Member> Delete() => AllowDeletion(this);
+    public DeletionToken<Member> Delete() => IssueDeletionToken(this);
 }
 
 internal sealed class MemberDbContext(DbContextOptions<MemberDbContext> options) : D3DbContext(options)
@@ -68,6 +68,21 @@ internal sealed class MemberDbContext(DbContextOptions<MemberDbContext> options)
             builder.ComplexValueObject(x => x.SubEmail);
         });
     }
+}
+
+internal sealed class UnmappedMemberDbContext(DbContextOptions<UnmappedMemberDbContext> options) : D3DbContext(options)
+{
+    public DbSet<Member> Members => Set<Member>();
+}
+
+internal sealed class Mailbox : AggregateRoot
+{
+    public List<Email> Aliases { get; private set; } = [];
+}
+
+internal sealed class UnmappedMailboxDbContext(DbContextOptions<UnmappedMailboxDbContext> options) : D3DbContext(options)
+{
+    public DbSet<Mailbox> Mailboxes => Set<Mailbox>();
 }
 
 internal sealed class MemberRepository(MemberDbContext dbContext) : RepositoryBase<MemberDbContext, Member>(dbContext);
@@ -97,6 +112,34 @@ internal sealed class SqliteTestDatabase : IDisposable
 
 public class D3DbContextTests
 {
+    [Fact]
+    public void ComplexValueObjectで登録していない値オブジェクトはモデル構築時に原因の分かる例外を送出する()
+    {
+        using var dbContext = new UnmappedMemberDbContext(new DbContextOptionsBuilder<UnmappedMemberDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .UseD3Fragments([typeof(TestColor).Assembly])
+            .Options);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => dbContext.Model);
+
+        Assert.Contains(typeof(Email).FullName!, exception.Message, StringComparison.Ordinal);
+        Assert.Contains("Member.Email", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("Member.SubEmail", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void 値オブジェクトのコレクションがエンティティ型としてマッピングされた場合も例外にプロパティ名を含める()
+    {
+        using var dbContext = new UnmappedMailboxDbContext(new DbContextOptionsBuilder<UnmappedMailboxDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => dbContext.Model);
+
+        Assert.Contains(typeof(Email).FullName!, exception.Message, StringComparison.Ordinal);
+        Assert.Contains("Mailbox.Aliases", exception.Message, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task UuidV7_TypeSafeEnum_ValueObjectを保存して復元できる()
     {
@@ -177,6 +220,23 @@ public class D3DbContextTests
         var reloaded = await readContext.Members.SingleAsync(TestContext.Current.CancellationToken);
         Assert.InRange(reloaded.UpdatedAt, before, DateTimeOffset.UtcNow);
         Assert.Equal(createdAt, reloaded.CreatedAt);
+    }
+
+    [Fact]
+    public void 同期版の保存でもVersionとUpdatedAtが更新される()
+    {
+        using var database = new SqliteTestDatabase();
+        using var dbContext = database.CreateContext();
+        var member = new Member(Email.Create("a@example.com"), null, TestColor.Red, null);
+        dbContext.Members.Add(member);
+        dbContext.SaveChanges();
+
+        var before = DateTimeOffset.UtcNow;
+        member.ChangeEmail(Email.Create("changed@example.com"));
+        dbContext.SaveChanges();
+
+        Assert.Equal(1, member.Version);
+        Assert.InRange(member.UpdatedAt, before, DateTimeOffset.UtcNow);
     }
 
     [Fact]

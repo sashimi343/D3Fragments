@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\BasicWebApp.Application\BasicWebApp.Application.csproj" />
+    <ProjectReference Include="..\BasicWebApp.Infrastructure\BasicWebApp.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Sashimi343.D3Fragments.AspNetCore" />
+    <PackageReference Include="Sashimi343.D3Fragments.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

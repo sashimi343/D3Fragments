@@ -71,4 +71,16 @@ public class CsrfProtectionTests
         Assert.Equal(StatusCodes.Status200OK, await SendAsync("POST", "/webhook/stripe"));
         Assert.Equal(StatusCodes.Status400BadRequest, await SendAsync("POST", "/webhooks"));
     }
+
+    [Fact]
+    public async Task 除外パスが複数ある場合はいずれかの配下なら検証しない()
+    {
+        Assert.Equal(StatusCodes.Status200OK, await SendAsync("POST", "/callback/x", configure: o => o.BypassPaths.Add("/callback")));
+    }
+
+    [Fact]
+    public void UseCsrfProtection_nullは例外になる()
+    {
+        Assert.Throws<ArgumentNullException>(() => ((IApplicationBuilder)null!).UseCsrfProtection());
+    }
 }

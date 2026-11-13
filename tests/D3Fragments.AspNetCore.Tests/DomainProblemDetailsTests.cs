@@ -3,6 +3,8 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace D3Fragments.AspNetCore.Tests;
 
@@ -95,5 +97,91 @@ public class DomainProblemDetailsTests
         await Result.Success().ToHttpResult().ExecuteAsync(context);
 
         Assert.Equal(StatusCodes.Status204NoContent, context.Response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Result成功_変換関数を指定した場合はその結果を返す()
+    {
+        var context = CreateContext();
+
+        await Result<int>.Success(42).ToHttpResult(x => TypedResults.Created($"/items/{x}", x)).ExecuteAsync(context);
+
+        Assert.Equal(StatusCodes.Status201Created, context.Response.StatusCode);
+        Assert.Equal("/items/42", context.Response.Headers.Location.ToString());
+    }
+
+    [Fact]
+    public async Task Result失敗_変換関数を指定しても呼ばずにProblemDetailsを返す()
+    {
+        var context = CreateContext();
+
+        await Result<int>.Failure(Error.NotFound("missing")).ToHttpResult(_ => throw new InvalidOperationException()).ExecuteAsync(context);
+
+        Assert.Equal(StatusCodes.Status404NotFound, context.Response.StatusCode);
+        Assert.Equal("application/problem+json", context.Response.ContentType);
+    }
+
+    [Fact]
+    public void ToHttpResult_nullは例外になる()
+    {
+        Assert.Throws<ArgumentNullException>(() => ((Result)null!).ToHttpResult());
+        Assert.Throws<ArgumentNullException>(() => ((Result<int>)null!).ToHttpResult());
+        Assert.Throws<ArgumentNullException>(() => ((Result<int>)null!).ToHttpResult(_ => TypedResults.Ok()));
+        Assert.Throws<ArgumentNullException>(() => Result<int>.Success(1).ToHttpResult(null!));
+    }
+
+    [Fact]
+    public void AddD3FragmentsAspNetCore_MinimalAPIとMVCのJSON設定に値オブジェクトのコンバーターを登録する()
+    {
+        using var services = new ServiceCollection().AddLogging().AddD3FragmentsAspNetCore().BuildServiceProvider();
+
+        Assert.Contains(
+            services.GetRequiredService<IOptions<Microsoft.AspNetCore.Http.Json.JsonOptions>>().Value.SerializerOptions.Converters,
+            x => x is ValueObjectJsonConverterFactory);
+        Assert.Contains(
+            services.GetRequiredService<IOptions<Microsoft.AspNetCore.Mvc.JsonOptions>>().Value.JsonSerializerOptions.Converters,
+            x => x is ValueObjectJsonConverterFactory);
+    }
+
+    [Fact]
+    public void AddD3FragmentsAspNetCore_nullは例外になる()
+    {
+        Assert.Throws<ArgumentNullException>(() => ((IServiceCollection)null!).AddD3FragmentsAspNetCore());
+    }
+
+    private sealed class RecordingLoggerProvider : ILoggerProvider
+    {
+        public List<(string Category, LogLevel Level, string Message)> Entries { get; } = [];
+
+        public ILogger CreateLogger(string categoryName) => new RecordingLogger(this, categoryName);
+
+        public void Dispose()
+        {
+        }
+
+        private sealed class RecordingLogger(RecordingLoggerProvider provider, string category) : ILogger
+        {
+            public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+            public bool IsEnabled(LogLevel logLevel) => true;
+
+            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) =>
+                provider.Entries.Add((category, logLevel, formatter(state, exception)));
+        }
+    }
+
+    [Fact]
+    public async Task DomainException_種類を含めてInformationでログに出力する()
+    {
+        var logs = new RecordingLoggerProvider();
+        var services = new ServiceCollection().AddLogging(x => x.AddProvider(logs)).AddD3FragmentsAspNetCore().BuildServiceProvider();
+        var context = new DefaultHttpContext { RequestServices = services, Response = { Body = new MemoryStream() } };
+        var handler = services.GetServices<IExceptionHandler>().Single();
+
+        await handler.TryHandleAsync(context, new DomainException(ErrorType.Conflict, "conflict"), CancellationToken.None);
+
+        var entry = Assert.Single(logs.Entries, x => x.Category.EndsWith("DomainExceptionHandler", StringComparison.Ordinal));
+        Assert.Equal(LogLevel.Information, entry.Level);
+        Assert.Contains("Conflict", entry.Message, StringComparison.Ordinal);
     }
 }

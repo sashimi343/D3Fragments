@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>Command / Query execution pipeline for the application layer, with handlers that save changes through a unit of work.</Description>
+    <PackageTags>$(PackageTags);cqrs;command;query</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <AppDesignerFolder>Resources</AppDesignerFolder>
   </PropertyGroup>
 
@@ -12,6 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Options" />
+    <InternalsVisibleTo Include="D3Fragments.Application.Tests" />
   </ItemGroup>
 
   <ItemGroup>
