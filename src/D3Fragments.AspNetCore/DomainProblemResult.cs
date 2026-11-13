@@ -14,7 +14,7 @@ internal sealed class DomainProblemResult(IReadOnlyList<Error> errors, string? e
         var errorType = errors[0].Type;
         var problem = new ProblemDetails
         {
-            Status = options.StatusCodeMap.TryGetValue(errorType, out var statusCode) ? statusCode : StatusCodes.Status400BadRequest,
+            Status = options.GetStatusCode(errorType),
             Title = errorType.ToString(),
             Detail = string.Join('\n', errors.Select(e => e.Message)),
         };

@@ -52,7 +52,7 @@ public sealed partial class DocumentationConsistencyTests
     public void Readme_ListsEveryRule(string language)
     {
         var culture = CultureInfo.GetCultureInfo(language);
-        var readme = File.ReadAllText(Path.Combine(AnalyzersDocsDirectory(language), "README.md"));
+        var readme = File.ReadAllText(Path.Combine(AnalyzersDocsDirectory(language), "index.md"));
         foreach (var descriptor in Descriptors)
         {
             Assert.Contains($"[{descriptor.Id}: {descriptor.Title.ToString(culture)}]({descriptor.Id}.md)", readme, StringComparison.Ordinal);

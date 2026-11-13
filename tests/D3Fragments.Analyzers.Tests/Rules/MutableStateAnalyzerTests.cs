@@ -214,4 +214,43 @@ public sealed class MutableStateAnalyzerTests
 
         await CodeFixVerifier<MutableStateAnalyzer, SetterAccessibilityCodeFixProvider>.VerifyAsync(source, fixedSource);
     }
+
+    [Fact]
+    public async Task CodeFix_KeepsIndentationAndAttributesOfAccessor()
+    {
+        const string source = Usings + """
+            public sealed class TodoItem : Entity
+            {
+                private int _total;
+                public int {|DFR0003:Total|}
+                {
+                    get => _total;
+                    internal set => _total = value;
+                }
+                public int {|DFR0003:Level|}
+                {
+                    get;
+                    [System.Obsolete] set;
+                }
+            }
+            """;
+        const string fixedSource = Usings + """
+            public sealed class TodoItem : Entity
+            {
+                private int _total;
+                public int Total
+                {
+                    get => _total;
+                    private set => _total = value;
+                }
+                public int Level
+                {
+                    get;
+                    [System.Obsolete] private set;
+                }
+            }
+            """;
+
+        await CodeFixVerifier<MutableStateAnalyzer, SetterAccessibilityCodeFixProvider>.VerifyAsync(source, fixedSource);
+    }
 }

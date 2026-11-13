@@ -1,0 +1,48 @@
+@page
+@using D3Fragments.Extensions
+@using BasicWebApp.Domain.Books
+@model BasicWebApp.Web.Pages.Books.IndexModel
+@{
+    ViewData["Title"] = "資料一覧";
+}
+<h1>資料一覧</h1>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<form method="get" class="d-flex gap-2 mb-3">
+    <label asp-for="Status" class="form-label">状態</label>
+    <select asp-for="Status" asp-items="Html.GetEnumSelectList<BookStatus>()" class="form-select w-auto">
+        <option value="">すべて</option>
+    </select>
+    <button class="btn btn-primary" type="submit">絞り込み</button>
+</form>
+@if (Model.Books.Items.Count == 0)
+{
+    <p>資料はありません。</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>書名</th><th>著者</th><th>ISBN</th><th>状態</th></tr></thead>
+            <tbody>
+                @foreach (var book in Model.Books.Items)
+                {
+                    <tr>
+                        <td><a asp-page="Details" asp-route-id="@book.Id">@book.Title</a></td>
+                        <td>@book.Author</td><td>@book.Isbn</td><td>@book.Status.GetDisplayName()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+<nav aria-label="資料一覧のページ">
+    <span>@Model.Books.PageNo / @Model.Books.TotalPages ページ（全 @Model.Books.TotalCount 冊）</span>
+    @if (Model.Books.HasPrevPage)
+    {
+        <a asp-route-PageNo="@Model.Books.PrevPage" asp-route-Status="@Model.Status" class="btn btn-outline-secondary">前へ</a>
+    }
+    @if (Model.Books.HasNextPage)
+    {
+        <a asp-route-PageNo="@Model.Books.NextPage" asp-route-Status="@Model.Status" class="btn btn-outline-secondary">次へ</a>
+    }
+</nav>

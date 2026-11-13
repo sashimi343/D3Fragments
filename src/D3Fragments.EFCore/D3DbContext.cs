@@ -50,6 +50,7 @@ public abstract class D3DbContext : DbContext
 
         configurationBuilder.Properties<UuidV7>().HaveConversion<UuidV7Converter>();
         configurationBuilder.Conventions.Add(_ => new VersionConcurrencyTokenConvention());
+        configurationBuilder.Conventions.Add(_ => new UnmappedValueObjectConvention());
 
         foreach (var type in _extension?.DomainAssemblies.SelectMany(x => x.GetTypes()) ?? [])
         {
@@ -76,11 +77,21 @@ public abstract class D3DbContext : DbContext
             }
 
             // 子エンティティの変更は、集約単位で競合を検知するため集約ルートの更新として扱う
-            if (entry.State is EntityState.Added or EntityState.Modified or EntityState.Deleted
-                && !IsAggregateRoot(entry.Entity.GetType())
-                && FindAggregateRoot(entry, entries) is { State: EntityState.Unchanged or EntityState.Modified, Entity: IUpdateTrackable root })
+            if (entry.State is not (EntityState.Added or EntityState.Modified or EntityState.Deleted) || IsAggregateRoot(entry.Entity.GetType()))
             {
-                updated.Add(root);
+                continue;
+            }
+
+            // 別の集約へ移された子（外部キーが変わった子）は、移動元と移動先の両方の集約の変更として扱う
+            EntityEntry?[] parents = entry.State == EntityState.Modified
+                ? [FindParent(entry, entries), FindParent(entry, entries, useOriginalValues: true)]
+                : [FindParent(entry, entries)];
+            foreach (var parent in parents)
+            {
+                if (FindAggregateRoot(parent, entries) is { State: EntityState.Unchanged or EntityState.Modified, Entity: IUpdateTrackable root })
+                {
+                    updated.Add(root);
+                }
             }
         }
 
@@ -91,10 +102,11 @@ public abstract class D3DbContext : DbContext
         }
     }
 
-    private static EntityEntry? FindAggregateRoot(EntityEntry entry, List<EntityEntry> entries)
+    // parent から親をたどり、最初に見つかった集約ルートを返す
+    private static EntityEntry? FindAggregateRoot(EntityEntry? parent, List<EntityEntry> entries)
     {
         var visited = new HashSet<EntityEntry>();
-        for (var current = FindParent(entry, entries); current is not null && visited.Add(current); current = FindParent(current, entries))
+        for (var current = parent; current is not null && visited.Add(current); current = FindParent(current, entries))
         {
             if (IsAggregateRoot(current.Entity.GetType()))
             {
@@ -107,12 +119,13 @@ public abstract class D3DbContext : DbContext
     // 親側に子へのナビゲーションがある外部キー（または所有関係）を集約の構成とみなし、親のエントリを探す。
     // 他の集約をIDのみで参照する外部キー（親側にナビゲーションがない）はたどらない
     // ponytail: 追跡中の全エントリを線形探索する。1回の保存で扱うエンティティ数が多くなり性能が問題になれば、キーで索引化する
-    private static EntityEntry? FindParent(EntityEntry entry, List<EntityEntry> entries)
+    // useOriginalValues が true の場合は、変更前の外部キーの値で親を探す（別の集約へ移される前の親）
+    private static EntityEntry? FindParent(EntityEntry entry, List<EntityEntry> entries, bool useOriginalValues = false)
     {
         foreach (var foreignKey in entry.Metadata.GetForeignKeys().Where(x => x.IsOwnership || x.PrincipalToDependent is not null))
         {
             // 削除された子や、コレクションから外されて外部キーがnullになった子は、変更前の値で親を特定する
-            var keyValues = foreignKey.Properties.Select(p => entry.State == EntityState.Deleted ? entry.OriginalValues[p] : entry.CurrentValues[p] ?? entry.OriginalValues[p]).ToArray();
+            var keyValues = foreignKey.Properties.Select(p => useOriginalValues || entry.State == EntityState.Deleted ? entry.OriginalValues[p] : entry.CurrentValues[p] ?? entry.OriginalValues[p]).ToArray();
             if (keyValues.Any(x => x is null))
             {
                 continue;

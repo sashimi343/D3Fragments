@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 using Testcontainers.PostgreSql;
 
+using Xunit.Sdk;
+
 [assembly: AssemblyFixture(typeof(PostgreSqlFixture))]
 
 namespace D3Fragments.Testing.EFCore.Tests;
@@ -118,9 +120,66 @@ public sealed class TransactionalTestBaseTests(PostgreSqlFixture fixture)
         await AssertEntityNotExistsAsync<Order>(x => x.Name == name);
     }
 
+    [Fact]
+    public async Task DisposeAsync_DbContextを破棄し2回呼んでも例外にならない()
+    {
+        var other = new SeedOnlyTest(Fixture);
+        await other.InitializeAsync();
+
+        await other.DisposeAsync();
+        await other.DisposeAsync();
+
+        Assert.Throws<ObjectDisposedException>(() => other.Context.Model);
+    }
+
+    [Fact]
+    public async Task AssertEntityExistsAsync_該当するデータがない場合は失敗する()
+    {
+        var name = TestData.Unique("missing");
+
+        await Assert.ThrowsAnyAsync<XunitException>(() => AssertEntityExistsAsync<Order>(x => x.Name == name));
+    }
+
+    [Fact]
+    public async Task AssertEntityNotExistsAsync_該当するデータがある場合は失敗する()
+    {
+        var order = Order.Place(TestData.Unique("exists"));
+        await SeedAsync(order);
+
+        await Assert.ThrowsAnyAsync<XunitException>(() => AssertEntityNotExistsAsync<Order>(x => x.Id == order.Id));
+    }
+
+    [Fact]
+    public async Task SeedAsync_保存後に変更追跡をクリアする()
+    {
+        await SeedAsync(Order.Place(TestData.Unique("seed")));
+
+        Assert.Empty(DbContext.ChangeTracker.Entries());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_実行後に変更追跡をクリアする()
+    {
+        await ExecuteAsync(new PlaceOrderHandler(new OrderRepository(DbContext)), new PlaceOrderCommand(TestData.Unique("command")));
+        Assert.Empty(DbContext.ChangeTracker.Entries());
+
+        // クエリで追加された未保存の変更も破棄され、後続の保存に混ざらない
+        await ExecuteAsync(new AddingQueryHandler(new OrderRepository(DbContext)), new AddingQuery(TestData.Unique("query")));
+        Assert.Empty(DbContext.ChangeTracker.Entries());
+    }
+
+    [Fact]
+    public async Task 不正な引数は例外になる()
+    {
+        Assert.Throws<ArgumentNullException>(() => new SeedOnlyTest(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => ExecuteAsync<PlaceOrderCommand, UuidV7>(null!, new PlaceOrderCommand("x")));
+    }
+
     private sealed class SeedOnlyTest(PostgreSqlFixture fixture)
         : TransactionalTestBase<TestDbContext, PostgreSqlFixture>(fixture)
     {
+        public TestDbContext Context => DbContext;
+
         public Task SeedOrderAsync(string name) => SeedAsync(Order.Place(name));
     }
 }

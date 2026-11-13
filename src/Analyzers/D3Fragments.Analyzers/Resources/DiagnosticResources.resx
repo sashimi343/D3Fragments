@@ -102,4 +102,16 @@
   <data name="CodeFix_MakeConstructorPrivate" xml:space="preserve">
     <value>Make the constructor private</value>
   </data>
+  <data name="DFR0015_Title" xml:space="preserve">
+    <value>Override FindAsync in repositories of aggregates that contain child entities</value>
+  </data>
+  <data name="DFR0015_MessageFormat" xml:space="preserve">
+    <value>Repository '{0}' does not override FindAsync, although aggregate '{1}' contains child entities ('{2}'). Override FindAsync and load the child entities with Include</value>
+  </data>
+  <data name="DFR0016_Title" xml:space="preserve">
+    <value>Request types should implement exactly one of ICommand and IQuery</value>
+  </data>
+  <data name="DFR0016_MessageFormat" xml:space="preserve">
+    <value>Request type '{0}' should implement exactly one of ICommand&lt;TResponse&gt; and IQuery&lt;TResponse&gt;</value>
+  </data>
 </root>

@@ -159,3 +159,41 @@ public class RequestExecutorTests
         Assert.Equal([100, 200, 300], executionOrder);
     }
 }
+
+file sealed class FakeExecutor(Func<Task<int>> action) : IRequestExecutor<FakeQuery, int>
+{
+    public Task<int> ExecuteAsync(FakeQuery request, CancellationToken cancellationToken) => action();
+}
+
+internal sealed record FakeQuery : IQuery<int>;
+
+public class RequestExecutorExtensionsTests
+{
+    [Fact]
+    public async Task TryExecuteAsync_成功時はレスポンスを保持する成功結果を返す()
+    {
+        var result = await new FakeExecutor(() => Task.FromResult(42)).TryExecuteAsync(new FakeQuery(), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(42, result.Value);
+    }
+
+    [Fact]
+    public async Task TryExecuteAsync_DomainExceptionは失敗結果に変換する()
+    {
+        var error = Error.Conflict("ng", target: "Name");
+
+        var result = await new FakeExecutor(() => throw new DomainException(error)).TryExecuteAsync(new FakeQuery(), CancellationToken.None);
+
+        Assert.True(result.IsFailure);
+        Assert.Same(error, Assert.Single(result.Errors));
+    }
+
+    [Fact]
+    public async Task TryExecuteAsync_DomainException以外の例外はそのまま伝播する()
+    {
+        var executor = new FakeExecutor(() => throw new InvalidOperationException());
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => executor.TryExecuteAsync(new FakeQuery(), CancellationToken.None));
+    }
+}

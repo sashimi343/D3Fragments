@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>ASP.NET Core integration for D3Fragments: converts domain errors into Problem Details responses.</Description>
+    <PackageTags>$(PackageTags);aspnetcore;problem-details</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <AppDesignerFolder>Resources</AppDesignerFolder>
   </PropertyGroup>
 

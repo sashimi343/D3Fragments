@@ -19,6 +19,12 @@ jobs:
 
       - run: dotnet test D3Fragments.slnx -c Release --no-build
 
+      # Detect broken links and xrefs in the documentation (not deployed)
+      - run: dotnet tool restore
+
+      - run: ./scripts/BuildDocs.ps1
+        shell: pwsh
+
       - run: dotnet pack D3Fragments.slnx -c Release --no-build -o artifacts
 
       - uses: actions/upload-artifact@v7

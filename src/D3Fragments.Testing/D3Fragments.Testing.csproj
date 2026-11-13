@@ -1,5 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <Description>Test helpers for applications built with D3Fragments.</Description>
+    <PackageTags>$(PackageTags);testing;xunit</PackageTags>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\D3Fragments\D3Fragments.csproj" />
     <ProjectReference Include="..\D3Fragments.Application\D3Fragments.Application.csproj" />

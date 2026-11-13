@@ -1,10 +1,35 @@
 using D3Fragments.Analyzers.Tests.Helpers;
+
 using Verifier = D3Fragments.Analyzers.Tests.Helpers.AnalyzerVerifier<D3Fragments.Analyzers.Rules.ModuleReferenceAnalyzer>;
 
 namespace D3Fragments.Analyzers.Tests.Rules;
 
 public sealed class ModuleReferenceAnalyzerTests
 {
+    [Fact]
+    public async Task PageModelInjectingRepository_ReportsDiagnostic()
+    {
+        const string source = Types + """
+            public sealed class BooksModel({|#0:IShelfRepository|} repository) : Microsoft.AspNetCore.Mvc.RazorPages.PageModel { }
+            """;
+
+        await Verifier.VerifyAsync(source, All, Verifier.Diagnostic(DiagnosticDescriptors.DFR0002)
+            .WithLocation(0).WithArguments("Presentation_Controller", "BooksModel", "Domain_RepositoryInterface", "IShelfRepository"));
+    }
+
+    [Fact]
+    public async Task PageModelUsingExecutor_ReportsNothing()
+    {
+        const string source = Types + """
+            public sealed class BooksModel(IRequestExecutor<GetShelf, int> executor) : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
+            {
+                public Task<int> OnGetAsync(UuidV7 id) => executor.ExecuteAsync(new GetShelf(id), CancellationToken.None);
+            }
+            """;
+
+        await Verifier.VerifyAsync(source, All);
+    }
+
     private const ArchitectureLayerType All =
         ArchitectureLayerType.Presentation | ArchitectureLayerType.Application | ArchitectureLayerType.Domain | ArchitectureLayerType.Infrastructure;
 

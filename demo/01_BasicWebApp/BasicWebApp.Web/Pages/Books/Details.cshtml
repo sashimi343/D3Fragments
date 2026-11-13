@@ -1,0 +1,61 @@
+@page "{id}"
+@using D3Fragments.Extensions
+@using BasicWebApp.Domain.Books
+@model BasicWebApp.Web.Pages.Books.DetailsModel
+@{
+    ViewData["Title"] = "資料詳細";
+}
+<h1>資料詳細</h1>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+@if (Model.Book is { } book)
+{
+    <dl class="row">
+        <dt class="col-sm-3">書名</dt><dd class="col-sm-9">@book.Title</dd>
+        <dt class="col-sm-3">著者</dt><dd class="col-sm-9">@book.Author</dd>
+        <dt class="col-sm-3">ISBN</dt><dd class="col-sm-9">@book.Isbn</dd>
+        <dt class="col-sm-3">状態</dt><dd class="col-sm-9">@book.Status.GetDisplayName()</dd>
+    </dl>
+    <h2 class="h4">予約待ち行列</h2>
+    @if (book.Reservations.Count == 0)
+    {
+        <p>予約はありません。</p>
+    }
+    else
+    {
+        <ol>
+            @foreach (var reservation in book.Reservations)
+            {
+                <li>
+                    @(reservation.MemberId == Model.CurrentMemberId ? "自分の予約" : "他の会員の予約")
+                    ／予約日：@reservation.ReservedOn
+                    @if (reservation.HoldUntil is { } until)
+                    {
+                        <span>／取り置き期限：@until</span>
+                    }
+                </li>
+            }
+        </ol>
+    }
+    @if (Model.CurrentMemberId is null)
+    {
+        <p><a asp-page="/Account/Login">会員ログイン</a>すると貸出・予約ができます。</p>
+    }
+    else
+    {
+        <div class="d-flex gap-2 mb-3">
+            @if (book.Status == BookStatus.Available || book.HoldMemberId == Model.CurrentMemberId)
+            {
+                <form method="post" asp-page-handler="Borrow"><button class="btn btn-primary">借りる</button></form>
+            }
+            @if (book.Reservations.Any(r => r.MemberId == Model.CurrentMemberId))
+            {
+                <form method="post" asp-page-handler="Cancel"><button class="btn btn-outline-danger">予約を取り消す</button></form>
+            }
+            else if (book.Status != BookStatus.Available)
+            {
+                <form method="post" asp-page-handler="Reserve"><button class="btn btn-outline-primary">予約する</button></form>
+            }
+        </div>
+    }
+}
+<a asp-page="Index">資料一覧へ戻る</a>

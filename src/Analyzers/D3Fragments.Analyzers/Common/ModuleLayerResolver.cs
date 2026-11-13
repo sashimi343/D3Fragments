@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
+
 using D3Fragments.Analyzers.Models;
+
 using Microsoft.CodeAnalysis;
 
 namespace D3Fragments.Analyzers.Common;
@@ -19,7 +21,7 @@ internal sealed class ModuleLayerResolver
         _rules =
         [
             (ModuleLayerType.Presentation_Controller, ArchitectureLayerType.Presentation,
-                t => IsClass(t) && (t.InheritsFrom(knownTypes.PageBase) || t.InheritsFrom(knownTypes.ControllerBase) || t.Implements(knownTypes.IComponent))),
+                t => IsClass(t) && (t.InheritsFrom(knownTypes.PageBase) || t.InheritsFrom(knownTypes.PageModel) || t.InheritsFrom(knownTypes.ControllerBase) || t.Implements(knownTypes.IComponent))),
             (ModuleLayerType.Application_Request, ArchitectureLayerType.Application,
                 t => IsClass(t) && (t.Implements(knownTypes.IRequest) || t.Implements(knownTypes.ICommand))),
             (ModuleLayerType.Application_RequestHandler, ArchitectureLayerType.Application,

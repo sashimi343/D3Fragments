@@ -26,8 +26,21 @@ public sealed class Pager<T> : IPager<T>
     ///     <para xml:lang="en">The total number of items across all pages.</para>
     ///     <para xml:lang="ja">現在のページ以外も含むすべてのページに存在するデータの件数。</para>
     /// </param>
+    /// <exception cref="ArgumentNullException">
+    ///     <para xml:lang="en">Thrown when <paramref name="items"/> is <see langword="null"/>.</para>
+    ///     <para xml:lang="ja"><paramref name="items"/>が<see langword="null"/>の場合。</para>
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     <para xml:lang="en">Thrown when <paramref name="pageNo"/> is less than <see cref="IPager.StartPageNo"/>, <paramref name="pageSize"/> is zero or negative, or <paramref name="totalCount"/> is negative.</para>
+    ///     <para xml:lang="ja"><paramref name="pageNo"/>が<see cref="IPager.StartPageNo"/>未満、<paramref name="pageSize"/>が0以下、または<paramref name="totalCount"/>が負の場合。</para>
+    /// </exception>
     public Pager(IEnumerable<T> items, int pageNo, int pageSize, int totalCount)
     {
+        ArgumentNullException.ThrowIfNull(items);
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageNo, IPager.StartPageNo);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
+        ArgumentOutOfRangeException.ThrowIfNegative(totalCount);
+
         Items = items.ToList();
         PageNo = pageNo;
         PageSize = pageSize;
@@ -65,5 +78,9 @@ public sealed class Pager<T> : IPager<T>
     ///     <para xml:lang="en">Creates an empty <see cref="Pager{T}"/> with the specified page size.</para>
     ///     <para xml:lang="ja">指定されたページサイズで、データが0件のページャを生成する。</para>
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     <para xml:lang="en">Thrown when <paramref name="pageSize"/> is zero or negative.</para>
+    ///     <para xml:lang="ja"><paramref name="pageSize"/>が0以下の場合。</para>
+    /// </exception>
     public static Pager<T> Empty(int pageSize) => new([], IPager.StartPageNo, pageSize, 0);
 }

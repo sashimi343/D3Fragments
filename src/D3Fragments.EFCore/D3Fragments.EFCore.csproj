@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>EF Core integration for D3Fragments: value object and UuidV7 mapping, optimistic concurrency, and domain event dispatching.</Description>
+    <PackageTags>$(PackageTags);efcore;entity-framework-core</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <AppDesignerFolder>Resources</AppDesignerFolder>
   </PropertyGroup>
 

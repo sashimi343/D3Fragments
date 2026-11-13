@@ -160,4 +160,35 @@ public sealed class TypeSafeEnumAnalyzerTests
 
         await CodeFixVerifier<TypeSafeEnumAnalyzer, TypeSafeEnumConstructorCodeFixProvider>.VerifyAsync(source, fixedSource);
     }
+
+    [Fact]
+    public async Task CodeFix_ReplacesAllAccessibilityModifiersAndKeepsOthers()
+    {
+        const string source = Usings + """
+            public class UserType : TypeSafeEnum<UserType, int>
+            {
+                public static readonly UserType Normal = new(0, "Normal");
+
+                protected internal {|DFR0006:UserType|}(int key, string name) : base(key, name) { }
+
+                public unsafe {|DFR0006:UserType|}(int key) : base(key) { }
+
+                unsafe internal {|DFR0006:UserType|}(string name) : base(0, name) { }
+            }
+            """;
+        const string fixedSource = Usings + """
+            public class UserType : TypeSafeEnum<UserType, int>
+            {
+                public static readonly UserType Normal = new(0, "Normal");
+
+                private UserType(int key, string name) : base(key, name) { }
+
+                private unsafe UserType(int key) : base(key) { }
+
+                private unsafe UserType(string name) : base(0, name) { }
+            }
+            """;
+
+        await CodeFixVerifier<TypeSafeEnumAnalyzer, TypeSafeEnumConstructorCodeFixProvider>.VerifyAsync(source, fixedSource, allowUnsafe: true);
+    }
 }

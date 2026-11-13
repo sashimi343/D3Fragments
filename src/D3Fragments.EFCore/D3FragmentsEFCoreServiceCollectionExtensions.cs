@@ -32,13 +32,13 @@ public static class D3FragmentsEFCoreServiceCollectionExtensions
     ///     <para xml:lang="en">The service collection to add the services to.</para>
     ///     <para xml:lang="ja">サービスを追加するサービスコレクション。</para>
     /// </param>
-    /// <param name="configureDbContext">
-    ///     <para xml:lang="en">The action that configures the <see cref="DbContext"/>, such as selecting the database provider.</para>
-    ///     <para xml:lang="ja">データベースプロバイダーの選択など、<see cref="DbContext"/>を構成するアクション。</para>
-    /// </param>
     /// <param name="assemblies">
     ///     <para xml:lang="en">The assemblies to scan for <see cref="TypeSafeEnum{TEnum, TKey}"/> types and repositories. At least one assembly is required.</para>
     ///     <para xml:lang="ja"><see cref="TypeSafeEnum{TEnum, TKey}"/>型とRepositoryを走査するアセンブリ。1つ以上必要である。</para>
+    /// </param>
+    /// <param name="configureDbContext">
+    ///     <para xml:lang="en">The action that configures the <see cref="DbContext"/>, such as selecting the database provider.</para>
+    ///     <para xml:lang="ja">データベースプロバイダーの選択など、<see cref="DbContext"/>を構成するアクション。</para>
     /// </param>
     /// <returns>
     ///     <para xml:lang="en">The same service collection for chaining.</para>
@@ -58,8 +58,8 @@ public static class D3FragmentsEFCoreServiceCollectionExtensions
     /// </exception>
     public static IServiceCollection AddD3FragmentsEFCore<TContext>(
         this IServiceCollection services,
-        Action<DbContextOptionsBuilder> configureDbContext,
-        IEnumerable<Assembly> assemblies)
+        IEnumerable<Assembly> assemblies,
+        Action<DbContextOptionsBuilder> configureDbContext)
         where TContext : D3DbContext
     {
         ArgumentNullException.ThrowIfNull(services);

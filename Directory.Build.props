@@ -13,6 +13,8 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/sashimi343/D3Fragments</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <!-- CI では pdb のソースパスを決定論的にする。SDK の targets より前に評価される必要があるため props に置く -->
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
         
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <AnalysisLevel>latest</AnalysisLevel>

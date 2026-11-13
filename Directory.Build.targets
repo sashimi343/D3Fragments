@@ -2,8 +2,5 @@
     <PropertyGroup>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">
-            true
-        </ContinuousIntegrationBuild>
     </PropertyGroup>
 </Project>

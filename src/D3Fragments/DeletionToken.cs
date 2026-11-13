@@ -1,8 +1,8 @@
 namespace D3Fragments;
 
 /// <summary>
-///     <para xml:lang="en">Represents proof that an aggregate has passed its own deletion rules. Instances can only be issued by the aggregate itself through <see cref="AggregateRoot{TId}.AllowDeletion{T}(T)"/>.</para>
-///     <para xml:lang="ja">集約が自身の削除ルールを通過したことを表す証明。インスタンスは集約自身が<see cref="AggregateRoot{TId}.AllowDeletion{T}(T)"/>を通じてのみ発行できる。</para>
+///     <para xml:lang="en">Represents proof that an aggregate has passed its own deletion rules. Instances can only be issued by the aggregate itself through <see cref="AggregateRoot{TId}.IssueDeletionToken{T}(T)"/>.</para>
+///     <para xml:lang="ja">集約が自身の削除ルールを通過したことを表す証明。インスタンスは集約自身が<see cref="AggregateRoot{TId}.IssueDeletionToken{T}(T)"/>を通じてのみ発行できる。</para>
 /// </summary>
 /// <remarks>
 ///     <para xml:lang="en">Deletion APIs such as repositories accept this token instead of an ID, so that deletion cannot be performed without going through the domain logic.</para>

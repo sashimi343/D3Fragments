@@ -1,0 +1,58 @@
+@page
+@model BasicWebApp.Web.Pages.Members.IndexModel
+@{
+    ViewData["Title"] = "マイページ";
+}
+<h1>マイページ</h1>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+@if (Model.MemberInfo is { } details)
+{
+    <dl class="row">
+        <dt class="col-sm-3">氏名</dt><dd class="col-sm-9">@details.Member.Name</dd>
+        <dt class="col-sm-3">メールアドレス</dt><dd class="col-sm-9">@details.Member.EmailAddress</dd>
+        <dt class="col-sm-3">会員種別</dt><dd class="col-sm-9">@details.Member.MemberType.Name</dd>
+        <dt class="col-sm-3">貸出中</dt><dd class="col-sm-9">@details.LoanCount / @details.Member.MemberType.LoanLimit 冊</dd>
+        <dt class="col-sm-3">貸出停止</dt>
+        <dd class="col-sm-9">
+            @if (details.IsLoanSuspended || details.IsLoanSuspensionScheduled)
+            {
+                @(details.IsLoanSuspended ? "停止中" : "停止予定")<text>（@details.Member.LoanSuspendedFrom ～ @details.Member.LoanSuspendedUntil）</text>
+            }
+            else
+            {
+                <text>停止していません</text>
+            }
+        </dd>
+    </dl>
+}
+<h2 class="h4">貸出中の資料</h2>
+@if (Model.Loans.Count == 0)
+{
+    <p>貸出中の資料はありません。</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>書名</th><th>貸出日</th><th>返却期限</th><th>延長回数</th><th>延滞</th><th>操作</th></tr></thead>
+            <tbody>
+                @foreach (var entry in Model.Loans)
+                {
+                    <tr>
+                        <td><a asp-page="/Books/Details" asp-route-id="@entry.Loan.BookId">@entry.BookTitle</a></td>
+                        <td>@entry.Loan.LoanedOn</td><td>@entry.Loan.DueDate</td><td>@entry.Loan.RenewalCount</td>
+                        <td>@(entry.IsOverdue ? "延滞中" : "なし")</td>
+                        <td>
+                            <form method="post" class="d-flex gap-2">
+                                <input type="hidden" name="LoanId" value="@entry.Loan.Id" />
+                                <button asp-page-handler="Return" class="btn btn-primary btn-sm">返却</button>
+                                <button asp-page-handler="Renew" class="btn btn-outline-primary btn-sm">延長</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+<a asp-page="/Books/Index">資料を探す</a>

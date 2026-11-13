@@ -60,6 +60,25 @@ public sealed class DuplicatedKey : TypeSafeEnum<DuplicatedKey, int>
     }
 }
 
+public sealed class DuplicatedName : TypeSafeEnum<DuplicatedName, int>
+{
+    public static readonly DuplicatedName A = new(1, "A");
+    public static readonly DuplicatedName B = new(2, "A");
+
+    private DuplicatedName(int key, string name) : base(key, name)
+    {
+    }
+}
+
+public sealed class EmptyName : TypeSafeEnum<EmptyName, int>
+{
+    public static readonly EmptyName A = new(1, "");
+
+    private EmptyName(int key, string name) : base(key, name)
+    {
+    }
+}
+
 public sealed record Order(Currency Currency, Shipping Shipping);
 
 public class TypeSafeEnumBaseTests
@@ -119,7 +138,45 @@ public class TypeSafeEnumBaseTests
     {
         var exception = Assert.Throws<TypeInitializationException>(() => DuplicatedKey.Values);
 
+        Assert.Equal("key", Assert.IsType<ArgumentException>(exception.InnerException).ParamName);
+    }
+
+    [Fact]
+    public void 名前が重複する定義は初期化時に例外になる()
+    {
+        var exception = Assert.Throws<TypeInitializationException>(() => DuplicatedName.Values);
+
+        Assert.Equal("name", Assert.IsType<ArgumentException>(exception.InnerException).ParamName);
+    }
+
+    [Fact]
+    public void 空の名前の定義は初期化時に例外になる()
+    {
+        var exception = Assert.Throws<TypeInitializationException>(() => EmptyName.Values);
+
         Assert.IsType<ArgumentException>(exception.InnerException);
+    }
+
+    [Fact]
+    public void ParseAsResult_定義済みのキーは成功結果を返す()
+    {
+        var result = Currency.ParseAsResult("JPY");
+
+        Assert.True(result.IsSuccess);
+        Assert.Same(Currency.Jpy, result.Value);
+    }
+
+    [Fact]
+    public void TryParse_nullのキーは例外になる()
+    {
+        Assert.Throws<ArgumentNullException>(() => Currency.TryParse(null!, out _));
+    }
+
+    [Fact]
+    public void ToString_名前を返す()
+    {
+        Assert.Equal("US Dollar", Currency.Usd.ToString());
+        Assert.Equal("1", Shipping.Standard.ToString());
     }
 }
 
@@ -164,5 +221,35 @@ public class TypeSafeEnumJsonConverterFactoryTests
         var options = Options(TypeSafeEnumJsonFormat.Key);
 
         Assert.Null(JsonSerializer.Deserialize<Currency>("null", options));
+    }
+
+    [Fact]
+    public void Constructor_既定はキー形式で未定義の形式は例外になる()
+    {
+        Assert.Equal(TypeSafeEnumJsonFormat.Key, new TypeSafeEnumJsonConverterFactory().Format);
+        Assert.Throws<ArgumentOutOfRangeException>(() => new TypeSafeEnumJsonConverterFactory((TypeSafeEnumJsonFormat)99));
+    }
+
+    [Fact]
+    public void CanConvert_TypeSafeEnumの定義型のみ変換対象とする()
+    {
+        var factory = new TypeSafeEnumJsonConverterFactory();
+
+        Assert.True(factory.CanConvert(typeof(Currency)));
+        Assert.True(factory.CanConvert(typeof(Shipping)));
+        Assert.False(factory.CanConvert(Shipping.Express.GetType()));
+        Assert.False(factory.CanConvert(typeof(string)));
+    }
+
+    [Fact]
+    public void CreateConverter_変換対象外の型は例外になる()
+    {
+        Assert.Throws<ArgumentException>(() => new TypeSafeEnumJsonConverterFactory().CreateConverter(typeof(string), JsonSerializerOptions.Default));
+    }
+
+    [Fact]
+    public void 名前指定時は文字列以外のトークンはJsonExceptionになる()
+    {
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<Currency>("1", Options(TypeSafeEnumJsonFormat.Name)));
     }
 }

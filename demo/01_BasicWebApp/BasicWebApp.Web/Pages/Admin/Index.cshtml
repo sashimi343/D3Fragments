@@ -1,0 +1,97 @@
+@page
+@using D3Fragments.Extensions
+@model BasicWebApp.Web.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "管理者（司書）";
+}
+<h1>管理者（司書）</h1>
+<p class="alert alert-warning">デモ専用の管理画面です。認証はありません。</p>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<h2 class="h4">資料登録</h2>
+<form method="post" asp-page-handler="Register" asp-route-PageNo="@Model.Books.PageNo" class="mb-4">
+    <div class="mb-3">
+        <label asp-for="Input.Isbn" class="form-label"></label>
+        <input asp-for="Input.Isbn" class="form-control" />
+        <span asp-validation-for="Input.Isbn" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.Title" class="form-label"></label>
+        <input asp-for="Input.Title" class="form-control" />
+        <span asp-validation-for="Input.Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.Author" class="form-label"></label>
+        <input asp-for="Input.Author" class="form-control" />
+        <span asp-validation-for="Input.Author" class="text-danger"></span>
+    </div>
+    <button class="btn btn-primary">資料を登録</button>
+</form>
+<h2 class="h4">資料の除籍</h2>
+<p>在架で予約のない資料だけを除籍できます。</p>
+<div class="table-responsive">
+    <table class="table">
+        <thead><tr><th>書名</th><th>状態</th><th>操作</th></tr></thead>
+        <tbody>
+            @foreach (var book in Model.Books.Items)
+            {
+                <tr>
+                    <td><a asp-page="/Books/Details" asp-route-id="@book.Id">@book.Title</a></td>
+                    <td>@book.Status.GetDisplayName()</td>
+                    <td>
+                        <form method="post" asp-page-handler="Delete" asp-route-PageNo="@Model.Books.PageNo">
+                            <input type="hidden" name="bookId" value="@book.Id" />
+                            <button class="btn btn-outline-danger btn-sm">除籍</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<nav aria-label="管理用資料一覧のページ" class="mb-4">
+    <span>@Model.Books.PageNo / @Model.Books.TotalPages ページ（全 @Model.Books.TotalCount 冊）</span>
+    @if (Model.Books.HasPrevPage)
+    {
+        <a asp-route-PageNo="@Model.Books.PrevPage" class="btn btn-outline-secondary">前へ</a>
+    }
+    @if (Model.Books.HasNextPage)
+    {
+        <a asp-route-PageNo="@Model.Books.NextPage" class="btn btn-outline-secondary">次へ</a>
+    }
+</nav>
+<h2 class="h4">取り置き期限切れ処理</h2>
+<p>日次バッチ相当の処理をController APIで手動実行します。</p>
+<button type="button" class="btn btn-outline-primary mb-2" id="expire-holds" data-url="@Url.Content("~/api/holds/expire")">期限切れを処理</button>
+<p id="expiry-result" role="status"></p>
+@if (Model.CanAdvanceDate)
+{
+    <h2 class="h4">開発用の日付変更</h2>
+    <p>すべての会員に影響します。前進のみ可能で、再起動すると実際の日付に戻ります。</p>
+    <form method="post" asp-page-handler="Advance" asp-route-PageNo="@Model.Books.PageNo" class="d-flex gap-2">
+        <label asp-for="Days" class="form-label">進める日数</label>
+        <input asp-for="Days" min="1" max="@int.MaxValue" required class="form-control w-auto" />
+        <button class="btn btn-outline-primary">日付を進める</button>
+    </form>
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $("#expire-holds").on("click", function () {
+            const button = $(this);
+            const result = $("#expiry-result");
+            button.prop("disabled", true);
+            result.text("処理中…");
+            $.ajax({
+                url: button.data("url"),
+                method: "POST",
+                headers: { "X-Requested-By": "BasicWebApp" }
+            }).done(function (data) {
+                result.removeClass("text-danger").text("処理した資料：" + data.processedCount + "件。一覧を更新して状態を確認してください。");
+            }).fail(function (xhr) {
+                result.addClass("text-danger").text("処理に失敗しました（HTTP " + xhr.status + "）。" + (xhr.responseJSON?.detail ?? "再度操作してください。"));
+            }).always(function () {
+                button.prop("disabled", false);
+            });
+        });
+    </script>
+}

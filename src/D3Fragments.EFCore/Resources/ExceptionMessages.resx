@@ -76,10 +76,16 @@
   <data name="Error_PageSizeExceedsMaximum" xml:space="preserve">
     <value>The page size must not exceed {0}.</value>
   </data>
+  <data name="Error_PageNoExceedsMaximum" xml:space="preserve">
+    <value>The page number must not exceed {0}.</value>
+  </data>
   <data name="ArgumentException_AssembliesEmpty" xml:space="preserve">
     <value>At least one assembly must be specified.</value>
   </data>
   <data name="InvalidOperationException_DuplicateRepositoryImplementation" xml:space="preserve">
     <value>Multiple implementations were found for the repository interface {0}: {1}, {2}.</value>
+  </data>
+  <data name="InvalidOperationException_ValueObjectMappedAsEntity" xml:space="preserve">
+    <value>The value object {0} is mapped as an entity type. Register the property ({1}) with ComplexValueObject in OnModelCreating.</value>
   </data>
 </root>

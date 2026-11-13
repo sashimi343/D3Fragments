@@ -1,13 +1,13 @@
 ---
 name: xml-commenting
-description: C# の XML ドキュメントコメント（`///`）を記述する際のルールを定義する。public/protected な型・メンバーのXMLコメントを作成または修正する際に参照する。
+description: NuGetパッケージとして公開する C# クラスの XML ドキュメントコメント（`///`）を記述する際のルールを定義する。 src/ 以下の public/protected な型・メンバーのXMLコメントを作成または修正する際に参照する。
 ---
 
 # C# XMLコメント記述ガイド
 
 ## 目的
 このガイドは、C# の XML ドキュメントコメント（`///`）を記述する際のルールを定義する。
-AIエージェントは、**public / protected の型・メンバー**に対して本ガイドを適用すること。
+AIエージェントは、`src/` 以下の **public / protected の型・メンバー**に対して本ガイドを適用すること。
 
 ---
 
@@ -284,6 +284,6 @@ public string Name { get; }
 
 ## エージェントへの適用指示
 
-- 生成対象が C# の public/protected API である場合、本ガイドを**必ず適用**すること。
+- 生成対象が `src/` 以下の C# の public/protected API である場合、本ガイドを**必ず適用**すること。
 - 例外条件・null可否・範囲制約がコード上で判別できる場合、`<param>` / `<exception>` に反映すること。
 - 曖昧な場合は過剰に推測せず、`<remarks>` を最小限に留めること。

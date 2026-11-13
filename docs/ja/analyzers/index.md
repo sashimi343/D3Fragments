@@ -1,0 +1,74 @@
+# D3Fragments アナライザ
+
+D3Fragments.Analyzers は、D3Fragments を使うときに推奨される設計・実装のガイドラインから外れたコードを、ビルド時に警告として検出します。
+
+## 適用方法
+
+D3Fragments.Analyzers を適用するためには以下の手順を実施してください。
+
+### アナライザ参照の追加
+
+各プロジェクトに以下の参照を追加します。
+
+dotnet コマンドで追加する場合は、次のコマンドを実行します。
+
+```bash
+dotnet add package Sashimi343.D3Fragments.Analyzers
+```
+
+csproj に直接書く場合は、次の要素を追加します。
+
+```csproj
+<ItemGroup>
+  <PackageReference Include="Sashimi343.D3Fragments.Analyzers">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  </PackageReference>
+</ItemGroup>
+```
+
+### アセンブリ アーキテクチャ層の設定
+
+D3Fragments.Analyzers を追加した各プロジェクトの `AssemblyInfo.cs` にて、該当アセンブリが属するアーキテクチャ層を明示します。
+`ArchitectureLayerAttribute` は D3Fragments パッケージ（`Sashimi343.D3Fragments`）に含まれるため、各プロジェクトから D3Fragments パッケージを参照している必要があります。
+アーキテクチャ層の詳細は [アーキテクチャ](../guide/01-architecture.md) を参照してください。
+
+アーキテクチャ層は以下のいずれかです。
+
+| アーキテクチャ層                                 | 設定値                                 |
+| :----------------------------------------------- | :------------------------------------- |
+| プレゼンテーション層（ユーザインターフェース層） | `ArchitectureLayerType.Presentation`   |
+| アプリケーション層                               | `ArchitectureLayerType.Application`    |
+| ドメイン層                                       | `ArchitectureLayerType.Domain`         |
+| インフラストラクチャ層                           | `ArchitectureLayerType.Infrastructure` |
+
+対象のアセンブリが複数のアーキテクチャ層を実装している場合、複数の `ArchitectureLayerType` を `|` で連結して指定できます。
+
+以下は `AssemblyInfo.cs` の設定例です。
+
+```csharp
+using D3Fragments;
+
+[assembly: ArchitectureLayer(ArchitectureLayerType.Application | ArchitectureLayerType.Domain)]
+```
+
+## 規則の一覧
+
+| 規則 ID と警告 | 説明 |
+|---|---|
+| [DFR0001: アーキテクチャ参照違反（プロジェクト間参照）](DFR0001.md) | プロジェクト間の依存関係が不適切です。抽象度の高いアセンブリは抽象度の低いアセンブリに依存すべきではありません。 |
+| [DFR0002: アーキテクチャ参照違反（モジュール間参照）](DFR0002.md) | モジュール（クラス・インターフェース）間の依存関係が不適切です。 |
+| [DFR0003: エンティティクラスは公開セッターをもつべきではありません](DFR0003.md) | エンティティクラスに公開セッターが定義されています。エンティティの状態変化は操作によって行われるべきであり、公開セッターによる値の書き換えは推奨しません。 |
+| [DFR0004: 集約の一部を取得するリポジトリメソッドを定義しないでください](DFR0004.md) | リポジトリメソッドの戻り値が集約ルート型ではなくその部分型になっています。リポジトリメソッドでは集約ルート単位でデータ取得を行う必要があります。 |
+| [DFR0005: 集約の一部を更新するリポジトリメソッドを定義しないでください](DFR0005.md) | リポジトリメソッドの引数に集約の部分型が使用されています。このようなメソッドは集約の部分更新を可能とし、集約の整合性を壊す可能性があるため実装しないでください。 |
+| [DFR0006: TypeSafeEnum型のコンストラクタをクラス外部に公開しないでください](DFR0006.md) | `TypeSafeEnum<TSelf, TKey>` を継承したクラスのコンストラクタの可視性が private ではありません。クラス外部にコンストラクタを公開すると意図しない列挙子を生成可能になるため、コンストラクタの公開を避けるべきです。 |
+| [DFR0007: 自己参照型パラメーター TSelf には宣言している型自身を指定してください](DFR0007.md) | `TypeSafeEnum<TSelf, TKey>` などの自己参照型パラメーター `TSelf` に、宣言しているクラス自身以外の型が指定されています。実行時に型変換の例外が発生します。 |
+| [DFR0008: TypeSafeEnum の値は static readonly フィールドで定義してください](DFR0008.md) | `TypeSafeEnum<TSelf, TKey>` の値が static readonly フィールド以外で定義されています。値の重複定義による例外や、値の差し替えが発生する可能性があります。 |
+| [DFR0009: エンティティは変更可能なコレクションを公開すべきではありません](DFR0009.md) | エンティティクラスが変更可能なコレクションを公開しています。セッターを非公開にしても、コレクションの操作によりエンティティの状態を外部から変更できてしまいます。 |
+| [DFR0010: 値オブジェクトは公開セッターをもつべきではありません](DFR0010.md) | 値オブジェクトに公開セッターが定義されています。値オブジェクトは不変であるべきです。 |
+| [DFR0011: コントローラはドメイン層のクラスをコンストラクタで注入すべきではありません](DFR0011.md) | コントローラのコンストラクタでドメイン層のクラス（ドメインサービス等）が注入されています。コントローラはアプリケーション層の処理を `IRequestExecutor<TRequest, TResponse>` 経由で呼び出すべきです。 |
+| [DFR0012: Pipeline Behavior 以外で保存・トランザクションを操作しないでください](DFR0012.md) | Pipeline Behavior・DbContext・Unit of Work 以外のクラスで、変更の保存やトランザクションの操作が行われています。保存とトランザクションの制御は Pipeline Behavior が一括して行うべきです。 |
+| [DFR0013: エンティティに対して Update・Attach を呼び出さないでください](DFR0013.md) | エンティティに対して EF Core の `Update`・`Attach` が呼び出されています。キーが設定済みのエンティティが既存の行として扱われ、子エンティティが正しく保存されない可能性があります。 |
+| [DFR0014: リポジトリで変更追跡を無効にしないでください](DFR0014.md) | リポジトリで `AsNoTracking()` 等により変更追跡が無効にされています。取得した集約への変更がエラーにならずに失われる可能性があります。 |
+| [DFR0015: 子エンティティを含む集約のリポジトリでは FindAsync をオーバーライドしてください](DFR0015.md) | 子エンティティを含む集約のリポジトリが `FindAsync` をオーバーライドしていません。既定の `FindAsync` は子エンティティを読み込まないため、集約の整合性を壊す可能性があります。 |
+| [DFR0016: リクエスト型は ICommand と IQuery のどちらか一方を実装してください](DFR0016.md) | リクエスト型が `ICommand` と `IQuery` のどちらも実装していないか、両方を実装しています。変更が保存されるかどうかを型から判断できず、Handler の登録時に例外となります。 |

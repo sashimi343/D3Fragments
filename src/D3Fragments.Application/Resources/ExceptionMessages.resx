@@ -61,4 +61,7 @@
   <data name="ArgumentException_AssembliesEmpty" xml:space="preserve">
     <value>At least one assembly must be specified.</value>
   </data>
+  <data name="InvalidOperationException_RequestMustBeCommandOrQuery" xml:space="preserve">
+    <value>The request type {0} must implement exactly one of ICommand&lt;TResponse&gt; and IQuery&lt;TResponse&gt;.</value>
+  </data>
 </root>
