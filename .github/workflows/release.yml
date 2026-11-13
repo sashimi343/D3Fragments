@@ -4,16 +4,24 @@ on:
   push:
     tags: ['v*']
 
-permissions:
-  contents: write # Create GitHub Release
-  pages: write    # Deploy documentation to GitHub Pages
-  id-token: write # Enable NuGet Trusted Publishing / verify the Pages deployment source
+# Grant permissions per job only
+permissions: {}
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    # The NuGet Trusted Publishing policy is bound to this environment, which only allows v* tags
+    environment: nuget
+    permissions:
+      contents: write # Create GitHub Release
+      id-token: write # Enable NuGet Trusted Publishing
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # Needed to check that the tagged commit is on main
+
+      # Do not publish commits that have not been merged into main
+      - run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
 
       - uses: actions/setup-dotnet@v6
         with:
@@ -51,6 +59,9 @@ jobs:
   deploy-docs:
     needs: release
     runs-on: ubuntu-latest
+    permissions:
+      pages: write    # Deploy documentation to GitHub Pages
+      id-token: write # Verify the Pages deployment source
     concurrency:
       group: pages
       cancel-in-progress: false
