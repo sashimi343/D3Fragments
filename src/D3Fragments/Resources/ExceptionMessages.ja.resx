@@ -156,4 +156,7 @@
   <data name="JsonException_InvalidUuidV7" xml:space="preserve">
     <value>UUID version 7として有効な値ではありません。</value>
   </data>
+  <data name="FormatException_InvalidUuidV7" xml:space="preserve">
+    <value>UUID version 7として有効な文字列ではありません。</value>
+  </data>
 </root>
