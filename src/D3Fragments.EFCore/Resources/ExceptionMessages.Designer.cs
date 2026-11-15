@@ -145,5 +145,14 @@ namespace D3Fragments.EFCore.Resources {
                 return ResourceManager.GetString("InvalidOperationException_ValueObjectMappedAsEntity", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   The D3Fragments conventions are not applied to {0}. Call ApplyD3FragmentsConventions in ConfigureConventions, or derive the context from D3DbContext. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string InvalidOperationException_ConventionsNotApplied {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_ConventionsNotApplied", resourceCulture);
+            }
+        }
     }
 }

@@ -88,4 +88,7 @@
   <data name="InvalidOperationException_ValueObjectMappedAsEntity" xml:space="preserve">
     <value>値オブジェクト {0} がエンティティ型としてマッピングされています。OnModelCreatingでプロパティ（{1}）をComplexValueObjectで登録してください。</value>
   </data>
+  <data name="InvalidOperationException_ConventionsNotApplied" xml:space="preserve">
+    <value>{0} にD3Fragmentsの規約が適用されていません。ConfigureConventionsでApplyD3FragmentsConventionsを呼び出すか、D3DbContextを継承してください。</value>
+  </data>
 </root>
