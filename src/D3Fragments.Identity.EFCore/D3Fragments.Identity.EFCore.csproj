@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- SignInManager（DB側の処理を分けた拡張メソッドの対象）のため -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\D3Fragments\D3Fragments.csproj" />
   </ItemGroup>
 

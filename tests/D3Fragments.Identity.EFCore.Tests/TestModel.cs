@@ -105,27 +105,41 @@ public sealed class IdentityTestHost : IDisposable
 {
     private readonly SqliteConnection _connection = new("DataSource=:memory:");
 
-    public IdentityTestHost(bool useRoles = true)
+    public IdentityTestHost(
+        bool useRoles = true,
+        Action<IdentityOptions>? configureIdentity = null,
+        Action<IdentityBuilder>? configureBuilder = null,
+        Action<IServiceCollection>? configureServices = null)
     {
         _connection.Open();
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddSingleton<MemberRegisteredProbe>();
         services.AddD3FragmentsApplication([typeof(IdentityTestHost).Assembly]);
+
+        void ConfigureIdentity(IdentityOptions options)
+        {
+            options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
+            configureIdentity?.Invoke(options);
+        }
+
+        IdentityBuilder builder;
         if (useRoles)
         {
             services.AddD3FragmentsEFCore<AppIdentityDbContext>([typeof(IdentityTestHost).Assembly], db => db.UseSqlite(_connection));
-            services.AddIdentityCore<Account>(options => options.Stores.SchemaVersion = IdentitySchemaVersions.Version3)
+            builder = services.AddIdentityCore<Account>(ConfigureIdentity)
                 .AddRoles<AccountRole>()
                 .AddD3FragmentsStores<AppIdentityDbContext>();
         }
         else
         {
             services.AddD3FragmentsEFCore<AppUserOnlyDbContext>([typeof(IdentityTestHost).Assembly], db => db.UseSqlite(_connection));
-            services.AddIdentityCore<Account>(options => options.Stores.SchemaVersion = IdentitySchemaVersions.Version3)
+            builder = services.AddIdentityCore<Account>(ConfigureIdentity)
                 .AddD3FragmentsStores<AppUserOnlyDbContext>();
         }
 
+        configureBuilder?.Invoke(builder);
+        configureServices?.Invoke(services);
         Services = services.BuildServiceProvider(validateScopes: true);
         using var scope = Services.CreateScope();
         (useRoles ? (DbContext)scope.ServiceProvider.GetRequiredService<AppIdentityDbContext>() : scope.ServiceProvider.GetRequiredService<AppUserOnlyDbContext>())
