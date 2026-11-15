@@ -42,6 +42,7 @@ dotnet add package Sashimi343.D3Fragments.AspNetCore     # Presentation layer
 | `Sashimi343.D3Fragments` | Domain model building blocks |
 | `Sashimi343.D3Fragments.Application` | Command / Query execution pipeline |
 | `Sashimi343.D3Fragments.EFCore` | EF Core integration |
+| `Sashimi343.D3Fragments.Identity.EFCore` | ASP.NET Core Identity integration (EF Core stores) |
 | `Sashimi343.D3Fragments.AspNetCore` | ASP.NET Core integration |
 | `Sashimi343.D3Fragments.AspNetCore.OpenApi` | OpenAPI integration |
 | `Sashimi343.D3Fragments.Testing` | Test helpers |
