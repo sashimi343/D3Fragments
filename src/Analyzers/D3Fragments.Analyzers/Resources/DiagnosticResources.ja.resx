@@ -114,4 +114,10 @@
   <data name="DFR0016_MessageFormat" xml:space="preserve">
     <value>リクエスト型 '{0}' は ICommand&lt;TResponse&gt; と IQuery&lt;TResponse&gt; のどちらか一方を実装してください</value>
   </data>
+  <data name="DFR0017_Title" xml:space="preserve">
+    <value>DBへの書き込みとCookieの操作を同時に行う SignInManager のメソッドを呼び出さないでください</value>
+  </data>
+  <data name="DFR0017_MessageFormat" xml:space="preserve">
+    <value>'{0}' から、DBへの書き込みとCookieの操作を同時に行う '{1}' を呼び出すべきではありません。代わりに {2} を使ってください</value>
+  </data>
 </root>
