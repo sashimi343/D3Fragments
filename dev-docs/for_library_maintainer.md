@@ -67,4 +67,13 @@ dotnet run scripts/StrykerSummary.cs -- tests/D3Fragments.EFCore.Tests/StrykerOu
 - 次の変異は Stryker が有効化できず、誤って「生存」になる。手で変異を入れてテストが失敗するか確かめる
   - static 初期化子の中（集計結果に `(static)` と表示される）や、static 初期化から呼ばれる処理（`TypeSafeEnum` の登録など）
   - EF Core のモデル構築（規約、`OnModelCreating`、`ConfigureConventions`）。モデルがプロセス内でキャッシュされるため
+  - アナライザーの `RegisterCompilationStartAction` の中（規則の登録を行うかどうかの早期リターンなど）
+- `D3Fragments.AspNetCore` の Identity 用の拡張メソッド（`D3Fragments.AspNetCore.Identity`）のテストは、記録用の認証サービスで標準の `SignInManager` と比べるため `D3Fragments.Identity.EFCore.Tests` にある。
+  `D3Fragments.AspNetCore` は両方のテストプロジェクトを指定して実行する
+
+  ```bash
+  cd tests/D3Fragments.AspNetCore.Tests
+  dotnet dotnet-stryker -f ../../stryker-config.json --project D3Fragments.AspNetCore.csproj --test-project D3Fragments.AspNetCore.Tests.csproj --test-project ../D3Fragments.Identity.EFCore.Tests/D3Fragments.Identity.EFCore.Tests.csproj
+  ```
+
 - Testcontainers を使う `D3Fragments.Testing.EFCore.Tests` は Docker が必要
