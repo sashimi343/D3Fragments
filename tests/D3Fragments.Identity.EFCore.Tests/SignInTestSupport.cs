@@ -57,7 +57,7 @@ public sealed class SignInTestHost : IDisposable
 
     private readonly IdentityTestHost _host;
 
-    public SignInTestHost(Action<IdentityOptions>? configureIdentity = null, Action<IdentityBuilder>? configureBuilder = null)
+    public SignInTestHost(Action<IdentityOptions>? configureIdentity = null, Action<IdentityBuilder>? configureBuilder = null, bool registerIdentityCookies = true)
     {
         _host = new IdentityTestHost(
             configureIdentity: options =>
@@ -73,7 +73,15 @@ public sealed class SignInTestHost : IDisposable
             configureServices: services =>
             {
                 services.AddDataProtection();
-                services.AddAuthentication().AddIdentityCookies();
+                if (registerIdentityCookies)
+                {
+                    services.AddAuthentication().AddIdentityCookies();
+                }
+                else
+                {
+                    // 二要素認証・外部ログインのスキームを登録しない構成
+                    services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
+                }
                 services.AddSingleton(Authentication);
                 services.Replace(ServiceDescriptor.Singleton<IAuthenticationService>(Authentication));
             });
