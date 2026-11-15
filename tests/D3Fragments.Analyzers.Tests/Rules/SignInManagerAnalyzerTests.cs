@@ -14,8 +14,8 @@ public sealed class SignInManagerAnalyzerTests
 
         """;
 
-    private static Microsoft.CodeAnalysis.Testing.DiagnosticResult Expect(int location, string from, string method, string replacement) =>
-        Verifier.Diagnostic(DiagnosticDescriptors.DFR0017).WithLocation(location).WithArguments(from, "SignInManager." + method, replacement);
+    private static Microsoft.CodeAnalysis.Testing.DiagnosticResult Expect(Microsoft.CodeAnalysis.DiagnosticDescriptor descriptor, int location, string from, string method, string replacement) =>
+        Verifier.Diagnostic(descriptor).WithLocation(location).WithArguments(from, "SignInManager." + method, replacement);
 
     [Fact]
     public async Task CookieとDBへの書き込みを同時に行うメソッドの呼び出し_ReportsDfr0017()
@@ -39,15 +39,15 @@ public sealed class SignInManagerAnalyzerTests
             """;
 
         await Verifier.VerifyAsync(source, All,
-            Expect(0, "LoginController", "PasswordSignInAsync", "VerifyPasswordAsync and CompleteSignInAsync / BeginTwoFactorSignInAsync"),
-            Expect(1, "LoginController", "PasswordSignInAsync", "VerifyPasswordAsync and CompleteSignInAsync / BeginTwoFactorSignInAsync"),
-            Expect(2, "LoginController", "CheckPasswordSignInAsync", "VerifyPasswordAsync"),
-            Expect(3, "LoginController", "TwoFactorSignInAsync", "VerifyTwoFactorCodeAsync and CompleteTwoFactorSignInAsync"),
-            Expect(4, "LoginController", "TwoFactorAuthenticatorSignInAsync", "VerifyTwoFactorCodeAsync and CompleteTwoFactorSignInAsync"),
-            Expect(5, "LoginController", "TwoFactorRecoveryCodeSignInAsync", "VerifyRecoveryCodeAsync and CompleteTwoFactorSignInAsync"),
-            Expect(6, "LoginController", "PasskeySignInAsync", "PerformPasskeyAssertionAsync, VerifyPasskeyAsync and CompleteSignInAsync"),
-            Expect(7, "LoginController", "ExternalLoginSignInAsync", "VerifyExternalLoginAsync and CompleteSignInAsync / BeginTwoFactorSignInAsync"),
-            Expect(8, "LoginController", "ExternalLoginSignInAsync", "VerifyExternalLoginAsync and CompleteSignInAsync / BeginTwoFactorSignInAsync"));
+            Expect(DiagnosticDescriptors.DFR0017, 0, "LoginController", "PasswordSignInAsync", "VerifyPasswordAsync and CompleteSignInAsync / BeginTwoFactorSignInAsync"),
+            Expect(DiagnosticDescriptors.DFR0017, 1, "LoginController", "PasswordSignInAsync", "VerifyPasswordAsync and CompleteSignInAsync / BeginTwoFactorSignInAsync"),
+            Expect(DiagnosticDescriptors.DFR0017, 2, "LoginController", "CheckPasswordSignInAsync", "VerifyPasswordAsync"),
+            Expect(DiagnosticDescriptors.DFR0017, 3, "LoginController", "TwoFactorSignInAsync", "VerifyTwoFactorCodeAsync and CompleteTwoFactorSignInAsync"),
+            Expect(DiagnosticDescriptors.DFR0017, 4, "LoginController", "TwoFactorAuthenticatorSignInAsync", "VerifyTwoFactorCodeAsync and CompleteTwoFactorSignInAsync"),
+            Expect(DiagnosticDescriptors.DFR0017, 5, "LoginController", "TwoFactorRecoveryCodeSignInAsync", "VerifyRecoveryCodeAsync and CompleteTwoFactorSignInAsync"),
+            Expect(DiagnosticDescriptors.DFR0017, 6, "LoginController", "PasskeySignInAsync", "PerformPasskeyAssertionAsync, VerifyPasskeyAsync and CompleteSignInAsync"),
+            Expect(DiagnosticDescriptors.DFR0017, 7, "LoginController", "ExternalLoginSignInAsync", "VerifyExternalLoginAsync and CompleteSignInAsync / BeginTwoFactorSignInAsync"),
+            Expect(DiagnosticDescriptors.DFR0017, 8, "LoginController", "ExternalLoginSignInAsync", "VerifyExternalLoginAsync and CompleteSignInAsync / BeginTwoFactorSignInAsync"));
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class SignInManagerAnalyzerTests
             }
             """;
 
-        await Verifier.VerifyAsync(source, All, Expect(0, "LoginHandler", "CheckPasswordSignInAsync", "VerifyPasswordAsync"));
+        await Verifier.VerifyAsync(source, All, Expect(DiagnosticDescriptors.DFR0017, 0, "LoginHandler", "CheckPasswordSignInAsync", "VerifyPasswordAsync"));
     }
 
     [Fact]
