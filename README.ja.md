@@ -42,6 +42,7 @@ dotnet add package Sashimi343.D3Fragments.AspNetCore     # プレゼンテーシ
 | `Sashimi343.D3Fragments` | ドメインモデルの部品 |
 | `Sashimi343.D3Fragments.Application` | Command / Query の実行基盤 |
 | `Sashimi343.D3Fragments.EFCore` | EF Core 連携 |
+| `Sashimi343.D3Fragments.Identity.EFCore` | ASP.NET Core Identity 連携（EF Core のストア） |
 | `Sashimi343.D3Fragments.AspNetCore` | ASP.NET Core 連携 |
 | `Sashimi343.D3Fragments.AspNetCore.OpenApi` | OpenAPI 連携 |
 | `Sashimi343.D3Fragments.Testing` | テスト用のヘルパー |

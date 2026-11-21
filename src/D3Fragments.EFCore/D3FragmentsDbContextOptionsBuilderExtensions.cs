@@ -12,9 +12,13 @@ namespace D3Fragments.EFCore;
 public static class D3FragmentsDbContextOptionsBuilderExtensions
 {
     /// <summary>
-    ///     <para xml:lang="en">Configures the settings used by <see cref="D3DbContext"/>. Call this together with the database provider (e.g. <c>UseNpgsql</c>) when registering the <see cref="DbContext"/>.</para>
-    ///     <para xml:lang="ja"><see cref="D3DbContext"/>が使用する設定を行う。<see cref="DbContext"/>の登録時に、DBプロバイダの指定（<c>UseNpgsql</c>等）と合わせて呼び出す。</para>
+    ///     <para xml:lang="en">Configures the settings used by <see cref="D3DbContext"/> and <see cref="D3FragmentsModelConfigurationBuilderExtensions.ApplyD3FragmentsConventions"/>. Call this together with the database provider (e.g. <c>UseNpgsql</c>) when registering the <see cref="DbContext"/>.</para>
+    ///     <para xml:lang="ja"><see cref="D3DbContext"/>と<see cref="D3FragmentsModelConfigurationBuilderExtensions.ApplyD3FragmentsConventions"/>が使用する設定を行う。<see cref="DbContext"/>の登録時に、DBプロバイダの指定（<c>UseNpgsql</c>等）と合わせて呼び出す。</para>
     /// </summary>
+    /// <remarks>
+    ///     <para xml:lang="en">This method also adds an interceptor that updates <see cref="IUpdateTrackable.UpdatedAt"/> and <see cref="IUpdateTrackable.Version"/> on save for a context that does not derive from <see cref="D3DbContext"/>. The interceptor does nothing for <see cref="D3DbContext"/>, which updates them itself, and is added only once even if this method is called more than once.</para>
+    ///     <para xml:lang="ja">このメソッドは、<see cref="D3DbContext"/>を継承しないコンテキストで保存時に<see cref="IUpdateTrackable.UpdatedAt"/>・<see cref="IUpdateTrackable.Version"/>を更新するインターセプターも追加する。自身で更新する<see cref="D3DbContext"/>ではインターセプターは何もしない。このメソッドを複数回呼び出しても、インターセプターは1つだけ追加する。</para>
+    /// </remarks>
     /// <param name="optionsBuilder">
     ///     <para xml:lang="en">The options builder.</para>
     ///     <para xml:lang="ja">オプションビルダー。</para>
@@ -43,6 +47,14 @@ public static class D3FragmentsDbContextOptionsBuilderExtensions
 
         var extension = new D3FragmentsOptionsExtension([.. domainAssemblies]);
         ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
+
+        // 複数回呼ばれても、保存時の更新が二重に行われないよう1つだけ登録する
+        var interceptors = optionsBuilder.Options.FindExtension<CoreOptionsExtension>()?.Interceptors ?? [];
+        if (!interceptors.Contains(D3SaveChangesInterceptor.Instance))
+        {
+            optionsBuilder.AddInterceptors(D3SaveChangesInterceptor.Instance);
+        }
+
         return optionsBuilder;
     }
 

@@ -88,4 +88,7 @@
   <data name="InvalidOperationException_ValueObjectMappedAsEntity" xml:space="preserve">
     <value>The value object {0} is mapped as an entity type. Register the property ({1}) with ComplexValueObject in OnModelCreating.</value>
   </data>
+  <data name="InvalidOperationException_ConventionsNotApplied" xml:space="preserve">
+    <value>The D3Fragments conventions are not applied to {0}. Call ApplyD3FragmentsConventions in ConfigureConventions, or derive the context from D3DbContext.</value>
+  </data>
 </root>

@@ -23,11 +23,20 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ResponseMessages.resx</DependentUpon>
     </Compile>
+    <Compile Update="Resources\ExceptionMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ExceptionMessages.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Resources\ResponseMessages.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ResponseMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\ExceptionMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

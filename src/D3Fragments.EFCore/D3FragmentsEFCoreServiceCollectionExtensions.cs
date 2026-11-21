@@ -25,8 +25,8 @@ public static class D3FragmentsEFCoreServiceCollectionExtensions
     ///     <para xml:lang="ja">このメソッドは、<paramref name="configureDbContext"/>の後に<see cref="D3FragmentsDbContextOptionsBuilderExtensions.UseD3Fragments(DbContextOptionsBuilder, IEnumerable{Assembly})"/>を適用した<typeparamref name="TContext"/>を登録する。また<see cref="EfUnitOfWork{TContext}"/>を<see cref="IUnitOfWork"/>として、<see cref="ImmediateDispatchStrategy"/>を<see cref="IDomainEventDispatchStrategy"/>としてScopedで登録する。別のDispatch戦略を使う場合は、このメソッドの呼び出し前に登録する。抽象型・ジェネリック型定義を除く各型について、実装している<see cref="IRepository{TAggregate, TId}"/>およびその派生インターフェースをすべてScopedで登録する。登録済みのサービスは置き換えない。<see cref="ImmediateDispatchStrategy"/>が依存する<see cref="IDomainEventDispatcher"/>は<c>AddD3FragmentsApplication</c>で登録する。<c>ILogger&lt;T&gt;</c>は別途登録が必要である（汎用ホストおよびASP.NET Coreは既定で登録する）。</para>
     /// </remarks>
     /// <typeparam name="TContext">
-    ///     <para xml:lang="en">The type of the application's <see cref="DbContext"/>.</para>
-    ///     <para xml:lang="ja">アプリケーションの<see cref="DbContext"/>の型。</para>
+    ///     <para xml:lang="en">The type of the application's <see cref="DbContext"/>. It derives from <see cref="D3DbContext"/>, or applies <see cref="D3FragmentsModelConfigurationBuilderExtensions.ApplyD3FragmentsConventions"/> in <see cref="DbContext.ConfigureConventions"/>.</para>
+    ///     <para xml:lang="ja">アプリケーションの<see cref="DbContext"/>の型。<see cref="D3DbContext"/>を継承するか、<see cref="DbContext.ConfigureConventions"/>で<see cref="D3FragmentsModelConfigurationBuilderExtensions.ApplyD3FragmentsConventions"/>を適用する。</para>
     /// </typeparam>
     /// <param name="services">
     ///     <para xml:lang="en">The service collection to add the services to.</para>
@@ -60,7 +60,7 @@ public static class D3FragmentsEFCoreServiceCollectionExtensions
         this IServiceCollection services,
         IEnumerable<Assembly> assemblies,
         Action<DbContextOptionsBuilder> configureDbContext)
-        where TContext : D3DbContext
+        where TContext : DbContext
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configureDbContext);

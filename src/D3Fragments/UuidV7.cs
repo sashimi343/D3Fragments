@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -14,8 +15,11 @@ namespace D3Fragments;
 ///     <para xml:lang="ja">この構造体の実態は <see cref="Guid"/> 型の薄いラッパーである。version 7の <see cref="Guid"/> のみを保持できる。</para>
 ///     <para xml:lang="en">In JSON, this struct is represented as a UUID string. Reading a string that is not a UUID version 7 throws a <see cref="JsonException"/>.</para>
 ///     <para xml:lang="ja">JSONではUUID文字列として表現する。UUID version 7でない文字列を読み取った場合は<see cref="JsonException"/>をスローする。</para>
+///     <para xml:lang="en">A <see cref="TypeConverter"/> that converts from a UUID string is applied, so components that convert through <see cref="TypeDescriptor"/> (such as ASP.NET Core Identity keys and configuration binding) can use this struct. Converting a string that is not a UUID version 7 throws a <see cref="FormatException"/>.</para>
+///     <para xml:lang="ja">UUID文字列から変換する<see cref="TypeConverter"/>を適用しているため、<see cref="TypeDescriptor"/>経由で変換する処理（ASP.NET Core IdentityのキーやConfigurationのバインドなど）で使用できる。UUID version 7でない文字列を変換した場合は<see cref="FormatException"/>をスローする。</para>
 /// </remarks>
 [JsonConverter(typeof(UuidV7JsonConverter))]
+[TypeConverter(typeof(UuidV7TypeConverter))]
 public readonly struct UuidV7 : IComparable, IComparable<UuidV7>, IEquatable<UuidV7>, IParsable<UuidV7>, ISpanFormattable, ISpanParsable<UuidV7>, IUtf8SpanFormattable, IUtf8SpanParsable<UuidV7>
 {
     /// <summary>

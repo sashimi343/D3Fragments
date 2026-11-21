@@ -176,5 +176,14 @@ namespace D3Fragments.Resources {
                 return ResourceManager.GetString("JsonException_InvalidUuidV7", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   The string is not a valid UUID version 7. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string FormatException_InvalidUuidV7 {
+            get {
+                return ResourceManager.GetString("FormatException_InvalidUuidV7", resourceCulture);
+            }
+        }
     }
 }
