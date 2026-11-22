@@ -10,6 +10,8 @@ If you generate OpenAPI documents, also use the `Sashimi343.D3Fragments.AspNetCo
 | [CSRF protection](03-csrf.md) | Protects cookie-authenticated APIs by requiring a custom header |
 | [OpenAPI](04-openapi.md) | Aligns the schemas in OpenAPI documents with the D3Fragments types |
 
+The extension methods that perform the cookie side of ASP.NET Core Identity (namespace `D3Fragments.AspNetCore.Identity`) are described in [ASP.NET Core Identity integration](../07-identity/index.md).
+
 ## Service registration
 
 ```csharp

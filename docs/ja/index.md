@@ -10,6 +10,7 @@ D3Fragments はドメイン駆動設計（DDD）に基づいた .NET のアプ�
 - ユースケースの実行基盤：Command / Query を Handler で処理します。Handler は保存処理を書かず、Handler が正常に終わったら Pipeline が変更を保存します。
 - EF Core 連携：`D3DbContext` が値オブジェクトや `UuidV7` を DB の列にマッピングし、同時更新の競合を検出します。Unit of Work は変更を保存するときに、ドメインイベントをハンドラに配信します。
 - ASP.NET Core 連携：ドメインの例外や失敗した `Result` を、Problem Details 形式のエラー応答に変換します。
+- ASP.NET Core Identity 連携：Identity の変更を Unit of Work でまとめて保存し、サインインのデータベース側の処理を Command で、Cookie の発行をプレゼンテーション層で行えるようにします。
 - アナライザ：レイヤー間の参照違反など、設計ガイドラインからの逸脱をビルド時に警告します。
 
 ## パッケージ
@@ -19,7 +20,8 @@ D3Fragments はドメイン駆動設計（DDD）に基づいた .NET のアプ�
 | `Sashimi343.D3Fragments` | ドメインモデルの部品（エンティティ、値オブジェクト、`Result` など） |
 | `Sashimi343.D3Fragments.Application` | Command / Query の実行基盤、Pipeline Behavior、ドメインイベントハンドラ |
 | `Sashimi343.D3Fragments.EFCore` | EF Core 連携（`D3DbContext`、リポジトリ基底クラス、Unit of Work） |
-| `Sashimi343.D3Fragments.AspNetCore` | ASP.NET Core 連携（エラー応答、CSRF 対策） |
+| `Sashimi343.D3Fragments.AspNetCore` | ASP.NET Core 連携（エラー応答、CSRF 対策、Identity の Cookie 側の処理） |
+| `Sashimi343.D3Fragments.Identity.EFCore` | ASP.NET Core Identity 連携（保存を Unit of Work に任せるストア、サインインのデータベース側の処理） |
 | `Sashimi343.D3Fragments.AspNetCore.OpenApi` | OpenAPI ドキュメントを D3Fragments の型に合わせる |
 | `Sashimi343.D3Fragments.Testing` | テスト用のアサーションとヘルパー |
 | `Sashimi343.D3Fragments.Testing.EFCore` | 実 DB を使ったテストの基盤 |

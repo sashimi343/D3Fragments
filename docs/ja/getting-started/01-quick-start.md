@@ -152,6 +152,7 @@ public sealed class GetBookQueryHandler(IBookRepository books)
 `Library.Infrastructure` に `Sashimi343.D3Fragments.EFCore` と `Microsoft.EntityFrameworkCore.Sqlite` を追加し、`Library.Application` を参照します。
 
 `DbContext` は `D3DbContext` を継承します。
+ASP.NET Core Identity の `IdentityDbContext` などを継承する場合は、[ASP.NET Core Identity 連携](../guide/07-identity/01-setup.md#dbcontext) を参照してください。
 値オブジェクトのプロパティは `ComplexValueObject` でマッピングします。
 マッピングしないと、モデルの構築時に例外がスローされます。
 

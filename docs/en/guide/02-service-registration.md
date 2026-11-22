@@ -33,7 +33,7 @@ The pipeline behaviors registered by `AddD3FragmentsApplication` use `IUnitOfWor
 
 ## Common rules
 
-- No method replaces services that are already registered. To replace a default implementation with your own, register yours before calling the method (see [Replacing default implementations](#replacing-default-implementations)).
+- No method replaces services that are already registered. To replace a default implementation with your own, register yours before calling the method (see [Replacing default implementations](#replacing-default-implementations)). The exception is `AddD3FragmentsStores`, which replaces already registered stores.
 - Calling the same method more than once does not register services twice.
 - Methods that take assemblies search them for types, excluding abstract types and generic type definitions, and register those types. They throw `ArgumentException` if no assembly is passed.
 - `ILogger<T>` is not registered. The generic host and ASP.NET Core register it by default.
@@ -74,7 +74,7 @@ services.AddD3FragmentsEFCore<TContext>(assemblies, configureDbContext);
 
 | Parameter | Description |
 |---|---|
-| `TContext` | The application's `DbContext`. It must derive from `D3DbContext` |
+| `TContext` | The application's `DbContext`. It derives from `D3DbContext`, or calls `ApplyD3FragmentsConventions` in `ConfigureConventions` (see [DbContext and mapping](05-efcore/01-dbcontext.md)) |
 | `assemblies` | Assemblies to search for type-safe enums and repository implementations. At least one is required |
 | `configureDbContext` | A delegate that configures the `DbContext`, for example by specifying the database provider (`UseNpgsql` and so on) |
 
@@ -118,6 +118,31 @@ It registers the following:
 To enable the exception handler, call `app.UseExceptionHandler()`.
 The JSON converter for type-safe enums is not registered (see [Type-safe enums](03-domain/03-type-safe-enum.md)).
 
+## AddD3FragmentsStores
+
+A method in the `Sashimi343.D3Fragments.Identity.EFCore` package.
+Call it on the ASP.NET Core Identity `IdentityBuilder` instead of `AddEntityFrameworkStores`.
+
+```csharp
+services.AddIdentityCore<UserAccount>()
+    .AddSignInManager()
+    .AddD3FragmentsStores<TContext>();
+```
+
+| Argument | Contents |
+|---|---|
+| `TContext` | The `DbContext` that contains the Identity entities. Register it with `AddD3FragmentsEFCore` |
+
+It registers the following services.
+Unlike the other methods, it replaces already registered stores (for example, those registered by `AddEntityFrameworkStores`).
+
+| Service | Implementation | Lifetime |
+|---|---|---|
+| `IUserStore<TUser>` | `D3UserStore` when roles are used, otherwise `D3UserOnlyStore` | Scoped |
+| `IRoleStore<TRole>` (when roles are used) | `D3RoleStore` | Scoped |
+
+See [ASP.NET Core Identity integration](07-identity/01-setup.md#addd3fragmentsstores) for how the type arguments of the stores are determined and the differences caused by leaving saving to the Unit of Work.
+
 ## Middleware and OpenAPI
 
 In addition to DI registration, configure the following as needed.
@@ -149,6 +174,7 @@ In the same way, you can replace `IDomainEventDispatchStrategy` and other servic
 
 - @D3Fragments.Application.D3FragmentsApplicationServiceCollectionExtensions
 - @D3Fragments.EFCore.D3FragmentsEFCoreServiceCollectionExtensions
+- @D3Fragments.Identity.EFCore.D3FragmentsIdentityBuilderExtensions
 - @D3Fragments.AspNetCore.D3FragmentsServiceCollectionExtensions
 - @D3Fragments.AspNetCore.CsrfProtectionApplicationBuilderExtensions
 - @D3Fragments.AspNetCore.OpenApi.D3FragmentsOpenApiOptionsExtensions

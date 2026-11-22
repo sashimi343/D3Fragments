@@ -10,6 +10,7 @@ The library is mainly intended for ASP.NET Core applications, but parts of it ca
 - Use case execution pipeline: Commands and Queries are processed by handlers. Handlers do not save anything themselves; when a handler completes successfully, the pipeline saves the changes.
 - EF Core integration: `D3DbContext` maps value objects and `UuidV7` to database columns and detects concurrent update conflicts. The Unit of Work dispatches domain events to their handlers when it saves changes.
 - ASP.NET Core integration: converts domain exceptions and failed `Result`s into error responses in the Problem Details format.
+- ASP.NET Core Identity integration: saves Identity changes together through the Unit of Work, and lets you perform the database side of sign-in in a Command and issue cookies in the presentation layer.
 - Analyzers: report deviations from the design guidelines, such as invalid references between layers, as warnings at build time.
 
 ## Packages
@@ -19,7 +20,8 @@ The library is mainly intended for ASP.NET Core applications, but parts of it ca
 | `Sashimi343.D3Fragments` | Domain model building blocks (entities, value objects, `Result`, and so on) |
 | `Sashimi343.D3Fragments.Application` | Command / Query execution pipeline, pipeline behaviors, domain event handlers |
 | `Sashimi343.D3Fragments.EFCore` | EF Core integration (`D3DbContext`, repository base classes, Unit of Work) |
-| `Sashimi343.D3Fragments.AspNetCore` | ASP.NET Core integration (error responses, CSRF protection) |
+| `Sashimi343.D3Fragments.AspNetCore` | ASP.NET Core integration (error responses, CSRF protection, the cookie side of Identity) |
+| `Sashimi343.D3Fragments.Identity.EFCore` | ASP.NET Core Identity integration (stores that leave saving to the Unit of Work, the database side of sign-in) |
 | `Sashimi343.D3Fragments.AspNetCore.OpenApi` | Aligns OpenAPI documents with the D3Fragments types |
 | `Sashimi343.D3Fragments.Testing` | Assertions and helpers for tests |
 | `Sashimi343.D3Fragments.Testing.EFCore` | Infrastructure for tests against a real database |

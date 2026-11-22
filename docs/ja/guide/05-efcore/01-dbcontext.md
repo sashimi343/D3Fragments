@@ -45,6 +45,31 @@ public sealed class LibraryDbContext(DbContextOptions options) : D3DbContext(opt
 `ConfigureConventions` をオーバーライドする場合は、`base.ConfigureConventions` を呼んでください。
 呼ばないと、上記の設定が適用されません。
 
+## D3DbContext を継承できない場合
+
+`IdentityDbContext` など別の基底クラスから派生する `DbContext` は、`D3DbContext` を継承できません。
+その場合は、`ConfigureConventions` で `ApplyD3FragmentsConventions` を呼び出します。
+
+```csharp
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
+    : IdentityDbContext<Account, IdentityRole<Guid>, Guid>(options)
+{
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+        configurationBuilder.ApplyD3FragmentsConventions(options);
+    }
+}
+```
+
+`ApplyD3FragmentsConventions` は、`D3DbContext` と同じ値コンバーターと同時実行トークンを設定し、値オブジェクトのマッピング漏れを検出します。
+引数には、コンストラクタで受け取った `DbContextOptions` を渡します（型安全な列挙型を探すアセンブリを、`UseD3Fragments` の設定から読み取るためです）。
+
+保存時の `UpdatedAt` / `Version` の更新は、`UseD3Fragments`（`AddD3FragmentsEFCore` が呼び出す）が登録するインターセプターが行います。
+`UseD3Fragments` で設定したのに `ApplyD3FragmentsConventions` を呼び忘れると、保存時に `InvalidOperationException` がスローされます。
+
+Identity と組み合わせる方法は [ASP.NET Core Identity 連携](../07-identity/01-setup.md) を参照してください。
+
 ## 値オブジェクトをマッピングする
 
 値オブジェクトのプロパティは `ComplexValueObject` で EF Core の Complex Type としてマッピングします。
@@ -99,6 +124,7 @@ var options = new DbContextOptionsBuilder<LibraryDbContext>()
 ## 関連する API
 
 - @D3Fragments.EFCore.D3DbContext
+- @D3Fragments.EFCore.D3FragmentsModelConfigurationBuilderExtensions
 - @D3Fragments.EFCore.ValueObjectComplexTypeExtensions
 - @D3Fragments.EFCore.D3FragmentsDbContextOptionsBuilderExtensions
 - @D3Fragments.EFCore.D3FragmentsEFCoreServiceCollectionExtensions

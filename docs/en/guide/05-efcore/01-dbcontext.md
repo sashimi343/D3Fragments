@@ -45,6 +45,31 @@ public sealed class LibraryDbContext(DbContextOptions options) : D3DbContext(opt
 If you override `ConfigureConventions`, call `base.ConfigureConventions`.
 Otherwise, the configuration above is not applied.
 
+## When you cannot derive from D3DbContext
+
+A `DbContext` that derives from another base class, such as `IdentityDbContext`, cannot derive from `D3DbContext`.
+In that case, call `ApplyD3FragmentsConventions` in `ConfigureConventions`.
+
+```csharp
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
+    : IdentityDbContext<Account, IdentityRole<Guid>, Guid>(options)
+{
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+        configurationBuilder.ApplyD3FragmentsConventions(options);
+    }
+}
+```
+
+`ApplyD3FragmentsConventions` sets the same value converters and concurrency tokens as `D3DbContext`, and detects unmapped value objects.
+Pass the `DbContextOptions` received by the constructor (it reads the assemblies to search for type-safe enums from the `UseD3Fragments` settings).
+
+Updating `UpdatedAt` / `Version` on save is done by the interceptor that `UseD3Fragments` (called by `AddD3FragmentsEFCore`) registers.
+If you configure the context with `UseD3Fragments` but forget to call `ApplyD3FragmentsConventions`, an `InvalidOperationException` is thrown on save.
+
+See [ASP.NET Core Identity integration](../07-identity/01-setup.md) for how to combine this with Identity.
+
 ## Mapping value objects
 
 Map value object properties as EF Core complex types with `ComplexValueObject`.
@@ -99,6 +124,7 @@ var options = new DbContextOptionsBuilder<LibraryDbContext>()
 ## Related APIs
 
 - @D3Fragments.EFCore.D3DbContext
+- @D3Fragments.EFCore.D3FragmentsModelConfigurationBuilderExtensions
 - @D3Fragments.EFCore.ValueObjectComplexTypeExtensions
 - @D3Fragments.EFCore.D3FragmentsDbContextOptionsBuilderExtensions
 - @D3Fragments.EFCore.D3FragmentsEFCoreServiceCollectionExtensions

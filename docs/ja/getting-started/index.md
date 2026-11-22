@@ -25,6 +25,8 @@ D3Fragments ではアプリケーションをプレゼンテーション層・�
 `Sashimi343.D3Fragments.Application` は `Sashimi343.D3Fragments` に依存しているため、アプリケーション層では `Sashimi343.D3Fragments` を別に参照する必要はありません。
 ほかのパッケージも同様です。
 
+ASP.NET Core Identity を使う場合は、インフラストラクチャ層に `Sashimi343.D3Fragments.Identity.EFCore` も追加します（[ASP.NET Core Identity 連携](../guide/07-identity/01-setup.md) を参照）。
+
 ### 複数の層を1つのプロジェクトにまとめる
 
 層は4つですが、プロジェクトを必ず4つに分ける必要はありません。

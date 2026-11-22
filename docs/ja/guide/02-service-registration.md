@@ -33,7 +33,7 @@ app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), api => a
 
 ## 共通の決まり
 
-- 各メソッドはすでに登録されているサービスを置き換えません。既定の実装を自分の実装に替えたい場合は、各メソッドを呼ぶ前に登録します（[既定の実装を替える](#既定の実装を替える) を参照）。
+- 各メソッドはすでに登録されているサービスを置き換えません。既定の実装を自分の実装に替えたい場合は、各メソッドを呼ぶ前に登録します（[既定の実装を替える](#既定の実装を替える) を参照）。ただし `AddD3FragmentsStores` は、登録済みのストアを置き換えます。
 - 同じメソッドを複数回呼んでも、サービスが重複して登録されることはありません。
 - アセンブリを受け取るメソッドは、渡したアセンブリの中から抽象型とジェネリック型定義を除いた型を探して登録します。アセンブリを1つも渡さないと `ArgumentException` をスローします。
 - `ILogger<T>` は登録しません。汎用ホストと ASP.NET Core では既定で登録されています。
@@ -74,7 +74,7 @@ services.AddD3FragmentsEFCore<TContext>(assemblies, configureDbContext);
 
 | 引数 | 内容 |
 |---|---|
-| `TContext` | アプリケーションの `DbContext`。`D3DbContext` を継承している必要がある |
+| `TContext` | アプリケーションの `DbContext`。`D3DbContext` を継承するか、`ConfigureConventions` で `ApplyD3FragmentsConventions` を呼び出す（[DbContext とマッピング](05-efcore/01-dbcontext.md) を参照） |
 | `assemblies` | 型安全な列挙型とリポジトリの実装を探すアセンブリ。1つ以上必要 |
 | `configureDbContext` | DB プロバイダーの指定（`UseNpgsql` など）など、`DbContext` を設定するデリゲート |
 
@@ -118,6 +118,31 @@ services.AddD3FragmentsAspNetCore(configure: null);
 例外ハンドラを有効にするには、`app.UseExceptionHandler()` を呼びます。
 型安全な列挙型の JSON コンバーターは登録しません（[型安全な列挙型](03-domain/03-type-safe-enum.md) を参照）。
 
+## AddD3FragmentsStores
+
+`Sashimi343.D3Fragments.Identity.EFCore` パッケージのメソッドです。
+ASP.NET Core Identity の `IdentityBuilder` に対して、`AddEntityFrameworkStores` の代わりに呼び出します。
+
+```csharp
+services.AddIdentityCore<UserAccount>()
+    .AddSignInManager()
+    .AddD3FragmentsStores<TContext>();
+```
+
+| 引数 | 内容 |
+|---|---|
+| `TContext` | Identity のエンティティを含む `DbContext`。`AddD3FragmentsEFCore` で登録する |
+
+登録するサービスは次のとおりです。
+ほかのメソッドと違い、登録済みのストア（`AddEntityFrameworkStores` で登録したものなど）を置き換えます。
+
+| サービス | 実装 | 有効期間 |
+|---|---|---|
+| `IUserStore<TUser>` | ロールを使う場合は `D3UserStore`、使わない場合は `D3UserOnlyStore` | Scoped |
+| `IRoleStore<TRole>`（ロールを使う場合） | `D3RoleStore` | Scoped |
+
+ストアの型引数の決め方と、保存を Unit of Work に任せることによる違いは、[ASP.NET Core Identity 連携](07-identity/01-setup.md#addd3fragmentsstores) を参照してください。
+
 ## ミドルウェアと OpenAPI
 
 DI への登録のほかに、必要に応じて次の設定を行います。
@@ -149,6 +174,7 @@ builder.Services.AddD3FragmentsApplication([typeof(GetBookQuery).Assembly]);
 
 - @D3Fragments.Application.D3FragmentsApplicationServiceCollectionExtensions
 - @D3Fragments.EFCore.D3FragmentsEFCoreServiceCollectionExtensions
+- @D3Fragments.Identity.EFCore.D3FragmentsIdentityBuilderExtensions
 - @D3Fragments.AspNetCore.D3FragmentsServiceCollectionExtensions
 - @D3Fragments.AspNetCore.CsrfProtectionApplicationBuilderExtensions
 - @D3Fragments.AspNetCore.OpenApi.D3FragmentsOpenApiOptionsExtensions

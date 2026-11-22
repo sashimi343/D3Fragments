@@ -4,13 +4,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- D3Fragments（Identity 連携は未公開のため、リポジトリで作ったパッケージを参照する。README の「実行方法」を参照） -->
-    <PackageVersion Include="Sashimi343.D3Fragments" Version="0.2.0-local.2" />
-    <PackageVersion Include="Sashimi343.D3Fragments.Application" Version="0.2.0-local.2" />
-    <PackageVersion Include="Sashimi343.D3Fragments.AspNetCore" Version="0.2.0-local.2" />
-    <PackageVersion Include="Sashimi343.D3Fragments.EFCore" Version="0.2.0-local.2" />
-    <PackageVersion Include="Sashimi343.D3Fragments.Identity.EFCore" Version="0.2.0-local.2" />
-    <PackageVersion Include="Sashimi343.D3Fragments.Analyzers" Version="0.2.0-local.2" />
+    <PackageVersion Include="Sashimi343.D3Fragments" Version="0.2.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.Application" Version="0.2.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.AspNetCore" Version="0.2.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.EFCore" Version="0.2.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.Identity.EFCore" Version="0.2.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.Analyzers" Version="0.2.0" />
 
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.7" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.7" />
