@@ -32,12 +32,6 @@ AppHost（Aspire）は次のリソースを起動します。
 
 .NET 10 SDK と Docker（Mailpit・Keycloak のコンテナ用）が必要です。
 
-Identity 連携のパッケージは未公開のため、リポジトリのルートでパッケージを作ってから起動します。作ったパッケージは `artifacts` フォルダーに出力され、デモの `nuget.config` がこのフォルダーを参照します。パッケージを公開したら、`nuget.config` を削除し、`Directory.Packages.props` のバージョンを公開版に変更します。
-
-```bash
-dotnet pack D3Fragments.slnx -c Release -o artifacts -p:Version=0.2.0-local.2
-```
-
 ```bash
 dotnet run --project demo/02_IdentityIntegration/IdentityIntegration.AppHost
 ```
