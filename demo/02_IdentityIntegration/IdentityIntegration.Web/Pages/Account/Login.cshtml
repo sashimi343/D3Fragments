@@ -28,7 +28,7 @@
     <section class="col-md-6">
         <h2 class="h5">パスキー</h2>
         <p>マイページで登録したパスキーで、パスワードなしでログインします。</p>
-        <form method="post" asp-page-handler="Passkey" id="passkey-login">
+        <form method="post" asp-page-handler="Passkey" asp-route-returnUrl="@(Request.Query["returnUrl"])" id="passkey-login">
             <input type="hidden" name="credentialJson" />
             <button class="btn btn-outline-primary" type="button" data-passkey-login="@Url.Page("/Account/Login", "PasskeyOptions")">パスキーでログイン</button>
         </form>

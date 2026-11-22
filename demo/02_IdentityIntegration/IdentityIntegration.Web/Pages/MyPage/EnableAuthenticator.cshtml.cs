@@ -29,6 +29,13 @@ public sealed class EnableAuthenticatorModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (string.IsNullOrWhiteSpace(Code))
+        {
+            ModelState.AddModelError(nameof(Code), "確認コードを入力してください。");
+            await LoadAsync();
+            return Page();
+        }
+
         UserAccount account = await GetCurrentAccountAsync();
         Result<IReadOnlyList<string>> result = await enable.ExecuteAsync(new EnableAuthenticatorCommand(account.Id, Code), HttpContext.RequestAborted);
         if (result.IsFailure)
