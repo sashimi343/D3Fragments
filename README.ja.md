@@ -56,6 +56,7 @@ dotnet add package Sashimi343.D3Fragments.AspNetCore     # プレゼンテーシ
 - **[ドキュメント（日本語）](https://sashimi343.github.io/D3Fragments/ja/)**
 - [クイックスタート](https://sashimi343.github.io/D3Fragments/ja/getting-started/01-quick-start.html)
 - [デモアプリケーション](demo/01_BasicWebApp)：D3Fragments で作った図書館の貸出管理アプリケーション
+- [Identity 連携のデモ](demo/02_IdentityIntegration)：ASP.NET Core Identity によるユーザー登録・ログイン・二要素認証・パスキー・外部ログイン
 
 ## ライセンス
 

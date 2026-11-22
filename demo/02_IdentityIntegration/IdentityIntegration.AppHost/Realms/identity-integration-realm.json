@@ -1,0 +1,41 @@
+{
+  "realm": "identity-integration",
+  "enabled": true,
+  "displayName": "IdentityIntegration デモ",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "clients": [
+    {
+      "clientId": "identity-integration-web",
+      "name": "IdentityIntegration.Web",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["https://localhost:7180/signin-oidc"],
+      "webOrigins": ["https://localhost:7180"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "https://localhost:7180/*"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "keycloak-user",
+      "enabled": true,
+      "email": "keycloak-user@example.com",
+      "emailVerified": true,
+      "firstName": "Keycloak",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Keycloak#Demo1",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

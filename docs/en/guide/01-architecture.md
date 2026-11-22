@@ -196,6 +196,10 @@ A class that directly or indirectly inherits the `Microsoft.EntityFrameworkCore.
 
 A class that directly or indirectly implements the `D3Fragments.Application.IUnitOfWork` interface.
 
+#### Infrastructure_IdentityUser
+
+A class that directly or indirectly inherits the `Microsoft.AspNetCore.Identity.IdentityUser<TKey>` class (the user type of ASP.NET Core Identity).
+
 #### Infrastructure_Other
 
 A class or interface in the infrastructure layer that does not fall under any of the above.

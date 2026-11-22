@@ -1,0 +1,19 @@
+@page
+@model IdentityIntegration.Web.Pages.MyPage.IndexModel
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "マイページ";
+    // サインインの方法（pwd: パスワード・パスキー、mfa: 二要素認証）と、外部ログインのプロバイダー
+    string[] methods = [.. User.FindAll("amr").Select(claim => claim.Value), .. User.FindAll(ClaimTypes.AuthenticationMethod).Select(claim => claim.Value)];
+}
+<h1>ようこそ、@Model.Profile?.Nickname さん</h1>
+<table class="table w-auto">
+    <tr><th>ニックネーム（会員）</th><td>@Model.Profile?.Nickname</td></tr>
+    <tr><th>入会日（会員）</th><td>@Model.Profile?.JoinedOn.ToString("yyyy-MM-dd")</td></tr>
+    <tr><th>ユーザー名（Identity）</th><td>@User.Identity!.Name</td></tr>
+    <tr><th>今回のサインインの方法</th><td>@string.Join(", ", methods)</td></tr>
+</table>
+<ul>
+    <li><a asp-page="/MyPage/TwoFactor">二要素認証の設定</a></li>
+    <li><a asp-page="/MyPage/Passkeys">パスキーの管理</a></li>
+</ul>

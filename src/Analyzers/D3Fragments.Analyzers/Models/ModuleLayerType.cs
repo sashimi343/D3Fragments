@@ -23,4 +23,5 @@ internal enum ModuleLayerType
     Infrastructure_RepositoryImplementation,
     Infrastructure_DbContext,
     Infrastructure_UnitOfWork,
+    Infrastructure_IdentityUser,
 }

@@ -1,0 +1,43 @@
+@page
+@model IdentityIntegration.Web.Pages.MyPage.TwoFactorModel
+@{
+    ViewData["Title"] = "二要素認証の設定";
+}
+<h1>二要素認証の設定</h1>
+
+<table class="table w-auto">
+    <tr><th>二要素認証</th><td>@(Model.IsEnabled ? "有効" : "無効")</td></tr>
+    <tr><th>認証アプリ</th><td>@(Model.HasAuthenticator ? "設定済み" : "未設定")</td></tr>
+    <tr><th>メールの確認コード</th><td>使用可（メールアドレス確認済み）</td></tr>
+    <tr><th>残りの回復コード</th><td>@Model.RecoveryCodesLeft 個</td></tr>
+    <tr><th>このブラウザ</th><td>@(Model.IsBrowserRemembered ? "記憶済み（二要素認証を省略）" : "記憶していない")</td></tr>
+</table>
+
+<div class="d-flex flex-wrap gap-2">
+    <a asp-page="/MyPage/EnableAuthenticator" class="btn btn-primary">認証アプリを設定する</a>
+    @if (!Model.IsEnabled)
+    {
+        <form method="post" asp-page-handler="EnableEmail">
+            <button class="btn btn-outline-primary" type="submit">メールの確認コードで有効にする</button>
+        </form>
+    }
+    else
+    {
+        <form method="post" asp-page-handler="RegenerateRecoveryCodes">
+            <button class="btn btn-outline-secondary" type="submit">回復コードを作り直す</button>
+        </form>
+        <form method="post" asp-page-handler="Disable">
+            <button class="btn btn-outline-danger" type="submit">二要素認証を無効にする</button>
+        </form>
+    }
+    @if (Model.IsBrowserRemembered)
+    {
+        <form method="post" asp-page-handler="ForgetBrowser">
+            <button class="btn btn-outline-secondary" type="submit">このブラウザの記憶を解除する</button>
+        </form>
+    }
+</div>
+<p class="form-text mt-3">
+    二要素認証を有効にすると、ログイン時に認証アプリ（設定済みの場合）またはメールの確認コードを選べます。
+    パスキーでのログインは、それ自体が多要素のため二要素認証を求めません。
+</p>

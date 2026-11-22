@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityIntegration.Core\IdentityIntegration.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Sashimi343.D3Fragments.EFCore" />
+    <PackageReference Include="Sashimi343.D3Fragments.Identity.EFCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" />
+    <PackageReference Include="Sashimi343.D3Fragments.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

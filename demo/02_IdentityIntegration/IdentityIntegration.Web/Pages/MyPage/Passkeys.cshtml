@@ -1,0 +1,48 @@
+@page
+@using Microsoft.AspNetCore.WebUtilities
+@model IdentityIntegration.Web.Pages.MyPage.PasskeysModel
+@{
+    ViewData["Title"] = "パスキーの管理";
+}
+<h1>パスキーの管理</h1>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+@if (Model.Passkeys.Count == 0)
+{
+    <p>登録済みのパスキーはありません。</p>
+}
+else
+{
+    <table class="table w-auto">
+        <thead><tr><th>名前</th><th>登録日時</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var passkey in Model.Passkeys)
+            {
+                <tr>
+                    <td>@passkey.Name</td>
+                    <td>@passkey.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <form method="post" asp-page-handler="Remove">
+                            <input type="hidden" name="credentialId" value="@WebEncoders.Base64UrlEncode(passkey.CredentialId)" />
+                            <button class="btn btn-sm btn-outline-danger" type="submit">削除</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2 class="h5 mt-4">パスキーを登録する</h2>
+<p>Windows Hello・スマートフォン・パスワードマネージャーなどにパスキーを作ります。登録すると、パスワードなしでログインできます。</p>
+<form method="post" asp-page-handler="Add" class="col-md-6">
+    <input type="hidden" name="credentialJson" />
+    <div class="mb-3">
+        <label class="form-label" for="name">名前（どの端末のパスキーか分かるように）</label>
+        <input id="name" name="name" class="form-control" value="パスキー" />
+    </div>
+    <button class="btn btn-primary" type="button" data-passkey-register="@Url.Page("/MyPage/Passkeys", "CreationOptions")">パスキーを登録する</button>
+</form>
+@section Scripts {
+    <script src="~/js/passkey.js" asp-append-version="true"></script>
+}

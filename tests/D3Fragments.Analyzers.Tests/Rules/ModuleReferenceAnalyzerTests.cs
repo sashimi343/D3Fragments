@@ -200,6 +200,32 @@ public sealed class ModuleReferenceAnalyzerTests
     }
 
     [Fact]
+    public async Task ControllerReferencingIdentityUserInInfrastructure_ReportsOnlyOtherInfrastructureTypes()
+    {
+        // Identity のユーザー型（IdentityUser<TKey> の派生クラス）は SignInManager<TUser> の型引数として参照できる。それ以外の Infrastructure の型は DFR0002
+        const string source = """
+            using Microsoft.AspNetCore.Identity;
+
+            public sealed class LoginModel(SignInManager<Account> signInManager, {|#0:EmailSender|} sender) : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
+            {
+                public string? Name(Account account) => account.UserName;
+            }
+            """;
+        const string infrastructureSource = """
+            public sealed class Account : Microsoft.AspNetCore.Identity.IdentityUser<System.Guid> { }
+            public sealed class EmailSender { }
+            """;
+
+        var test = Verifier.CreateTest(source, ArchitectureLayerType.Presentation);
+        test.AddReferencedProject("Infrastructure", infrastructureSource, ArchitectureLayerType.Infrastructure);
+        test.ExpectedDiagnostics.Add(Verifier.Diagnostic(DiagnosticDescriptors.DFR0002)
+            .WithLocation(0)
+            .WithArguments("Presentation_Controller", "LoginModel", "Infrastructure_Other", "EmailSender"));
+
+        await test.RunAsync(TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
     public async Task ReferenceToTypeInReferencedAssembly_UsesLayerOfThatAssembly()
     {
         const string source = """

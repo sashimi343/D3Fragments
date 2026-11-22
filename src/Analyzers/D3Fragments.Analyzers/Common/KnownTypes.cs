@@ -35,6 +35,7 @@ internal sealed class KnownTypes
         PageModel = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.RazorPages.PageModel");
         IComponent = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Components.IComponent");
         SignInManager = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Identity.SignInManager`1");
+        IdentityUser = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Identity.IdentityUser`1");
         ICollection = compilation.GetSpecialType(SpecialType.System_Collections_Generic_ICollection_T);
         IDictionary = compilation.GetTypeByMetadataName("System.Collections.Generic.IDictionary`2");
     }
@@ -68,6 +69,7 @@ internal sealed class KnownTypes
     public INamedTypeSymbol? IComponent { get; }
 
     public INamedTypeSymbol? SignInManager { get; }
+    public INamedTypeSymbol? IdentityUser { get; }
     public INamedTypeSymbol ICollection { get; }
     public INamedTypeSymbol? IDictionary { get; }
 

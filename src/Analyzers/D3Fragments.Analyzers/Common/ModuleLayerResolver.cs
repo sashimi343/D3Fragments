@@ -46,6 +46,8 @@ internal sealed class ModuleLayerResolver
                 t => IsClass(t) && t.InheritsFrom(knownTypes.DbContext)),
             (ModuleLayerType.Infrastructure_UnitOfWork, ArchitectureLayerType.Infrastructure,
                 t => IsClass(t) && t.Implements(knownTypes.IUnitOfWork)),
+            (ModuleLayerType.Infrastructure_IdentityUser, ArchitectureLayerType.Infrastructure,
+                t => IsClass(t) && t.InheritsFrom(knownTypes.IdentityUser)),
         ];
     }
 

@@ -20,7 +20,8 @@ public sealed class ModuleReferenceAnalyzer : DiagnosticAnalyzer
         ModuleLayerType.Application_DomainEventHandler,
     ];
 
-    // 参照元のモジュールレイヤーから参照を禁止するモジュールレイヤー
+    // 参照元のモジュールレイヤーから参照を禁止するモジュールレイヤー。
+    // Infrastructure_IdentityUser（Identity のユーザー型）は、プレゼンテーション層が SignInManager<TUser> で Cookie を発行するために必要なため禁止しない
     private static readonly Dictionary<ModuleLayerType, HashSet<ModuleLayerType>> ForbiddenReferences = new()
     {
         [ModuleLayerType.Presentation_Controller] =

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="IdentityIntegration.AppHost/IdentityIntegration.AppHost.csproj" />
+  <Project Path="IdentityIntegration.Core/IdentityIntegration.Core.csproj" />
+  <Project Path="IdentityIntegration.Infrastructure/IdentityIntegration.Infrastructure.csproj" />
+  <Project Path="IdentityIntegration.Web/IdentityIntegration.Web.csproj" />
+</Solution>

@@ -196,6 +196,10 @@ ASP.NET Core の [PageBase](https://learn.microsoft.com/dotnet/api/microsoft.asp
 
 `D3Fragments.Application.IUnitOfWork` インターフェースを直接または間接的に実装したクラスです。
 
+#### Infrastructure_IdentityUser
+
+`Microsoft.AspNetCore.Identity.IdentityUser<TKey>` クラスを直接または間接的に継承したクラス（ASP.NET Core Identity のユーザー型）です。
+
 #### Infrastructure_Other
 
 インフラストラクチャ層のクラス・インターフェースのうち、上記のどれにも当てはまらないものです。

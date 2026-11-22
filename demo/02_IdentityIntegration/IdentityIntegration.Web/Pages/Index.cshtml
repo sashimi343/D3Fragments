@@ -1,0 +1,12 @@
+@page
+@{
+    ViewData["Title"] = "トップ";
+}
+<h1>ASP.NET Core Identity 連携のデモ</h1>
+<p>D3Fragments のアーキテクチャに沿って、ASP.NET Core Identity のユーザー登録・ログイン・二要素認証・パスキー・外部ログインを実装したデモです。</p>
+<p class="alert alert-warning">ローカルで試すためのデモです。実在する個人情報やパスワードは使用しないでください。</p>
+<ul>
+    <li><a asp-page="/Account/Register">ユーザー登録</a>（確認メールは Mailpit に届きます）</li>
+    <li><a asp-page="/Account/Login">ログイン</a>（パスワード・パスキー・Keycloak）</li>
+    <li><a asp-page="/MyPage/Index">マイページ</a>（二要素認証とパスキーの設定）</li>
+</ul>
