@@ -25,6 +25,8 @@ Each project references the following packages.
 `Sashimi343.D3Fragments.Application` depends on `Sashimi343.D3Fragments`, so the application layer does not need a separate reference to `Sashimi343.D3Fragments`.
 The same applies to the other packages.
 
+If you use ASP.NET Core Identity, also add `Sashimi343.D3Fragments.Identity.EFCore` to the infrastructure layer (see [ASP.NET Core Identity integration](../guide/07-identity/01-setup.md)).
+
 ### Combining multiple layers into one project
 
 There are four layers, but you do not have to split the application into exactly four projects.

@@ -152,6 +152,7 @@ A `DomainException` such as `EntityNotFoundException` is converted into an error
 Add `Sashimi343.D3Fragments.EFCore` and `Microsoft.EntityFrameworkCore.Sqlite` to `Library.Infrastructure` and reference `Library.Application`.
 
 The `DbContext` derives from `D3DbContext`.
+To derive from ASP.NET Core Identity's `IdentityDbContext` or similar, see [ASP.NET Core Identity integration](../guide/07-identity/01-setup.md#dbcontext).
 Map value object properties with `ComplexValueObject`.
 If you do not map them, an exception is thrown when the model is built.
 

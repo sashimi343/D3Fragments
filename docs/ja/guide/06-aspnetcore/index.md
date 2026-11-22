@@ -10,6 +10,8 @@ OpenAPI ドキュメントを生成する場合は、`Sashimi343.D3Fragments.Asp
 | [CSRF 対策](03-csrf.md) | カスタムヘッダーを必須にして、Cookie 認証の API を守る |
 | [OpenAPI](04-openapi.md) | OpenAPI ドキュメントのスキーマを D3Fragments の型に合わせる |
 
+ASP.NET Core Identity の Cookie 側の処理を行う拡張メソッド（名前空間 `D3Fragments.AspNetCore.Identity`）は、[ASP.NET Core Identity 連携](../07-identity/index.md) で説明します。
+
 ## サービスの登録
 
 ```csharp
