@@ -1,0 +1,47 @@
+@page
+@using IdentityIntegration.Core.Accounts
+@model IdentityIntegration.Web.Pages.Account.LoginWith2faModel
+@{
+    ViewData["Title"] = "二要素認証";
+}
+<h1>二要素認証</h1>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+<ul class="nav nav-tabs mb-3">
+    @foreach (TwoFactorMethod method in Model.Methods)
+    {
+        <li class="nav-item">
+            <a class="nav-link @(method == Model.Method ? "active" : "")" asp-route-method="@method" asp-route-rememberMe="@Model.RememberMe" asp-route-returnUrl="@Model.ReturnUrl">
+                @(method == TwoFactorMethod.Authenticator ? "認証アプリ" : "メール")
+            </a>
+        </li>
+    }
+</ul>
+
+@if (Model.Method == TwoFactorMethod.Email)
+{
+    <form method="post" asp-page-handler="SendEmailCode" asp-route-rememberMe="@Model.RememberMe" asp-route-returnUrl="@Model.ReturnUrl" class="mb-3">
+        <p>登録済みのメールアドレスに確認コードを送ります。メールは Mailpit で確認できます。</p>
+        <button class="btn btn-outline-primary" type="submit">確認コードを送信</button>
+    </form>
+}
+else
+{
+    <p>認証アプリに表示されている6桁のコードを入力してください。</p>
+}
+
+<form method="post" asp-route-rememberMe="@Model.RememberMe" asp-route-returnUrl="@Model.ReturnUrl" class="col-md-6">
+    <input type="hidden" asp-for="Method" />
+    <div class="mb-3">
+        <label asp-for="Code" class="form-label">確認コード</label>
+        <input asp-for="Code" class="form-control" autocomplete="one-time-code" inputmode="numeric" />
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="RememberMachine" class="form-check-input" />
+        <label asp-for="RememberMachine" class="form-check-label">このブラウザを記憶する（次回からパスワードだけでログインする）</label>
+    </div>
+    <button class="btn btn-primary" type="submit">ログイン</button>
+</form>
+<p class="mt-3">
+    認証アプリもメールも使えない場合は、<a asp-page="/Account/LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">回復コードでログイン</a>してください。
+</p>

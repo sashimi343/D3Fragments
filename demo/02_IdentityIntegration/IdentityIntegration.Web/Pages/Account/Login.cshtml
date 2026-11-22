@@ -1,0 +1,44 @@
+@page
+@model IdentityIntegration.Web.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "ログイン";
+}
+<h1>ログイン</h1>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<div class="row g-4">
+    <section class="col-md-6">
+        <h2 class="h5">パスワード</h2>
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="Input.UserName" class="form-label"></label>
+                <input asp-for="Input.UserName" class="form-control" autocomplete="username" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Password" class="form-label"></label>
+                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+            </div>
+            <div class="form-check mb-3">
+                <input asp-for="Input.RememberMe" class="form-check-input" />
+                <label asp-for="Input.RememberMe" class="form-check-label"></label>
+            </div>
+            <button class="btn btn-primary" type="submit">ログイン</button>
+            <a asp-page="/Account/Register" class="btn btn-link">ユーザー登録</a>
+        </form>
+    </section>
+    <section class="col-md-6">
+        <h2 class="h5">パスキー</h2>
+        <p>マイページで登録したパスキーで、パスワードなしでログインします。</p>
+        <form method="post" asp-page-handler="Passkey" id="passkey-login">
+            <input type="hidden" name="credentialJson" />
+            <button class="btn btn-outline-primary" type="button" data-passkey-login="@Url.Page("/Account/Login", "PasskeyOptions")">パスキーでログイン</button>
+        </form>
+
+        <h2 class="h5 mt-4">外部ログイン</h2>
+        <form method="post" asp-page="/Account/ExternalLogin" asp-route-provider="@ExternalLoginProviders.Keycloak">
+            <button class="btn btn-outline-secondary" type="submit">Keycloak でログイン</button>
+        </form>
+    </section>
+</div>
+@section Scripts {
+    <script src="~/js/passkey.js" asp-append-version="true"></script>
+}

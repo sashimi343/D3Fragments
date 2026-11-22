@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityIntegration.Core\IdentityIntegration.Core.csproj" />
+    <ProjectReference Include="..\IdentityIntegration.Infrastructure\IdentityIntegration.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Sashimi343.D3Fragments.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+    <PackageReference Include="Sashimi343.D3Fragments.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

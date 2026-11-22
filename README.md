@@ -56,6 +56,7 @@ See the documentation for how to get started, the guides, and the API reference.
 - **[Documentation (English)](https://sashimi343.github.io/D3Fragments/en/)**
 - [Quick start](https://sashimi343.github.io/D3Fragments/en/getting-started/01-quick-start.html)
 - [Demo application](demo/01_BasicWebApp): a library lending management application built with D3Fragments
+- [Identity integration demo](demo/02_IdentityIntegration): sign-up, sign-in, two-factor authentication, passkeys and external login with ASP.NET Core Identity
 
 ## License
 

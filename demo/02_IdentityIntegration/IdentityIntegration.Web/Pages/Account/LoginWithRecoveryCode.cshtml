@@ -1,0 +1,15 @@
+@page
+@model IdentityIntegration.Web.Pages.Account.LoginWithRecoveryCodeModel
+@{
+    ViewData["Title"] = "回復コードでログイン";
+}
+<h1>回復コードでログイン</h1>
+<p>二要素認証を有効にしたときに表示された回復コードを1つ入力してください。使った回復コードは、次から使えなくなります。</p>
+<form method="post" asp-route-returnUrl="@Model.ReturnUrl" class="col-md-6">
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+    <div class="mb-3">
+        <label asp-for="RecoveryCode" class="form-label">回復コード</label>
+        <input asp-for="RecoveryCode" class="form-control" autocomplete="off" />
+    </div>
+    <button class="btn btn-primary" type="submit">ログイン</button>
+</form>

@@ -1,0 +1,31 @@
+@page
+@model IdentityIntegration.Web.Pages.MyPage.EnableAuthenticatorModel
+@{
+    ViewData["Title"] = "認証アプリの設定";
+}
+<h1>認証アプリの設定</h1>
+<ol>
+    <li>Google Authenticator や Microsoft Authenticator などの認証アプリ（TOTP）を用意します。</li>
+    <li>
+        次の QR コードを読み取るか、キー <kbd>@Model.SharedKey</kbd> を入力します。
+        <div id="qr-code" class="my-3" data-uri="@Model.AuthenticatorUri"></div>
+    </li>
+    <li>
+        認証アプリに表示された6桁のコードを入力して、設定を確認します。
+        <form method="post" class="col-md-6 mt-2">
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+            <div class="mb-3">
+                <label asp-for="Code" class="form-label">確認コード</label>
+                <input asp-for="Code" class="form-control" autocomplete="one-time-code" inputmode="numeric" />
+            </div>
+            <button class="btn btn-primary" type="submit">確認して有効にする</button>
+        </form>
+    </li>
+</ol>
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        const element = document.getElementById('qr-code');
+        new QRCode(element, { text: element.dataset.uri, width: 180, height: 180 });
+    </script>
+}
