@@ -5,6 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>D3Fragments</title>
   <link rel="icon" href="en/images/favicon.ico">
+  <script>
+    // Open the language last viewed (saved by templates/common/public/main.js), else the browser's language.
+    (function () {
+      var lang = null;
+      try {
+        lang = localStorage.getItem('D3Fragments.lang');
+      } catch (e) {
+        // Storage may be unavailable (private mode, blocked site data).
+      }
+      if (lang !== 'en' && lang !== 'ja') {
+        var preferred = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+        lang = 'en';
+        for (var i = 0; i < preferred.length; i++) {
+          var code = preferred[i].toLowerCase();
+          if (code.indexOf('ja') === 0) { lang = 'ja'; break; }
+          if (code.indexOf('en') === 0) { break; }
+        }
+      }
+      location.replace(lang + '/' + location.search + location.hash);
+    })();
+  </script>
 </head>
 <body>
   <h1>D3Fragments</h1>
