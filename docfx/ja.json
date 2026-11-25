@@ -10,7 +10,7 @@
     "content": [{ "src": "../docs/ja", "files": ["**/*.md", "**/*.yml"] }],
     "resource": [{ "files": ["images/**"] }],
     "output": "../_site/ja",
-    "template": ["default", "modern", "templates/ja"],
+    "template": ["default", "modern", "templates/common", "templates/ja"],
     "globalMetadata": {
       "_appTitle": "D3Fragments",
       "_appName": "D3Fragments",

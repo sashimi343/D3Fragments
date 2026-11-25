@@ -8,6 +8,51 @@ dotnet pack D3Fragments.slnx -c Release -o artifacts
 
 - ビルド時に `scripts/SeparateDocs.ps1` が XML ドキュメントを en(既定) / ja に分離する（要 PowerShell 7 `pwsh`）
 - ローカル版を区別する場合は `--version-suffix local.1` などを付与
+
+## 未公開の変更をデモアプリで確かめる
+
+デモアプリ（`demo/`）は NuGet のパッケージを参照するため、未公開の変更はローカルで作ったパッケージで確かめる。
+
+1. `dotnet pack D3Fragments.slnx -c Release -o artifacts --version-suffix local.1` でパッケージを作る（バージョンは `<VersionPrefix>-local.1`）
+2. デモアプリのフォルダに、`artifacts/` を参照する `nuget.config` を置く
+
+   ```xml
+   <?xml version="1.0" encoding="utf-8"?>
+   <configuration>
+     <!-- 未公開の D3Fragments をリポジトリで作ったパッケージから参照する。公開後は削除する -->
+     <packageSources>
+       <add key="D3Fragments-local" value="../../artifacts" />
+     </packageSources>
+   </configuration>
+   ```
+
+3. デモアプリの `Directory.Packages.props` の D3Fragments のバージョンを、作ったパッケージのバージョンにする
+
+- 同じバージョンのパッケージは NuGet のキャッシュ（`~/.nuget/packages`）から使われるため、作り直すたびに `local.2`、`local.3` と番号を上げる
+- `nuget.config` とローカル版のバージョンは、リリースの前に必ず元に戻す（下の「リリース」を参照）
+
+## リリース
+
+`main` 上のコミットに `v*` タグを push すると、`release.yml` が NuGet への公開、ドキュメントサイトの公開、GitHub Release の下書きの作成を行う。
+タグを打つ前に、リリース用のブランチで次の変更を行い、`main` にマージする。
+
+1. `Directory.Build.props` の `VersionPrefix` を新しいバージョンにする
+2. `src/Analyzers/D3Fragments.Analyzers/AnalyzerReleases.Unshipped.md` の規則を、`AnalyzerReleases.Shipped.md` の先頭に `## Release <バージョン>` として移す
+3. デモアプリ（`demo/*/Directory.Packages.props`）の D3Fragments の参照を新しいバージョンにし、ローカルのパッケージを参照する `nuget.config` があれば削除する
+4. ドキュメント（`docs/`）が新しい機能に追いついているか確認する
+
+マージ後の手順:
+
+```bash
+git switch main && git pull
+git tag v0.3.0
+git push origin v0.3.0
+```
+
+- タグ名の `v` を除いた部分がパッケージのバージョンになる。`-` を含む場合（`v0.3.0-preview.1` など）はプレリリースになる
+- `release.yml` は、タグのコミットが `main` に含まれていない場合は失敗する
+- ワークフローが成功したら、GitHub Release の下書きのリリースノートを確認して公開する
+- デモアプリは公開されたパッケージで復元・ビルドできることを確認する（NuGet への反映には少し時間がかかる）
 ## ドキュメントサイト
 
 `docs/<lang>` の Markdown と、XML ドキュメントコメントから生成した API リファレンスを DocFX で言語別にビルドする。
