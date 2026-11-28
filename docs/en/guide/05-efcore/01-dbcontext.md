@@ -72,7 +72,20 @@ See [ASP.NET Core Identity integration](../07-identity/01-setup.md) for how to c
 
 ## Mapping value objects
 
-Map value object properties as EF Core complex types with `ComplexValueObject`.
+There are two ways to map value object properties.
+Use `ComplexValueObject` in most cases, and use `HasValueObjectConversion` only for properties that need an index, such as a unique constraint.
+
+| | `ComplexValueObject` (usual) | `HasValueObjectConversion` |
+|---|---|---|
+| Mapping | Complex type | Value converter |
+| When to use | Value objects without an index | Value objects with a unique constraint or an index |
+| Index | Cannot be defined | Can be defined |
+| Using the wrapped value in queries (`x.Email.Value.EndsWith(...)`) | Supported | Not supported (compare value objects, such as `x.Email == email`) |
+| Column name | Property name (naming conventions are not applied) | Follows the naming convention |
+
+### Mapping as a complex type
+
+`ComplexValueObject` maps a value object property as an EF Core complex type.
 By default, a value object is stored in a single column named after the property (`Email`, not `Email_Value`).
 
 ```csharp
@@ -92,6 +105,42 @@ var members = await DbContext.Members
     .Where(x => x.EmailAddress.Value.EndsWith("@example.com"))
     .ToListAsync(cancellationToken);
 ```
+
+Because the column name is set explicitly to the property name, naming conventions such as `UseSnakeCaseNamingConvention()` are not applied.
+To match the naming convention, specify the column name for each property.
+
+```csharp
+builder.ComplexValueObject(x => x.EmailAddress)
+    .Property(x => x.Value).HasColumnName("email_address");
+```
+
+### Mapping with a value converter
+
+Map properties that need an index, such as a unique constraint, with a value converter by using `HasValueObjectConversion`.
+This is because EF Core cannot define an index on a complex type property.
+You do not need to specify the wrapped type (such as `string`); it is determined from the value object type.
+
+```csharp
+modelBuilder.Entity<Member>(builder =>
+{
+    builder.Property(x => x.EmailAddress).HasValueObjectConversion().HasMaxLength(254);
+    builder.HasIndex(x => x.EmailAddress).IsUnique();
+});
+```
+
+The column name is not set, so it follows the naming convention of the DbContext (`email_address` with `UseSnakeCaseNamingConvention()`).
+When a value is read from the database, the value object is created with `Create`, so a value that fails `ValidateValue` throws an exception.
+
+In queries, compare value objects instead of the wrapped values.
+
+```csharp
+var member = await DbContext.Members
+    .SingleOrDefaultAsync(x => x.EmailAddress == emailAddress, cancellationToken);
+```
+
+When the unique constraint is violated, `DbUpdateException` is thrown on save.
+
+### When you forget to map a value object
 
 If you forget to map a value object, EF Core tries to treat it as an entity.
 `D3DbContext` detects this and throws an `InvalidOperationException` that names the unmapped properties when the model is built.
@@ -126,6 +175,7 @@ var options = new DbContextOptionsBuilder<LibraryDbContext>()
 - @D3Fragments.EFCore.D3DbContext
 - @D3Fragments.EFCore.D3FragmentsModelConfigurationBuilderExtensions
 - @D3Fragments.EFCore.ValueObjectComplexTypeExtensions
+- @D3Fragments.EFCore.ValueObjectConversionExtensions
 - @D3Fragments.EFCore.D3FragmentsDbContextOptionsBuilderExtensions
 - @D3Fragments.EFCore.D3FragmentsEFCoreServiceCollectionExtensions
 - <xref:D3Fragments.EFCore.EfUnitOfWork`1>

@@ -147,11 +147,20 @@ namespace D3Fragments.EFCore.Resources {
         }
 
         /// <summary>
-        ///   The value object {0} is mapped as an entity type. Register the property ({1}) with ComplexValueObject in OnModelCreating. に類似しているローカライズされた文字列を検索します。
+        ///   The value object {0} is mapped as an entity type. Map the property ({1}) with ComplexValueObject or HasValueObjectConversion in OnModelCreating. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string InvalidOperationException_ValueObjectMappedAsEntity {
             get {
                 return ResourceManager.GetString("InvalidOperationException_ValueObjectMappedAsEntity", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   The type {0} does not implement IValueObject&lt;TSelf, TPrimitive&gt; with itself as TSelf. HasValueObjectConversion can be used only for value object properties. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string InvalidOperationException_NotValueObject {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_NotValueObject", resourceCulture);
             }
         }
 

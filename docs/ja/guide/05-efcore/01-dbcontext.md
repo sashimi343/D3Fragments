@@ -72,7 +72,20 @@ Identity と組み合わせる方法は [ASP.NET Core Identity 連携](../07-ide
 
 ## 値オブジェクトをマッピングする
 
-値オブジェクトのプロパティは `ComplexValueObject` で EF Core の Complex Type としてマッピングします。
+値オブジェクトのプロパティのマッピング方法は2つあります。
+通常は `ComplexValueObject` を使い、一意制約などのインデックスが必要なプロパティだけ `HasValueObjectConversion` を使います。
+
+| | `ComplexValueObject`（通常） | `HasValueObjectConversion` |
+|---|---|---|
+| マッピング | Complex Type | 値コンバーター |
+| 使う場面 | インデックスのない値オブジェクト | 一意制約・インデックスのある値オブジェクト |
+| インデックス | 定義できない | 定義できる |
+| クエリでラップしている値を使う（`x.Email.Value.EndsWith(...)`） | できる | できない（`x.Email == email` のように値オブジェクトどうしで比較する） |
+| 列名 | プロパティ名（命名規約は適用されない） | 命名規約に従う |
+
+### Complex Type としてマッピングする
+
+`ComplexValueObject` は、値オブジェクトのプロパティを EF Core の Complex Type としてマッピングします。
 既定ではプロパティ名の列1つ（`Email_Value` ではなく `Email`）に保存します。
 
 ```csharp
@@ -92,6 +105,42 @@ var members = await DbContext.Members
     .Where(x => x.EmailAddress.Value.EndsWith("@example.com"))
     .ToListAsync(cancellationToken);
 ```
+
+列名はプロパティ名で明示的に設定するため、`UseSnakeCaseNamingConvention()` などの命名規約は適用されません。
+命名規約に合わせた列名にするには、プロパティごとに列名を指定します。
+
+```csharp
+builder.ComplexValueObject(x => x.EmailAddress)
+    .Property(x => x.Value).HasColumnName("email_address");
+```
+
+### 値コンバーターでマッピングする
+
+一意制約などのインデックスが必要なプロパティは、`HasValueObjectConversion` で値コンバーターを使ってマッピングします。
+EF Core は Complex Type のプロパティにインデックスを定義できないためです。
+ラップしている型（`string` など）は指定しなくても、値オブジェクトの型から決まります。
+
+```csharp
+modelBuilder.Entity<Member>(builder =>
+{
+    builder.Property(x => x.EmailAddress).HasValueObjectConversion().HasMaxLength(254);
+    builder.HasIndex(x => x.EmailAddress).IsUnique();
+});
+```
+
+列名は設定しないため、DbContext に設定した命名規約（`UseSnakeCaseNamingConvention()` なら `email_address`）に従います。
+DB から読み込むときは `Create` で値オブジェクトを生成するため、`ValidateValue` の検証を満たさない値は例外になります。
+
+クエリでは、ラップしている値ではなく値オブジェクトどうしを比較します。
+
+```csharp
+var member = await DbContext.Members
+    .SingleOrDefaultAsync(x => x.EmailAddress == emailAddress, cancellationToken);
+```
+
+一意制約に違反した場合、保存時に `DbUpdateException` がスローされます。
+
+### マッピングを忘れた場合
 
 値オブジェクトのマッピングを忘れると、EF Core は値オブジェクトをエンティティとして扱おうとします。
 `D3DbContext` はこれを検出し、マッピングを忘れたプロパティの名前を示す `InvalidOperationException` をモデルの構築時にスローします。
@@ -126,6 +175,7 @@ var options = new DbContextOptionsBuilder<LibraryDbContext>()
 - @D3Fragments.EFCore.D3DbContext
 - @D3Fragments.EFCore.D3FragmentsModelConfigurationBuilderExtensions
 - @D3Fragments.EFCore.ValueObjectComplexTypeExtensions
+- @D3Fragments.EFCore.ValueObjectConversionExtensions
 - @D3Fragments.EFCore.D3FragmentsDbContextOptionsBuilderExtensions
 - @D3Fragments.EFCore.D3FragmentsEFCoreServiceCollectionExtensions
 - <xref:D3Fragments.EFCore.EfUnitOfWork`1>
