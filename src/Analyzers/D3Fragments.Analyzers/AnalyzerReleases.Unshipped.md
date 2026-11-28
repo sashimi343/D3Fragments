@@ -7,3 +7,4 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 DFR0018 | Architecture | Warning | DiagnosticDescriptors
 DFR0019 | Architecture | Warning | DiagnosticDescriptors
+DFR0020 | Architecture | Warning | DiagnosticDescriptors

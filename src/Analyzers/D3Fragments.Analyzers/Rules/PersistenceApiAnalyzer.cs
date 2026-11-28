@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.Operations;
 namespace D3Fragments.Analyzers.Rules;
 
 // DFR0012: 保存・トランザクション操作 / DFR0013: エンティティに対する Update・Attach / DFR0014: リポジトリでの変更追跡の無効化
+// DFR0020: リポジトリで ExecuteImmediateAsync を経由しない即時の操作（ExecuteUpdate・ExecuteDelete・ExecuteSql*）
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class PersistenceApiAnalyzer : DiagnosticAnalyzer
 {
@@ -22,12 +23,14 @@ public sealed class PersistenceApiAnalyzer : DiagnosticAnalyzer
 
     private static readonly ImmutableHashSet<string> NoTrackingMethods = ImmutableHashSet.Create("AsNoTracking", "AsNoTrackingWithIdentityResolution");
 
+    private static readonly ImmutableHashSet<string> BulkMethods = ImmutableHashSet.Create("ExecuteUpdate", "ExecuteUpdateAsync", "ExecuteDelete", "ExecuteDeleteAsync");
+
     // 保存・トランザクション操作を許可するモジュールレイヤー
     private static readonly ImmutableHashSet<ModuleLayerType> PersistenceControlLayers = ImmutableHashSet.Create(
         ModuleLayerType.Application_PipelineBehavior, ModuleLayerType.Infrastructure_DbContext, ModuleLayerType.Infrastructure_UnitOfWork);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(DiagnosticDescriptors.DFR0012, DiagnosticDescriptors.DFR0013, DiagnosticDescriptors.DFR0014);
+        ImmutableArray.Create(DiagnosticDescriptors.DFR0012, DiagnosticDescriptors.DFR0013, DiagnosticDescriptors.DFR0014, DiagnosticDescriptors.DFR0020);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -78,6 +81,37 @@ public sealed class PersistenceApiAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptors.DFR0014, location, from.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat), method.Name));
         }
+
+        if (fromLayer == ModuleLayerType.Infrastructure_RepositoryImplementation && IsImmediateOperation(method, knownTypes) && !IsInsideExecuteImmediate(invocation, knownTypes))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.DFR0020, location, from.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat), method.Name));
+        }
+    }
+
+    private static bool IsImmediateOperation(IMethodSymbol method, KnownTypes knownTypes) =>
+        (BulkMethods.Contains(method.Name) && SymbolEqualityComparer.Default.Equals(method.ContainingType, knownTypes.EntityFrameworkQueryableExtensions))
+        || (method.Name.StartsWith("ExecuteSql", StringComparison.Ordinal) && SymbolEqualityComparer.Default.Equals(method.ContainingType, knownTypes.RelationalDatabaseFacadeExtensions));
+
+    // RepositoryBase.ExecuteImmediateAsync の引数のラムダの中（入れ子のラムダを含む）での呼び出しかどうか。
+    // ラムダから呼んだ別のメソッドの中の呼び出しは判定できない
+    private static bool IsInsideExecuteImmediate(IOperation operation, KnownTypes knownTypes)
+    {
+        for (var current = operation.Parent; current is not null; current = current.Parent)
+        {
+            if (current is not IAnonymousFunctionOperation lambda)
+            {
+                continue;
+            }
+
+            var argument = lambda.Parent is IDelegateCreationOperation creation ? creation.Parent : lambda.Parent;
+            if (argument?.Parent is IInvocationOperation { TargetMethod: { Name: "ExecuteImmediateAsync" } target }
+                && SymbolEqualityComparer.Default.Equals(target.ContainingType.OriginalDefinition, knownTypes.RepositoryBase))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     // 拡張メソッドは第1引数の型、それ以外は宣言している型をレシーバーの型とする

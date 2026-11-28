@@ -91,4 +91,7 @@
   <data name="InvalidOperationException_ConventionsNotApplied" xml:space="preserve">
     <value>The D3Fragments conventions are not applied to {0}. Call ApplyD3FragmentsConventions in ConfigureConventions, or derive the context from D3DbContext.</value>
   </data>
+  <data name="InvalidOperationException_ImmediateOperationOutsideTransaction" xml:space="preserve">
+    <value>An immediate operation must be executed within a transaction. Make the command implement ITransactionalCommand.</value>
+  </data>
 </root>

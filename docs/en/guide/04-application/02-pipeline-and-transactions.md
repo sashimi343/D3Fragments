@@ -36,6 +36,8 @@ public sealed record ReserveSeatCommand(UuidV7 SeatId, UuidV7 MemberId)
 `TransactionBehavior` runs the rest of the pipeline inside `IUnitOfWork.ExecuteInTransactionAsync`.
 If no exception is thrown, it commits; if one is thrown, it rolls back.
 
+Commands that use a repository's `ExecuteImmediateAsync` (immediate operations such as `ExecuteUpdate`, `ExecuteDelete`, and `ExecuteSql*`) also need `ITransactionalCommand` ([Executing immediate operations](../05-efcore/02-repositories.md#executing-immediate-operations)).
+
 ## Executing a command in a separate scope
 
 One call to `IRequestExecutor` is one unit of saving.

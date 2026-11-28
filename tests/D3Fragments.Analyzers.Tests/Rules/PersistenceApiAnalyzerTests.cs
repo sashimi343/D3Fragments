@@ -197,6 +197,83 @@ public sealed class PersistenceApiAnalyzerTests
     }
 
     [Fact]
+    public async Task RepositoryExecutingImmediateOperationDirectly_ReportsDfr0020()
+    {
+        const string source = Types + """
+            public sealed class ShelfRepository(AppDbContext dbContext) : RepositoryBase<AppDbContext, Shelf>(dbContext), IShelfRepository
+            {
+                public void Run()
+                {
+                    {|#0:Set.ExecuteDelete()|};
+                    {|#1:Set.ExecuteUpdate(s => s.SetProperty(x => x.Version, 1))|};
+                    {|#2:DbContext.Database.ExecuteSqlRaw("DELETE FROM Logs")|};
+                    {|#3:DbContext.Database.ExecuteSql($"DELETE FROM Logs")|};
+                }
+
+                public async Task RunAsync(CancellationToken cancellationToken)
+                {
+                    await {|#4:Set.ExecuteDeleteAsync(cancellationToken)|};
+                    await {|#5:Set.ExecuteUpdateAsync(s => s.SetProperty(x => x.Version, 1), cancellationToken)|};
+                    await {|#6:DbContext.Database.ExecuteSqlAsync($"DELETE FROM Logs", cancellationToken)|};
+                    await {|#7:DbContext.Database.ExecuteSqlRawAsync("DELETE FROM Logs", cancellationToken)|};
+                    await {|#8:DbContext.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM Logs", cancellationToken)|};
+                    await ExecuteImmediateAsync(ct => Task.Run(() => {|#9:Set.ExecuteDelete()|}, ct), cancellationToken);
+                    System.Func<CancellationToken, Task<int>> operation = ct => {|#10:Set.ExecuteDeleteAsync(ct)|};
+                    await ExecuteImmediateAsync(operation, cancellationToken);
+                }
+            }
+            """;
+
+        await Verifier.VerifyAsync(source, All,
+            Expect(DiagnosticDescriptors.DFR0020, 0, "ShelfRepository", "ExecuteDelete"),
+            Expect(DiagnosticDescriptors.DFR0020, 1, "ShelfRepository", "ExecuteUpdate"),
+            Expect(DiagnosticDescriptors.DFR0020, 2, "ShelfRepository", "ExecuteSqlRaw"),
+            Expect(DiagnosticDescriptors.DFR0020, 3, "ShelfRepository", "ExecuteSql"),
+            Expect(DiagnosticDescriptors.DFR0020, 4, "ShelfRepository", "ExecuteDeleteAsync"),
+            Expect(DiagnosticDescriptors.DFR0020, 5, "ShelfRepository", "ExecuteUpdateAsync"),
+            Expect(DiagnosticDescriptors.DFR0020, 6, "ShelfRepository", "ExecuteSqlAsync"),
+            Expect(DiagnosticDescriptors.DFR0020, 7, "ShelfRepository", "ExecuteSqlRawAsync"),
+            Expect(DiagnosticDescriptors.DFR0020, 8, "ShelfRepository", "ExecuteSqlInterpolatedAsync"),
+            Expect(DiagnosticDescriptors.DFR0020, 10, "ShelfRepository", "ExecuteDeleteAsync"));
+    }
+
+    [Fact]
+    public async Task RepositoryExecutingImmediateOperationInsideExecuteImmediate_ReportsNothing()
+    {
+        const string source = Types + """
+            public sealed class ShelfRepository(AppDbContext dbContext) : RepositoryBase<AppDbContext, Shelf>(dbContext), IShelfRepository
+            {
+                public async Task RunAsync(CancellationToken cancellationToken)
+                {
+                    await ExecuteImmediateAsync(ct => Set.ExecuteDeleteAsync(ct), cancellationToken);
+                    await ExecuteImmediateAsync(ct => Set.ExecuteUpdateAsync(s => s.SetProperty(x => x.Version, 1), ct), cancellationToken);
+                    await ExecuteImmediateAsync(ct => DbContext.Database.ExecuteSqlAsync($"DELETE FROM Logs", ct), cancellationToken);
+                    await ExecuteImmediateAsync(async ct =>
+                    {
+                        var deleted = await Set.ExecuteDeleteAsync(ct);
+                        return deleted + await DbContext.Database.ExecuteSqlRawAsync("DELETE FROM Logs", ct);
+                    }, cancellationToken);
+                }
+            }
+            """;
+
+        await Verifier.VerifyAsync(source, All);
+    }
+
+    [Fact]
+    public async Task NonRepositoryExecutingImmediateOperation_ReportsNothing()
+    {
+        const string source = Types + """
+            public sealed class LogCleaner(AppDbContext dbContext)
+            {
+                public Task<int> CleanAsync(CancellationToken cancellationToken) => dbContext.Logs.ExecuteDeleteAsync(cancellationToken);
+            }
+            """;
+
+        await Verifier.VerifyAsync(source, All);
+    }
+
+    [Fact]
     public async Task AssemblyWithoutAttribute_ReportsNothing()
     {
         const string source = Types + """
