@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -119,5 +119,17 @@
   </data>
   <data name="DFR0017_MessageFormat" xml:space="preserve">
     <value>'{0}' must not call '{1}', which writes to the database and the cookies together. Use {2} instead</value>
+  </data>
+  <data name="DFR0018_Title" xml:space="preserve">
+    <value>Use IIsolatedRequestExecutor to execute a command from a handler</value>
+  </data>
+  <data name="DFR0018_MessageFormat" xml:space="preserve">
+    <value>'{0}' must not inject '{1}', which executes command '{2}' in the same scope. Use IIsolatedRequestExecutor instead</value>
+  </data>
+  <data name="DFR0019_Title" xml:space="preserve">
+    <value>Query handlers should not execute commands</value>
+  </data>
+  <data name="DFR0019_MessageFormat" xml:space="preserve">
+    <value>Query handler '{0}' must not inject '{1}', which executes command '{2}'</value>
   </data>
 </root>

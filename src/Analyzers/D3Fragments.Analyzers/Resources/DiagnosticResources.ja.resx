@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -119,5 +119,17 @@
   </data>
   <data name="DFR0017_MessageFormat" xml:space="preserve">
     <value>'{0}' から、DBへの書き込みとCookieの操作を同時に行う '{1}' を呼び出すべきではありません。代わりに {2} を使ってください</value>
+  </data>
+  <data name="DFR0018_Title" xml:space="preserve">
+    <value>Handler から Command を実行するときは IIsolatedRequestExecutor を使ってください</value>
+  </data>
+  <data name="DFR0018_MessageFormat" xml:space="preserve">
+    <value>'{0}' は、Command '{2}' を同じスコープで実行する '{1}' を注入すべきではありません。代わりに IIsolatedRequestExecutor を使ってください</value>
+  </data>
+  <data name="DFR0019_Title" xml:space="preserve">
+    <value>Query の Handler から Command を実行しないでください</value>
+  </data>
+  <data name="DFR0019_MessageFormat" xml:space="preserve">
+    <value>Query の Handler '{0}' は、Command '{2}' を実行する '{1}' を注入すべきではありません</value>
   </data>
 </root>

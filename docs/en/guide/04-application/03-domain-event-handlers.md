@@ -40,6 +40,10 @@ In that case, the before-commit handlers for the new events are called as well.
 To prevent handlers from raising events for each other indefinitely, this is repeated at most 10 times.
 If that limit is exceeded, `InvalidOperationException` is thrown.
 
+To execute another Command from a before-commit handler, use `IIsolatedRequestExecutor<TRequest, TResponse>` ([DFR0018](../../analyzers/DFR0018.md)).
+The changes of that Command are committed separately from the business data and remain even if the business data is rolled back.
+For changes that must be saved together with the business data, change the aggregates in the handler instead of executing a Command.
+
 ## After-commit handlers
 
 Because the business data has already been committed, exceptions thrown by the handler do not propagate to the caller of the Command.
@@ -61,6 +65,7 @@ public sealed class NotifyBookPlacedOnHoldHandler(ILogger<NotifyBookPlacedOnHold
 Do not change entities directly in an after-commit handler.
 Such changes are not saved, and the fact that they were discarded is written to the error log.
 If you need to update the database, execute another Command from the handler.
+Because the commit has already completed, you can execute it in the same scope with `IRequestExecutor<TRequest, TResponse>`.
 
 The default dispatcher passes `CancellationToken.None` as `cancellationToken`.
 This prevents the caller's cancellation from interrupting the follow-up processing of committed changes.

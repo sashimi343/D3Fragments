@@ -56,6 +56,7 @@ services.AddD3FragmentsApplication(assemblies, configure: null);
 | サービス | 実装 | 有効期間 |
 |---|---|---|
 | `IRequestExecutor<TRequest, TResponse>` | `RequestExecutor<TRequest, TResponse>` | Scoped |
+| `IIsolatedRequestExecutor<TRequest, TResponse>` | `IsolatedRequestExecutor<TRequest, TResponse>` | Scoped |
 | `IPipelineBehavior<TRequest, TResponse>` | `TransactionBehavior<TRequest, TResponse>`、`UnitOfWorkBehavior<TRequest, TResponse>` | Scoped |
 | `IDomainEventDispatcher` | `DomainEventDispatcher` | Scoped |
 | `IRequestHandler<TRequest, TResponse>` | `assemblies` にある実装 | Scoped |

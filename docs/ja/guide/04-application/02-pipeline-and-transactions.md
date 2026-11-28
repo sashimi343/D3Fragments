@@ -36,6 +36,57 @@ public sealed record ReserveSeatCommand(UuidV7 SeatId, UuidV7 MemberId)
 `TransactionBehavior` は、Pipeline の残りの処理を `IUnitOfWork.ExecuteInTransactionAsync` の中で実行します。
 例外がスローされなければ Commit し、スローされれば Rollback します。
 
+## 別のスコープで Command を実行する
+
+1回の `IRequestExecutor` の呼び出しが、1つの保存の単位です。
+Handler が例外をスローすると、その Command の変更はすべて破棄されます。
+次のような処理は、`IIsolatedRequestExecutor<TRequest, TResponse>` を使って、呼び出し元とは別のスコープで実行します。
+
+- 本体より前に、別のトランザクションで確定させたい前処理
+- 本体が失敗しても残したい記録（外部 API の呼び出しの試行記録など）
+
+`IIsolatedRequestExecutor` は、新しい DI スコープを作り、そのスコープの `IRequestExecutor` でリクエストを実行します。
+`DbContext`・`IUnitOfWork` が呼び出し元とは別のインスタンスになるため、呼び出し元とは独立して保存・Commit されます。
+Pipeline Behavior とドメインイベントの配信は、通常の実行と同じに動きます。
+`IRequestExecutor` を継承しているため、`TryExecuteAsync` もそのまま使えます。
+
+```csharp
+public sealed class ChangePlanCommandHandler(
+    IIsolatedRequestExecutor<StartPaymentAttemptCommand, UuidV7> startAttempt,
+    IPaymentAttemptRepository attempts,
+    IPaymentGateway paymentGateway)
+    : IRequestHandler<ChangePlanCommand, Result>
+{
+    public async Task<Result> HandleAsync(ChangePlanCommand request, CancellationToken cancellationToken)
+    {
+        // 外部 API を呼ぶ前に、試行記録を確定させる。この後で本体が失敗しても残る
+        UuidV7 attemptId = await startAttempt.ExecuteAsync(new StartPaymentAttemptCommand(request.SubscriptionId), cancellationToken);
+
+        await paymentGateway.ChangePlanAsync(request.SubscriptionId, request.Plan, cancellationToken);
+
+        // 本体の変更と同じトランザクションで、試行を完了にする
+        PaymentAttempt attempt = await attempts.FindAsync(attemptId, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(PaymentAttempt));
+        attempt.Complete();
+        // 本体の変更
+        return Result.Success();
+    }
+}
+```
+
+この例では、本体の保存や Commit が失敗すると、試行記録は未完了のまま残ります。
+未完了のまま残った試行記録を検知すれば、外部 API と DB の不整合に気付けます。
+
+別のスコープで実行するときは、次の点に注意してください。
+
+- Command の Handler・Commit 前のドメインイベントハンドラから、Command を `IRequestExecutor` で実行しないでください（[DFR0018](../../analyzers/DFR0018.md)）。`DbContext` を共有するため、内側の Command の保存が、呼び出し元のまだ保存していない変更まで保存してしまいます。Commit 後のハンドラは Commit が済んでいるため、`IRequestExecutor` で実行できます
+- Query の Handler からは、Command を実行しないでください（[DFR0019](../../analyzers/DFR0019.md)）
+- 内側の Command からは、呼び出し元がまだ Commit していない行は見えません。それらの行への外部キーを持つ行を登録すると、制約違反になるか、ロックの解放を待ち続けます
+- 呼び出し元のトランザクションがロックしている行を内側の Command が更新すると、内側の Command は待ち続けます（呼び出し元は内側の完了を待つため、処理が進みません）。ライブラリでは検出できません
+- Scoped のサービスが持つ状態（キャッシュなど）は、新しいスコープに引き継がれません。`IHttpContextAccessor` は新しいスコープでも同じ `HttpContext` を返します
+- 1回のリクエストで DB の接続を2本使います。接続プールの上限に注意してください
+- Handler の単体テストでは、`IIsolatedRequestExecutor` をスパイに差し替えて、呼ばれたこととリクエストの内容を確認します。`TransactionalTestBase` の `DbContext` とは別の接続で実行され、テストのロールバックの対象にならないためです
+
 ## 独自の Pipeline Behavior を追加する
 
 ロギングなどの共通処理は `IPipelineBehavior<TRequest, TResponse>` を実装して追加します。
@@ -73,3 +124,4 @@ builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<
 - <xref:D3Fragments.Application.TransactionBehavior`2>
 - @D3Fragments.Application.ITransactionalCommand
 - @D3Fragments.Application.IUnitOfWork
+- <xref:D3Fragments.Application.IIsolatedRequestExecutor`2>

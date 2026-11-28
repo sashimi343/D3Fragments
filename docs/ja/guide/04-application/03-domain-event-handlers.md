@@ -40,6 +40,10 @@ public sealed class SuspendMemberOnOverdueReturnHandler(IMemberRepository member
 ハンドラ同士がイベントを循環して発行し続けないように、繰り返しは最大10回までです。
 それを超えると `InvalidOperationException` がスローされます。
 
+Commit 前のハンドラから別の Command を実行する場合は、`IIsolatedRequestExecutor<TRequest, TResponse>` を使います（[DFR0018](../../analyzers/DFR0018.md)）。
+その Command の変更は業務データとは別に Commit され、業務データがロールバックされても残ります。
+業務データと一緒に保存したい変更は、Command を実行せずにハンドラの中で集約を変更してください。
+
 ## Commit 後のハンドラ
 
 業務データはすでに確定しているため、ハンドラがスローした例外は Command の呼び出し元に伝わりません。
@@ -61,6 +65,7 @@ public sealed class NotifyBookPlacedOnHoldHandler(ILogger<NotifyBookPlacedOnHold
 Commit 後のハンドラではエンティティを直接変更しないでください。
 変更しても保存されず、破棄されたことがエラーログに出力されます。
 DB を更新したい場合は、ハンドラから別の Command を実行します。
+Commit が済んでいるため、`IRequestExecutor<TRequest, TResponse>` で同じスコープのまま実行できます。
 
 既定のディスパッチャーは `cancellationToken` に `CancellationToken.None` を渡します。
 確定した変更の後続処理を、呼び出し元のキャンセルで中断させないためです。

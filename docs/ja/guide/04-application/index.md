@@ -6,7 +6,7 @@ D3Fragments はユースケースを実行する基盤を `Sashimi343.D3Fragment
 | ページ | 主な型 |
 |---|---|
 | [Command と Query](01-commands-and-queries.md) | `ICommand<TResponse>`、`IQuery<TResponse>`、`IRequestHandler<TRequest, TResponse>`、`IRequestExecutor<TRequest, TResponse>` |
-| [Pipeline とトランザクション](02-pipeline-and-transactions.md) | `IPipelineBehavior<TRequest, TResponse>`、`UnitOfWorkBehavior`、`TransactionBehavior`、`ITransactionalCommand` |
+| [Pipeline とトランザクション](02-pipeline-and-transactions.md) | `IPipelineBehavior<TRequest, TResponse>`、`UnitOfWorkBehavior`、`TransactionBehavior`、`ITransactionalCommand`、`IIsolatedRequestExecutor<TRequest, TResponse>` |
 | [ドメインイベントハンドラ](03-domain-event-handlers.md) | `IBeforeCommitDomainEventHandler<TEvent>`、`IAfterCommitDomainEventHandler<TEvent>` |
 
 ## サービスの登録

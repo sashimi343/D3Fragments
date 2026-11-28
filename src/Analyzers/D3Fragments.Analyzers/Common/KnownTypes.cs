@@ -20,6 +20,7 @@ internal sealed class KnownTypes
         IQuery = compilation.GetTypeByMetadataName("D3Fragments.Application.IQuery");
         IRequestHandler = compilation.GetTypeByMetadataName("D3Fragments.Application.IRequestHandler`2");
         IRequestExecutor = compilation.GetTypeByMetadataName("D3Fragments.Application.IRequestExecutor`2");
+        IIsolatedRequestExecutor = compilation.GetTypeByMetadataName("D3Fragments.Application.IIsolatedRequestExecutor`2");
         IBeforeCommitDomainEventHandler = compilation.GetTypeByMetadataName("D3Fragments.Application.IBeforeCommitDomainEventHandler`1");
         IAfterCommitDomainEventHandler = compilation.GetTypeByMetadataName("D3Fragments.Application.IAfterCommitDomainEventHandler`1");
         IPipelineBehavior = compilation.GetTypeByMetadataName("D3Fragments.Application.IPipelineBehavior`2");
@@ -53,6 +54,7 @@ internal sealed class KnownTypes
     public INamedTypeSymbol? IQuery { get; }
     public INamedTypeSymbol? IRequestHandler { get; }
     public INamedTypeSymbol? IRequestExecutor { get; }
+    public INamedTypeSymbol? IIsolatedRequestExecutor { get; }
     public INamedTypeSymbol? IBeforeCommitDomainEventHandler { get; }
     public INamedTypeSymbol? IAfterCommitDomainEventHandler { get; }
     public INamedTypeSymbol? IPipelineBehavior { get; }

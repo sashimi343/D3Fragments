@@ -6,7 +6,7 @@ D3Fragments provides the infrastructure for executing use cases in the `Sashimi3
 | Page | Main types |
 |---|---|
 | [Commands and Queries](01-commands-and-queries.md) | `ICommand<TResponse>`, `IQuery<TResponse>`, `IRequestHandler<TRequest, TResponse>`, `IRequestExecutor<TRequest, TResponse>` |
-| [Pipeline and transactions](02-pipeline-and-transactions.md) | `IPipelineBehavior<TRequest, TResponse>`, `UnitOfWorkBehavior`, `TransactionBehavior`, `ITransactionalCommand` |
+| [Pipeline and transactions](02-pipeline-and-transactions.md) | `IPipelineBehavior<TRequest, TResponse>`, `UnitOfWorkBehavior`, `TransactionBehavior`, `ITransactionalCommand`, `IIsolatedRequestExecutor<TRequest, TResponse>` |
 | [Domain event handlers](03-domain-event-handlers.md) | `IBeforeCommitDomainEventHandler<TEvent>`, `IAfterCommitDomainEventHandler<TEvent>` |
 
 ## Service registration
