@@ -38,13 +38,13 @@ public sealed class DetailsModel(
     }
 
     public Task<IActionResult> OnPostBorrowAsync() => ExecuteCommandAsync(async () =>
-        await loanBook.ExecuteAsync(new LoanBookCommand { BookId = Id, MemberId = MemberId }, HttpContext.RequestAborted), "貸出が完了しました。");
+        await loanBook.ExecuteAsync(new LoanBookCommand { BookId = Id, MemberId = MemberId }, HttpContext.RequestAborted), "The book has been borrowed.");
 
     public Task<IActionResult> OnPostReserveAsync() => ExecuteCommandAsync(async () =>
-        await reserveBook.ExecuteAsync(new ReserveBookCommand { BookId = Id, MemberId = MemberId }, HttpContext.RequestAborted), "予約が完了しました。");
+        await reserveBook.ExecuteAsync(new ReserveBookCommand { BookId = Id, MemberId = MemberId }, HttpContext.RequestAborted), "The book has been reserved.");
 
     public Task<IActionResult> OnPostCancelAsync() => ExecuteCommandAsync(async () =>
-        await cancelReservation.ExecuteAsync(new CancelReservationCommand { BookId = Id, MemberId = MemberId }, HttpContext.RequestAborted), "予約を取り消しました。");
+        await cancelReservation.ExecuteAsync(new CancelReservationCommand { BookId = Id, MemberId = MemberId }, HttpContext.RequestAborted), "The reservation has been canceled.");
 
     private async Task LoadAsync() => Book = await getBook.ExecuteAsync(new GetBookQuery { BookId = Id }, HttpContext.RequestAborted);
 

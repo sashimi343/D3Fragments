@@ -21,18 +21,17 @@ public static class InfrastructureServiceCollectionExtensions
             [typeof(IdentityIntegrationDbContext).Assembly],
             options => options.UseSqlite(sqliteConnectionString));
 
-        // AddIdentity ではなく AddIdentityCore を使い、Cookie はプレゼンテーション層で AddIdentityCookies により登録する
+        // Use AddIdentityCore instead of AddIdentity; cookies are registered in the presentation layer with AddIdentityCookies
         services.AddIdentityCore<UserAccount>(options =>
             {
                 options.SignIn.RequireConfirmedEmail = true;
                 options.User.RequireUniqueEmail = true;
-                // パスキーのテーブル（AspNetUserPasskeys）を作る
+                // Creates the passkey table (AspNetUserPasskeys)
                 options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
             })
             .AddSignInManager()
             .AddDefaultTokenProviders()
-            .AddErrorDescriber<JapaneseIdentityErrorDescriber>()
-            // 保存を UnitOfWork に任せるストア（UserManager の各操作で SaveChanges を呼ばない）
+            // Stores that leave saving to the UnitOfWork (SaveChanges is not called for each UserManager operation)
             .AddD3FragmentsStores<IdentityIntegrationDbContext>();
 
         services.AddScoped<IMemberRepository, MemberRepository>();

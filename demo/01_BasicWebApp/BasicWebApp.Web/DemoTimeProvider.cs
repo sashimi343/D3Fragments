@@ -24,7 +24,7 @@ public sealed class DemoTimeProvider : TimeProvider
             {
                 throw new ArgumentOutOfRangeException(nameof(days));
             }
-            // 表現可能な日付の範囲を超える場合はArgumentOutOfRangeExceptionになる（呼び出し元で入力エラーとして扱う）
+            // Exceeding the representable date range throws ArgumentOutOfRangeException (the caller treats it as an input error)
             _ = System.GetUtcNow().AddDays(total);
             _days = (int)total;
         }

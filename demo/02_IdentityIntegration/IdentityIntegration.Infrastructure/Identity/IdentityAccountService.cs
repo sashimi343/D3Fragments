@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace IdentityIntegration.Infrastructure.Identity;
 
-// Core 層のインターフェースを ASP.NET Core Identity で実装する。Command の中で呼び出され、変更は UnitOfWorkBehavior が保存する。
-// SignInManager の Verify* は D3Fragments.Identity.EFCore の拡張メソッドで、Cookie を操作せずに DB 側の処理だけを行う（DFR0017）
+// Implements the Core layer interfaces with ASP.NET Core Identity. Called inside Commands, and UnitOfWorkBehavior saves the changes.
+// SignInManager's Verify* methods are extension methods of D3Fragments.Identity.EFCore that only do the database side without touching cookies (DFR0017)
 internal sealed class IdentityAccountService(UserManager<UserAccount> users, SignInManager<UserAccount> signIn) : IAccountAuthenticator, IAccountManager
 {
     private const int RecoveryCodeCount = 10;
@@ -78,21 +78,21 @@ internal sealed class IdentityAccountService(UserManager<UserAccount> users, Sig
     {
         if (await users.FindByIdAsync(accountId.ToString()) is not { } account)
         {
-            return Result.Failure(Error.NotFound("アカウントが見つかりません。"));
+            return Result.Failure(Error.NotFound("The account was not found."));
         }
-        return (await users.ConfirmEmailAsync(account, token)).ToResult(_ => Error.Validation("確認用のリンクが正しくないか、期限が切れています。"));
+        return (await users.ConfirmEmailAsync(account, token)).ToResult(_ => Error.Validation("The confirmation link is invalid or has expired."));
     }
 
     public async Task<Result<UuidV7>> RegisterWithExternalLoginAsync(string userName, string emailAddress, string loginProvider, string providerKey, string providerDisplayName)
     {
-        // メールアドレスは外部の ID プロバイダーが確認済みのものとして扱う
+        // The email address is treated as already confirmed by the external identity provider
         var account = new UserAccount { UserName = userName, Email = emailAddress, EmailConfirmed = true };
         Result created = (await users.CreateAsync(account)).ToResult();
         if (created.IsFailure)
         {
             return Result<UuidV7>.Failure(created.Errors);
         }
-        // ユーザーを作った後の失敗は、Result で返すと UnitOfWork がユーザーだけを保存してしまうため、例外にして変更を破棄させる
+        // A failure after creating the user would make the UnitOfWork save only the user if returned as a Result, so throw an exception to discard the changes
         Result linked = (await users.AddLoginAsync(account, new UserLoginInfo(loginProvider, providerKey, providerDisplayName))).ToResult();
         return linked.IsFailure ? throw new DomainException(linked.Errors[0]) : account.Id;
     }
@@ -112,7 +112,7 @@ internal sealed class IdentityAccountService(UserManager<UserAccount> users, Sig
         UserAccount account = await GetAsync(accountId);
         if (!await users.VerifyTwoFactorTokenAsync(account, users.Options.Tokens.AuthenticatorTokenProvider, Normalize(code)))
         {
-            return Result<IReadOnlyList<string>>.Failure(Error.Validation("確認コードが正しくありません。", target: "Code"));
+            return Result<IReadOnlyList<string>>.Failure(Error.Validation("The verification code is invalid.", target: "Code"));
         }
         return Result<IReadOnlyList<string>>.Success(await EnableTwoFactorAsync(account));
     }
@@ -149,7 +149,7 @@ internal sealed class IdentityAccountService(UserManager<UserAccount> users, Sig
     public async Task RemovePasskeyAsync(UuidV7 accountId, byte[] credentialId) =>
         await users.RemovePasskeyAsync(await GetAsync(accountId), credentialId);
 
-    // 二要素認証を有効にし、回復コードがまだなければ作る
+    // Enables two-factor authentication and creates recovery codes if there are none yet
     private async Task<IReadOnlyList<string>> EnableTwoFactorAsync(UserAccount account)
     {
         await users.SetTwoFactorEnabledAsync(account, true);
@@ -159,11 +159,11 @@ internal sealed class IdentityAccountService(UserManager<UserAccount> users, Sig
     }
 
     private async Task<UserAccount> GetAsync(UuidV7 accountId) =>
-        await users.FindByIdAsync(accountId.ToString()) ?? throw new DomainException(Error.NotFound("アカウントが見つかりません。"));
+        await users.FindByIdAsync(accountId.ToString()) ?? throw new DomainException(Error.NotFound("The account was not found."));
 
     private static bool IsRemembered(UserAccount account, string? rememberedAccountId) => rememberedAccountId == account.Id.ToString();
 
-    // 認証アプリの表示に合わせて入力された空白・ハイフンを除く
+    // Removes spaces and hyphens entered to match how the authenticator app displays the code
     private static string Normalize(string code) => code.Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
 
     private static SignInOutcome ToOutcome(SignInResult result, UserAccount account)

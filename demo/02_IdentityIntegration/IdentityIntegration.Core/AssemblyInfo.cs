@@ -1,4 +1,4 @@
 using D3Fragments;
 
-// ドメインロジックはないが、D3Fragments のアーキテクチャに沿ってアプリケーション層とドメイン層を兼ねる
+// There is no domain logic, but following the D3Fragments architecture, this project serves as both the application layer and the domain layer
 [assembly: ArchitectureLayer(ArchitectureLayerType.Application | ArchitectureLayerType.Domain)]

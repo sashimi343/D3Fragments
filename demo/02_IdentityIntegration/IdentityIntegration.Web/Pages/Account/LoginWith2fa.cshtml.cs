@@ -35,7 +35,7 @@ public sealed class LoginWith2faModel(
     public async Task<IActionResult> OnGetAsync() =>
         await LoadAsync() is null ? RedirectToPage("/Account/Login") : Page();
 
-    // メールで確認コードを送る
+    // Send a verification code by email
     public async Task<IActionResult> OnPostSendEmailCodeAsync()
     {
         if (await LoadAsync() is not { } account)
@@ -44,24 +44,24 @@ public sealed class LoginWith2faModel(
         }
         ModelState.Clear();
         await sendEmailCode.ExecuteAsync(new SendTwoFactorEmailCodeCommand(account.Id), HttpContext.RequestAborted);
-        TempData["Success"] = "確認コードをメールで送信しました。";
+        TempData["Success"] = "A verification code has been sent by email.";
         return RedirectToPage(new { RememberMe, ReturnUrl, method = TwoFactorMethod.Email });
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        // 二要素認証を待っているアカウント（1要素目の後に BeginTwoFactorSignInAsync が発行した Cookie から読み取る）
+        // The account waiting for two-factor authentication (read from the cookie issued by BeginTwoFactorSignInAsync after the first factor)
         if (await LoadAsync() is not { } account)
         {
             return RedirectToPage("/Account/Login");
         }
         if (string.IsNullOrWhiteSpace(Code))
         {
-            ModelState.AddModelError(nameof(Code), "確認コードを入力してください。");
+            ModelState.AddModelError(nameof(Code), "Enter the verification code.");
             return Page();
         }
 
-        // DB 側: コードの検証と、アクセス失敗回数の記録・リセット
+        // Database side: verify the code and record or reset the access failure count
         SignInOutcome outcome = await signInWithCode.ExecuteAsync(new SignInWithTwoFactorCodeCommand(account.Id, Method, Code), HttpContext.RequestAborted);
         if (outcome.Status != SignInStatus.Succeeded)
         {
@@ -69,7 +69,7 @@ public sealed class LoginWith2faModel(
             return Page();
         }
 
-        // Cookie 側: 二要素認証待ちの Cookie を消してサインインし、選んだ場合はこのブラウザを記憶する
+        // Cookie side: delete the two-factor cookie, sign in, and remember this browser if selected
         await SignInManager.CompleteTwoFactorSignInAsync(account, RememberMe, RememberMachine);
         return LocalRedirect(Url.IsLocalUrl(ReturnUrl) ? ReturnUrl : "/MyPage");
     }
@@ -80,7 +80,7 @@ public sealed class LoginWith2faModel(
         {
             return null;
         }
-        // 認証アプリはキーを登録済みの場合、メールは確認済みの場合に使える
+        // The authenticator app is available if its key is registered, and email if it is confirmed
         IList<string> providers = await Users.GetValidTwoFactorProvidersAsync(account);
         Methods = [.. providers.Contains(Users.Options.Tokens.AuthenticatorTokenProvider) ? [TwoFactorMethod.Authenticator] : Array.Empty<TwoFactorMethod>(),
             .. providers.Contains(TokenOptions.DefaultEmailProvider) ? [TwoFactorMethod.Email] : Array.Empty<TwoFactorMethod>()];

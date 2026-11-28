@@ -2,8 +2,8 @@ using D3Fragments;
 
 namespace IdentityIntegration.Core.Members;
 
-// 業務上の利用者（会員）。認証の情報（パスワード・二要素認証など）は Identity のユーザー（Infrastructure の UserAccount）が持ち、
-// 会員は AccountId でそれを参照する。Identity の型には依存しない
+// The business user (member). Authentication information (password, two-factor authentication, etc.) belongs to the Identity user (UserAccount in Infrastructure),
+// and the member refers to it by AccountId. It does not depend on Identity types
 public sealed class Member : AggregateRoot
 {
     private Member(UuidV7 accountId, Nickname nickname, DateOnly joinedOn)
@@ -14,13 +14,13 @@ public sealed class Member : AggregateRoot
         AddDomainEvent(new MemberRegisteredDomainEvent(DateTimeOffset.UtcNow, Id, accountId));
     }
 
-    // EF Core用（Complex Typeはコンストラクタ引数にバインドできない）
+    // For EF Core (Complex Types cannot be bound to constructor parameters)
     private Member()
     {
         Nickname = null!;
     }
 
-    // Identity のユーザーの ID
+    // ID of the Identity user
     public UuidV7 AccountId { get; private set; }
 
     public Nickname Nickname { get; private set; }

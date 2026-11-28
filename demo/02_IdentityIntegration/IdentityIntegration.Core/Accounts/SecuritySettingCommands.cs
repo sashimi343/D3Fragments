@@ -3,7 +3,7 @@ using D3Fragments.Application;
 
 namespace IdentityIntegration.Core.Accounts;
 
-// 二要素認証とパスキーの設定。security stamp が変わる操作の後は、プレゼンテーション層で Cookie を更新する（RefreshSignInAsync）
+// Two-factor authentication and passkey settings. After operations that change the security stamp, the presentation layer refreshes the cookie (RefreshSignInAsync)
 
 public sealed record PrepareAuthenticatorKeyCommand(UuidV7 AccountId) : ICommand<string>;
 
@@ -48,7 +48,7 @@ public sealed class RegenerateRecoveryCodesCommandHandler(IAccountManager accoun
         accounts.RegenerateRecoveryCodesAsync(request.AccountId);
 }
 
-// パスキーの検証（署名・オリジンの確認）はプレゼンテーション層で済ませ、検証済みの内容を保存する
+// Passkey verification (checking the signature and origin) is done in the presentation layer, and the verified content is saved here
 public sealed record AddPasskeyCommand(UuidV7 AccountId, PasskeyCredential Passkey) : ICommand<Result>;
 
 public sealed class AddPasskeyCommandHandler(IAccountManager accounts) : IRequestHandler<AddPasskeyCommand, Result>

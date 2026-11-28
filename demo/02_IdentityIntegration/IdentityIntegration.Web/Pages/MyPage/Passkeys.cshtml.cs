@@ -19,7 +19,7 @@ public sealed class PasskeysModel(
 
     public async Task OnGetAsync() => await LoadAsync();
 
-    // 登録（1/2）: ブラウザに渡すオプションを作る。チャレンジは Cookie に保存される（DB は変更しない）
+    // Registration (1/2): create the options to pass to the browser. The challenge is stored in a cookie (the database is not changed)
     public async Task<IActionResult> OnPostCreationOptionsAsync()
     {
         UserAccount account = await GetCurrentAccountAsync();
@@ -32,22 +32,22 @@ public sealed class PasskeysModel(
         return Content(options, "application/json");
     }
 
-    // 登録（2/2）: ブラウザが作ったパスキーを検証し、Command で保存する
+    // Registration (2/2): verify the passkey created by the browser and save it with a Command
     public async Task<IActionResult> OnPostAddAsync(string? credentialJson, string? name)
     {
         UserAccount account = await GetCurrentAccountAsync();
         if (string.IsNullOrEmpty(credentialJson))
         {
-            ModelState.AddModelError(string.Empty, "パスキーの登録が取り消されました。");
+            ModelState.AddModelError(string.Empty, "Passkey registration was canceled.");
             await LoadAsync();
             return Page();
         }
 
-        // 署名とオリジンの検証（DB は変更しない）
+        // Verify the signature and origin (the database is not changed)
         PasskeyAttestationResult attestation = await SignInManager.PerformPasskeyAttestationAsync(credentialJson);
         if (!attestation.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, $"パスキーの登録に失敗しました。（{attestation.Failure.Message}）");
+            ModelState.AddModelError(string.Empty, $"Passkey registration failed. ({attestation.Failure.Message})");
             await LoadAsync();
             return Page();
         }
@@ -56,7 +56,7 @@ public sealed class PasskeysModel(
         Result result = await addPasskey.ExecuteAsync(new AddPasskeyCommand(account.Id, new PasskeyCredential(
             passkey.CredentialId, passkey.PublicKey, passkey.CreatedAt, passkey.SignCount, passkey.Transports,
             passkey.IsUserVerified, passkey.IsBackupEligible, passkey.IsBackedUp, passkey.AttestationObject, passkey.ClientDataJson,
-            string.IsNullOrWhiteSpace(name) ? "パスキー" : name.Trim())), HttpContext.RequestAborted);
+            string.IsNullOrWhiteSpace(name) ? "Passkey" : name.Trim())), HttpContext.RequestAborted);
         if (result.IsFailure)
         {
             AddErrors(result);
@@ -64,7 +64,7 @@ public sealed class PasskeysModel(
             return Page();
         }
 
-        TempData["Success"] = "パスキーを登録しました。ログイン画面の「パスキーでログイン」で使えます。";
+        TempData["Success"] = "The passkey has been registered. You can use it with \"Sign in with a passkey\" on the sign-in page.";
         return RedirectToPage();
     }
 
@@ -72,8 +72,8 @@ public sealed class PasskeysModel(
     {
         UserAccount account = await GetCurrentAccountAsync();
         await removePasskey.ExecuteAsync(new RemovePasskeyCommand(account.Id, WebEncoders.Base64UrlDecode(credentialId)), HttpContext.RequestAborted);
-        // パスキーの削除では security stamp が変わらないため、そのパスキーでログインした他のセッションは切れない
-        TempData["Success"] = "パスキーを削除しました。";
+        // Deleting a passkey does not change the security stamp, so other sessions signed in with that passkey are not ended
+        TempData["Success"] = "The passkey has been deleted.";
         return RedirectToPage();
     }
 

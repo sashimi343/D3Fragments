@@ -30,17 +30,17 @@ public sealed class ExternalLoginModel(
 
     public IActionResult OnGet() => RedirectToPage("/Account/Login");
 
-    // 外部の ID プロバイダーへリダイレクトする
+    // Redirects to the external identity provider
     public IActionResult OnPost(string provider)
     {
         string? redirectUrl = Url.Page("/Account/ExternalLogin", "Callback");
         return new ChallengeResult(provider, SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl));
     }
 
-    // ID プロバイダーから戻ってきたとき
+    // When returning from the identity provider
     public async Task<IActionResult> OnGetCallbackAsync(string? remoteError)
     {
-        // ID プロバイダーでの認証結果（外部ログイン用の Cookie から読み取る。DB は変更しない）
+        // The authentication result from the identity provider (read from the external login cookie; the database is not changed)
         if (remoteError is not null || await SignInManager.GetExternalLoginInfoAsync() is not { } info)
         {
             return RedirectToPage("/Account/Login");
@@ -55,11 +55,11 @@ public sealed class ExternalLoginModel(
                 await SignInManager.CompleteSignInAsync(await FindAccountAsync(outcome.AccountId!.Value), isPersistent: false, info.LoginProvider);
                 return LocalRedirect("/MyPage");
             case SignInStatus.RequiresTwoFactor:
-                // 外部ログインでも、二要素認証を有効にしたアカウントは2段目を求める（Identity と同じ）
+                // Even with external login, accounts with two-factor authentication enabled require the second step (same as Identity)
                 await SignInManager.BeginTwoFactorSignInAsync(await FindAccountAsync(outcome.AccountId!.Value), info.LoginProvider);
                 return RedirectToPage("/Account/LoginWith2fa");
             case SignInStatus.NotRegistered:
-                // 初めてのログイン: アカウントを作る確認画面を出す
+                // First sign-in: show the page to create an account
                 Load(info);
                 UserName = info.Principal.FindFirstValue("preferred_username") ?? string.Empty;
                 Nickname = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? UserName;
@@ -70,7 +70,7 @@ public sealed class ExternalLoginModel(
         }
     }
 
-    // 初めてのログインで、アカウントを作ってサインインする
+    // On the first sign-in, create the account and sign in
     public async Task<IActionResult> OnPostConfirmationAsync()
     {
         if (await SignInManager.GetExternalLoginInfoAsync() is not { } info)
@@ -80,16 +80,16 @@ public sealed class ExternalLoginModel(
         Load(info);
         if (EmailAddress is null)
         {
-            ModelState.AddModelError(string.Empty, "ID プロバイダーからメールアドレスを取得できませんでした。");
+            ModelState.AddModelError(string.Empty, "The email address could not be obtained from the identity provider.");
             return Page();
         }
         if (string.IsNullOrWhiteSpace(UserName))
         {
-            ModelState.AddModelError(nameof(UserName), "ユーザー名を入力してください。");
+            ModelState.AddModelError(nameof(UserName), "Enter a user name.");
             return Page();
         }
 
-        // メールアドレスはフォームではなく、ID プロバイダーのクレームから使う
+        // The email address comes from the identity provider's claims, not the form
         Result<UuidV7> result = await registerWithExternalLogin.ExecuteAsync(
             new RegisterWithExternalLoginCommand(UserName.Trim(), EmailAddress, Nickname, info.LoginProvider, info.ProviderKey, info.ProviderDisplayName ?? info.LoginProvider),
             HttpContext.RequestAborted);

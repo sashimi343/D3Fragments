@@ -2,7 +2,7 @@ using D3Fragments;
 
 namespace IdentityIntegration.Core.Accounts;
 
-// アカウントの登録と、認証の設定の変更。実装は Infrastructure 層（ASP.NET Core Identity）
+// Account registration and changes to authentication settings. Implemented in the Infrastructure layer (ASP.NET Core Identity)
 public interface IAccountManager
 {
     Task<Result<RegisteredAccount>> RegisterAsync(string userName, string emailAddress, string password);
@@ -11,10 +11,10 @@ public interface IAccountManager
 
     Task<Result<UuidV7>> RegisterWithExternalLoginAsync(string userName, string emailAddress, string loginProvider, string providerKey, string providerDisplayName);
 
-    // 認証アプリに登録するキー。まだなければ作る
+    // The key to register in the authenticator app. Created if it does not exist yet
     Task<string> PrepareAuthenticatorKeyAsync(UuidV7 accountId);
 
-    // 二要素認証を有効にする。回復コードがなければ作って返す
+    // Enables two-factor authentication. Creates and returns recovery codes if there are none
     Task<Result<IReadOnlyList<string>>> EnableAuthenticatorAsync(UuidV7 accountId, string code);
 
     Task<IReadOnlyList<string>> EnableEmailTwoFactorAsync(UuidV7 accountId);
@@ -30,7 +30,7 @@ public interface IAccountManager
 
 public sealed record RegisteredAccount(UuidV7 AccountId, string EmailConfirmationToken);
 
-// 登録するパスキー（Identity の UserPasskeyInfo と同じ内容）
+// A passkey to register (the same content as Identity's UserPasskeyInfo)
 public sealed record PasskeyCredential(
     byte[] CredentialId,
     byte[] PublicKey,

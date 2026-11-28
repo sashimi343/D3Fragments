@@ -4,7 +4,7 @@ using D3Fragments;
 
 namespace IdentityIntegration.Core.Members;
 
-// 画面に表示する会員の名前（ログインに使うユーザー名とは別）
+// The member's name shown on the pages (separate from the user name used to sign in)
 public sealed class Nickname : ValueObjectBase<Nickname, string>, IValueObject<Nickname, string>
 {
     private const int MaxLength = 20;
@@ -19,7 +19,7 @@ public sealed class Nickname : ValueObjectBase<Nickname, string>, IValueObject<N
     {
         if (string.IsNullOrWhiteSpace(value) || value.Trim().Length > MaxLength)
         {
-            errorMessage = $"ニックネームは1文字以上、{MaxLength}文字以内で指定してください。";
+            errorMessage = $"The nickname must be between 1 and {MaxLength} characters.";
             return false;
         }
         errorMessage = null;

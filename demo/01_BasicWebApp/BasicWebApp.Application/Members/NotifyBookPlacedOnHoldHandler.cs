@@ -21,8 +21,8 @@ public class NotifyBookPlacedOnHoldHandler : IAfterCommitDomainEventHandler<Book
 
     public Task HandleAsync(BookPlacedOnHoldDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        // 取り置きされたことをメールなどで通知する（デモAPではログ記録のみ）
-        _logger.LogInformation("MemberId = '{memberId}': BookId '{bookId}' の取り置きが完了しました。", domainEvent.MemberId, domainEvent.BookId);
+        // Notify the member of the hold by email, etc. (the demo app only writes a log)
+        _logger.LogInformation("MemberId = '{memberId}': BookId '{bookId}' has been placed on hold.", domainEvent.MemberId, domainEvent.BookId);
         return Task.CompletedTask;
     }
 }

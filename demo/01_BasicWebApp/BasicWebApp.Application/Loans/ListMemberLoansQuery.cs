@@ -34,7 +34,7 @@ public class ListMemberLoansQueryHandler : IRequestHandler<ListMemberLoansQuery,
     {
         DateOnly today = _timeProvider.GetLocalToday();
         List<Loan> loans = await _loanRepository.FindActiveByMemberIdAsync(request.MemberId, cancellationToken);
-        // 貸出中の資料は除籍できない（B9）ため、必ず見つかる
+        // A book on loan cannot be withdrawn (B9), so it is always found
         Dictionary<UuidV7, BookTitle> titles = (await _bookRepository.FindByIdsAsync([.. loans.Select(l => l.BookId)], cancellationToken))
             .ToDictionary(b => b.Id, b => b.Title);
         return [.. loans.Select(l => new LoanWithOverdueDto(l, titles[l.BookId], l.GetOverdueDays(today) > 0))];

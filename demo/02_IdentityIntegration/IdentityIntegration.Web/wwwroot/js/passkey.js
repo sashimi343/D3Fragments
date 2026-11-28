@@ -1,5 +1,5 @@
-// パスキー（WebAuthn）のブラウザ側の処理。
-// サーバーが作ったオプションで navigator.credentials を呼び出し、結果の JSON をフォームで送る。
+// Browser-side processing for passkeys (WebAuthn).
+// Calls navigator.credentials with the options created by the server, and posts the resulting JSON with a form.
 (() => {
     const antiforgeryToken = form => form.querySelector('input[name="__RequestVerificationToken"]').value;
 
@@ -9,7 +9,7 @@
             headers: { 'RequestVerificationToken': antiforgeryToken(form) },
         });
         if (!response.ok) {
-            throw new Error(`オプションの取得に失敗しました（${response.status}）`);
+            throw new Error(`Failed to get the options (${response.status})`);
         }
         return response.json();
     };
@@ -25,20 +25,20 @@
         try {
             credential = await ceremony(form);
         } catch (error) {
-            // 取り消し（NotAllowedError）も含め、空の結果を送ってサーバー側でエラーを表示する
+            // Including cancellation (NotAllowedError), post an empty result so that the server shows the error
             console.warn(error);
         }
         submitCredential(form, credential);
     };
 
-    // ログイン（認証）
+    // Sign-in (authentication)
     document.querySelectorAll('[data-passkey-login]').forEach(button => button.addEventListener('click', () =>
         run(button, async form => {
             const options = await fetchOptions(button.dataset.passkeyLogin, form);
             return navigator.credentials.get({ publicKey: PublicKeyCredential.parseRequestOptionsFromJSON(options) });
         })));
 
-    // 登録
+    // Registration
     document.querySelectorAll('[data-passkey-register]').forEach(button => button.addEventListener('click', () =>
         run(button, async form => {
             const options = await fetchOptions(button.dataset.passkeyRegister, form);

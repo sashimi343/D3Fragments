@@ -12,19 +12,19 @@ public class MemberName : ValueObjectBase<MemberName, string>, IValueObject<Memb
     {
     }
 
-    // 検証はValueObjectBaseのコンストラクタで行われる
+    // Validation is performed by the ValueObjectBase constructor
     public static MemberName Create(string value) => new(value.Trim());
 
     public static bool ValidateValue(string value, [NotNullWhen(false)] out string? errorMessage)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            errorMessage = "会員名を指定してください。";
+            errorMessage = "Specify a member name.";
             return false;
         }
         if (value.Trim().Length > 50)
         {
-            errorMessage = "会員名は1文字以上、50文字以内で指定してください。";
+            errorMessage = "The member name must be between 1 and 50 characters.";
             return false;
         }
         errorMessage = null;

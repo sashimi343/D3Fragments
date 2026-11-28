@@ -1,51 +1,51 @@
 # BasicWebApp
 
-D3Fragments の主要機能を一通り使った、図書館の貸出・予約を扱う Web アプリ（ASP.NET Core Razor Pages）のデモです。
+A demo web application (ASP.NET Core Razor Pages) for library lending and reservations that uses the main features of D3Fragments.
 
-## このデモの意図
+## Purpose of this demo
 
-- 集約・Value Object・ドメインルール・ドメインイベントに、単純な値の設定以上の業務ロジックを持たせ、「どの責務をどこに置くか」を D3Fragments の型に沿って示す
-- 子エンティティを持つ集約／持たない集約、集約をまたぐ判定、同一トランザクション内の後続処理、集約単位の同時更新の競合検知を、図書館という説明不要の題材で確認できるようにする
+- Give aggregates, value objects, domain rules and domain events business logic beyond simple value assignment, and show "which responsibility goes where" along the types of D3Fragments
+- Let you see aggregates with and without child entities, decisions that span aggregates, follow-up processing in the same transaction, and conflict detection for concurrent updates per aggregate, using a library as a self-explanatory subject
 
-## 構成
+## Structure
 
-| プロジェクト               | アーキテクチャ層 | 主な参照パッケージ                                                                    |
-| :------------------------- | :--------------- | :------------------------------------------------------------------------------------ |
-| BasicWebApp.Web            | Presentation     | `Sashimi343.D3Fragments.AspNetCore`                                                   |
-| BasicWebApp.Application    | Application      | `Sashimi343.D3Fragments.Application`                                                  |
-| BasicWebApp.Domain         | Domain           | `Sashimi343.D3Fragments`                                                              |
-| BasicWebApp.Infrastructure | Infrastructure   | `Sashimi343.D3Fragments.EFCore`, `Microsoft.EntityFrameworkCore.Sqlite`（インメモリ） |
+| Project                    | Architecture layer | Main package references                                                              |
+| :------------------------- | :----------------- | :----------------------------------------------------------------------------------- |
+| BasicWebApp.Web            | Presentation       | `Sashimi343.D3Fragments.AspNetCore`                                                  |
+| BasicWebApp.Application    | Application        | `Sashimi343.D3Fragments.Application`                                                 |
+| BasicWebApp.Domain         | Domain             | `Sashimi343.D3Fragments`                                                             |
+| BasicWebApp.Infrastructure | Infrastructure     | `Sashimi343.D3Fragments.EFCore`, `Microsoft.EntityFrameworkCore.Sqlite` (in-memory) |
 
-全プロジェクトに `Sashimi343.D3Fragments.Analyzers` を参照しています。
+All projects reference `Sashimi343.D3Fragments.Analyzers`.
 
-## 実行方法
+## How to run
 
 ```bash
 dotnet run --project demo/01_BasicWebApp/BasicWebApp.Web
 ```
 
-### 画面から試す
+### Try it from the UI
 
-1. 「管理者（司書）」で資料を登録する。ISBN は `9784873113364`（ハイフン付きなら `978-4-87311-336-4`）を利用できる。
-2. 「会員登録」で架空の氏名・メールアドレスと会員種別を登録し、ログイン画面で登録済みメールアドレスを入力する。
-3. 「資料一覧」で状態を絞り込み、資料詳細の「借りる」から貸し出す。「マイページ」で会員情報・返却期限・延滞状態を確認し、返却・延長する。
-4. 別の会員でログインすると、貸出中の資料を予約できる。複数会員を同時に試す場合は別のブラウザプロファイルを使用する。資料詳細で予約順と自分の取り置き期限を確認し、予約を取り消すこともできる。
-5. 返却すると先頭の予約者の取り置きになる。「管理者（司書）」で業務日付を8日以上進め、期限切れ処理を実行すると次の予約へ繰り上がる。
-6. 延滞を試す場合は貸出後に一般会員なら15日以上、学生会員なら29日以上進めて返却する。返却翌日から延滞日数分だけ貸出停止となる。
+1. Register a book on "Administrator (librarian)". You can use the ISBN `9784873113364` (or `978-4-87311-336-4` with hyphens).
+2. On "Register as a member", register a fictitious name, email address and member type, then enter the registered email address on the sign-in page.
+3. Filter by status on "Books" and borrow a book with "Borrow" on its details page. Check the member information, due dates and overdue status on "My page", and return or renew loans there.
+4. Sign in as another member to reserve a book on loan. To try several members at the same time, use separate browser profiles. On the book details page you can check the reservation order and your hold expiration date, and cancel the reservation.
+5. When the book is returned, it is placed on hold for the first reservation. Advance the business date by 8 days or more on "Administrator (librarian)" and run the hold expiration to move the hold to the next reservation.
+6. To try overdue loans, advance the date by 15 days or more (regular members) or 29 days or more (student members) after borrowing, then return the book. Loans are suspended from the day after the return for as many days as the book was overdue.
 
-会員はマイページで本人の貸出だけを返却・延長できる。資料登録・除籍・期限切れ処理は管理者ページにまとめている。資料一覧は1ページ20件。
+Members can return and renew only their own loans on "My page". Registering and withdrawing books and expiring holds are on the administrator page. The book list shows 20 books per page.
 
-### デモの制約
+### Limitations of the demo
 
-- **ローカルで試すためのデモ**であり、公開運用しないこと。メールアドレスだけの暫定ログインと、認証のない管理者ページを意図的に採用している。実在する個人情報は使用しないこと。
-- 暫定ログインは登録済みメールアドレスのみを受け付ける。未登録メールの自動登録はしない。認証は ASP.NET Core 標準の Cookie 認証を使用する。
-- DB は SQLite インメモリで、起動時に空のスキーマを作成する。データは複数リクエスト間で共有され、アプリの終了時に消える。再起動前のCookieでログインを続けることはできない。
-- Development 環境では管理者ページから業務日付を正の日数だけ進められる。**全会員に影響**し、逆行はできない。再起動で実際の日付へ戻る。Production では日付操作を受け付けない。認証Cookieの期限は実際の時計に従う。
-- Bootstrap・jQuery・jQuery Validation は `wwwroot` 内の同梱ファイルを使用する。実行用のパッケージ追加は不要。
+- This is a **demo for local use** and must not be run publicly. It deliberately uses a temporary sign-in with only an email address and an administrator page without authentication. Do not use real personal information.
+- The temporary sign-in accepts only registered email addresses. Unregistered email addresses are not registered automatically. Authentication uses the standard cookie authentication of ASP.NET Core.
+- The database is SQLite in-memory, and an empty schema is created at startup. Data is shared across requests and lost when the application exits. You cannot stay signed in with a cookie from before a restart.
+- In the Development environment, you can advance the business date by a positive number of days on the administrator page. This **affects all members** and cannot be reversed. A restart returns to the actual date. Production does not accept date changes. The authentication cookie expiration follows the actual clock.
+- Bootstrap, jQuery and jQuery Validation are bundled in `wwwroot`. No additional packages are needed to run the demo.
 
-### 取り置き期限切れ処理API
+### Hold expiration API
 
-唯一のWeb APIとして、`HoldsController` の `POST /api/holds/expire` を提供する。Minimal APIは使用しない。正常時は `{ "processedCount": 1 }` のように処理した資料の件数を返す。管理者画面のボタンからも実行できる。
+As the only Web API, `HoldsController` provides `POST /api/holds/expire`. Minimal APIs are not used. On success, it returns the number of processed books, such as `{ "processedCount": 1 }`. You can also run it with the button on the administrator page.
 
 ```powershell
 Invoke-RestMethod -Method Post `
@@ -53,169 +53,169 @@ Invoke-RestMethod -Method Post `
   -Headers @{ "X-Requested-By" = "BasicWebApp" }
 ```
 
-このAPIに会員認証は不要だが、CSRF対策として `X-Requested-By` ヘッダを必須とする。ヘッダ欠落は400のProblemDetails応答になる。Razor Pages の変更操作には標準の偽造防止トークンを使用する。
+This API does not require member authentication, but requires the `X-Requested-By` header as a CSRF countermeasure. A missing header results in a 400 ProblemDetails response. Changes from Razor Pages use the standard antiforgery token.
 
-### エラーの表示と検証
+### Error display and validation
 
-画面項目はDataAnnotationsとASP.NET CoreのModelStateで検証し、既存のjQuery検証も併用する。業務上の検証は既存Command・ドメインへ委ねる。画面では入力値を保持し、日本語のエラーをHTMLで表示する。APIはD3Fragmentsの例外ハンドラでProblemDetailsへ変換する。いずれも競合409・権限違反403・未検出404等のステータスを維持する。
+Form fields are validated with DataAnnotations and the ASP.NET Core ModelState, together with the existing jQuery validation. Business validation is delegated to the existing Commands and the domain. Pages keep the input values and show errors in HTML. The API converts errors to ProblemDetails with the D3Fragments exception handler. Both keep status codes such as 409 for conflicts, 403 for permission violations and 404 for not found.
 
-## ドメインモデル
+## Domain model
 
 ```mermaid
 classDiagram
     direction LR
 
-    namespace 会員集約 {
-        class Member["会員 Member"] {
+    namespace MemberAggregate {
+        class Member {
             <<AggregateRoot>>
-            氏名 : MemberName
-            メールアドレス : EmailAddress
-            会員種別 : MemberType
-            貸出停止期限 : DateOnly?
-            貸出停止開始日 : DateOnly?
-            貸出停止中か(今日) bool
-            貸出停止する(返却日, 延滞日数)
+            Name : MemberName
+            EmailAddress : EmailAddress
+            MemberType : MemberType
+            LoanSuspendedUntil : DateOnly?
+            LoanSuspendedFrom : DateOnly?
+            IsLoanSuspended(today) bool
+            SuspendLoan(returnedOn, suspensionDays)
         }
-        class MemberType["会員種別 MemberType"] {
+        class MemberType {
             <<TypeSafeEnum>>
-            一般 / 学生
-            貸出上限 : int
-            貸出期間 : int
+            Regular / Student
+            LoanLimit : int
+            LoanPeriodDays : int
         }
     }
 
-    namespace 資料集約 {
-        class Book["資料 Book"] {
+    namespace BookAggregate {
+        class Book {
             <<AggregateRoot>>
-            ISBN : Isbn
-            書名 : BookTitle
-            著者 : string
-            状態 : BookStatus
-            貸し出す(会員ID)
-            返却を受ける(返却日)
-            予約を受け付ける(会員ID, 予約日)
-            予約を取り消す(会員ID, 今日)
-            取り置き期限切れを処理する(今日)
-            除籍を許可する() DeletionToken
+            Isbn : Isbn
+            Title : BookTitle
+            Author : string
+            Status : BookStatus
+            LendTo(member)
+            AcceptReturn(returnedOn)
+            AcceptReservation(member, reservedOn)
+            CancelReservation(member, today)
+            ExpireHold(today)
+            IssueDeletionToken() DeletionToken
         }
-        class Reservation["予約 Reservation"] {
+        class Reservation {
             <<Entity>>
-            会員ID : UuidV7
-            予約日 : DateOnly
-            取り置き期限 : DateOnly?
+            MemberId : UuidV7
+            ReservedOn : DateOnly
+            HoldUntil : DateOnly?
         }
         class BookStatus {
             <<enumeration>>
-            在架
-            貸出中
-            取り置き中
+            OnShelf
+            OnLoan
+            OnHold
         }
     }
 
-    namespace 貸出集約 {
-        class Loan["貸出 Loan"] {
+    namespace LoanAggregate {
+        class Loan {
             <<AggregateRoot>>
-            資料ID : UuidV7
-            会員ID : UuidV7
-            貸出日 : DateOnly
-            返却期限 : DateOnly
-            延長回数 : int
-            返却日 : DateOnly?
-            延長する(今日, 貸出期間, 予約あり)
-            返却する(返却日)
-            延滞日数(今日) int
+            BookId : UuidV7
+            MemberId : UuidV7
+            LoanedOn : DateOnly
+            DueDate : DateOnly
+            RenewalCount : int
+            ReturnedOn : DateOnly?
+            Renew(today, loanPeriodDays, hasReservations)
+            Return(returnedOn)
+            GetOverdueDays(today) int
         }
     }
 
     Member --> MemberType
-    Book "1" *-- "0..*" Reservation : 受付順
+    Book "1" *-- "0..*" Reservation : in order received
     Book --> BookStatus
-    Reservation ..> Member : 会員ID
-    Loan ..> Book : 資料ID
-    Loan ..> Member : 会員ID
+    Reservation ..> Member : MemberId
+    Loan ..> Book : BookId
+    Loan ..> Member : MemberId
 ```
 
-- 実線の矢印は集約内の関連、破線の矢印は ID による他集約への参照を表す
+- Solid arrows are associations within an aggregate, and dashed arrows are references to other aggregates by ID
 
-- 1 資料 = 1 冊とする（複本は扱わない）
-- 集約間の参照は ID のみ
+- 1 book = 1 copy (multiple copies are not handled)
+- Aggregates reference each other only by ID
 
-### 会員種別
+### Member types
 
-| 種別 | 貸出上限 | 貸出期間 |
-| :--- | -------: | -------: |
-| 一般 |     5 冊 |    14 日 |
-| 学生 |    10 冊 |    28 日 |
+| Type    | Loan limit | Loan period |
+| :------ | ---------: | ----------: |
+| Regular |    5 books |     14 days |
+| Student |   10 books |     28 days |
 
-## 機能要件
+## Functional requirements
 
-| #   | 機能                 | 概要                                                                                                  |
-| :-- | :------------------- | :---------------------------------------------------------------------------------------------------- |
-| F1  | 会員登録             | 氏名・メールアドレス・会員種別を指定して登録する                                                      |
-| F2  | 会員照会             | 会員の情報と、貸出停止中かどうか・貸出中の冊数を返す                                                  |
-| F3  | 資料登録             | ISBN・書名・著者を指定して登録する                                                                    |
-| F4  | 資料一覧             | 資料をページングして一覧取得する（状態で絞り込み可）                                                  |
-| F5  | 資料照会             | 資料の情報と予約の待ち行列を返す                                                                      |
-| F6  | 資料の除籍           | 資料を削除する                                                                                        |
-| F7  | 貸出                 | 会員に資料を貸し出す                                                                                  |
-| F8  | 返却                 | 貸出中の資料を返却する                                                                                |
-| F9  | 貸出延長             | 返却期限を延長する                                                                                    |
-| F10 | 予約                 | 貸出中の資料を予約する                                                                                |
-| F11 | 予約取消             | 予約を取り消す                                                                                        |
-| F12 | 取り置き期限切れ処理 | 取り置き期限を過ぎた予約を取り消し、次の予約者へ繰り上げる（日次バッチ想定。デモでは API で手動実行） |
-| F13 | 会員の貸出一覧       | 会員の貸出中の資料を返却期限・延滞の有無とともに返す                                                  |
+| #   | Feature                | Summary                                                                                                                              |
+| :-- | :--------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| F1  | Member registration    | Registers a member with a name, email address and member type                                                                       |
+| F2  | Member inquiry         | Returns the member's information, whether loans are suspended, and the number of books on loan                                      |
+| F3  | Book registration      | Registers a book with an ISBN, title and author                                                                                      |
+| F4  | Book list              | Lists books with paging (can be filtered by status)                                                                                  |
+| F5  | Book inquiry           | Returns the book's information and its reservation queue                                                                            |
+| F6  | Book withdrawal        | Deletes a book                                                                                                                       |
+| F7  | Loan                   | Lends a book to a member                                                                                                             |
+| F8  | Return                 | Returns a book on loan                                                                                                               |
+| F9  | Loan renewal           | Extends the due date                                                                                                                 |
+| F10 | Reservation            | Reserves a book on loan                                                                                                              |
+| F11 | Reservation cancel     | Cancels a reservation                                                                                                                |
+| F12 | Hold expiration        | Cancels reservations whose hold has expired and moves the hold to the next reservation (intended as a daily batch; run manually through the API in the demo) |
+| F13 | Member's loan list     | Returns the member's books on loan with their due dates and whether they are overdue                                                |
 
-日付が絡むルールを試せるよう、現在日付は `TimeProvider` から取得し、開発環境では日付を進められるようにする。
+To make rules involving dates easy to try, the current date is taken from `TimeProvider`, and the date can be advanced in the development environment.
 
-## ドメインルール
+## Domain rules
 
-### 会員 Member
+### Member
 
-- M1. 氏名は 1〜50 文字、メールアドレスは形式が正しいこと
-- M2. 会員種別ごとに貸出上限冊数と貸出期間が決まる
-- M3. 延滞して返却した場合、返却日の翌日から延滞日数と同じ日数だけ貸出停止になる。すでに停止中なら、停止期限は遅い方を採用する
-- M4. 貸出停止中は貸出・予約ができない。停止期限を過ぎれば自動的に解除される（解除処理は持たず、日付で判定する）
+- M1. The name is 1 to 50 characters, and the email address has a valid format
+- M2. The member type determines the loan limit and the loan period
+- M3. When an overdue book is returned, loans are suspended from the day after the return date for the same number of days as it was overdue. If loans are already suspended, the later end date is used
+- M4. While loans are suspended, the member cannot borrow or reserve books. The suspension ends automatically after its end date (there is no process to lift it; it is decided by date)
 
-### 資料 Book
+### Book
 
-- B1. ISBN は 13 桁で、チェックディジットが正しいこと。書名は 1〜200 文字
-- B2. 状態は「在架」「貸出中」「取り置き中」のいずれか
-- B3. 予約できるのは貸出中または取り置き中の資料のみ（在架ならそのまま借りればよい）
-- B4. 同じ会員が同じ資料を重複して予約できない。その資料を現在借りている会員も予約できない
-- B5. 予約は受付順に並ぶ
-- B6. 返却時、予約があれば先頭の予約者向けの「取り置き中」にし、取り置き期限を返却日 + 7 日とする。予約がなければ「在架」に戻す
-- B7. 取り置き中の資料は、取り置き対象の会員だけが借りられる。借りた時点でその予約は消化される
-- B8. 取り置き対象の会員が予約を取り消した場合、または取り置き期限を過ぎた場合は、次の予約者へ繰り上げる（取り置き期限は繰り上げ日 + 7 日）。次の予約者がいなければ「在架」に戻す
-- B9. 除籍できるのは、在架かつ予約がない資料のみ
+- B1. The ISBN has 13 digits and a valid check digit. The title is 1 to 200 characters
+- B2. The status is one of "on shelf", "on loan" or "on hold"
+- B3. Only books on loan or on hold can be reserved (a book on the shelf can simply be borrowed)
+- B4. The same member cannot reserve the same book twice. The member currently borrowing the book cannot reserve it either
+- B5. Reservations are queued in the order received
+- B6. On return, if there are reservations, the book is placed "on hold" for the first reservation, with a hold expiration date of the return date + 7 days. If there are no reservations, it goes back "on shelf"
+- B7. A book on hold can be borrowed only by the member it is held for. The reservation is fulfilled when the member borrows it
+- B8. If the member the book is held for cancels the reservation, or the hold expires, the hold moves to the next reservation (with a hold expiration date of that day + 7 days). If there is no next reservation, the book goes back "on shelf"
+- B9. Only books that are on the shelf and not reserved can be withdrawn
 
-### 貸出 Loan
+### Loan
 
-- L1. 返却期限は、貸出日 + 会員種別の貸出期間
-- L2. 延長は 1 回まで。返却期限を過ぎている場合と、その資料に予約がある場合は延長できない
-- L3. 延長後の返却期限は、延長した日 + 会員種別の貸出期間
-- L4. 返却日が返却期限を過ぎていれば、その差を延滞日数とする
-- L5. 返却済みの貸出は返却・延長できない
+- L1. The due date is the loan date + the loan period of the member type
+- L2. A loan can be renewed only once. It cannot be renewed if it is past the due date or the book is reserved
+- L3. The due date after renewal is the renewal date + the loan period of the member type
+- L4. If the return date is past the due date, the difference is the number of overdue days
+- L5. A returned loan cannot be returned or renewed
 
-### 集約をまたぐルール
+### Rules spanning aggregates
 
-- X1. 貸出可否（F7）: 以下をすべて満たす場合のみ貸し出せる
-  - 会員が貸出停止中でない（M4）
-  - 会員が延滞中の資料を持っていない
-  - 会員の貸出中冊数が上限未満（M2）
-  - 資料が在架、または自分向けの取り置き中（B7）
+- X1. Loan eligibility (F7): a book can be lent only if all of the following are met
+  - The member's loans are not suspended (M4)
+  - The member has no overdue books
+  - The member's number of books on loan is below the limit (M2)
+  - The book is on the shelf, or on hold for the member (B7)
 
-## 実装上のポイント（D3Fragments の機能との対応）
+## Implementation highlights (mapping to D3Fragments features)
 
-| 機能                        | このデモでの使いどころ                                                                                                           |
-| :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
-| 集約（子エンティティなし）  | Member, Loan                                                                                                                     |
-| 集約（子エンティティあり）  | Book と Reservation                                                                                                              |
-| Value Object                | 氏名、メールアドレス、ISBN（チェックディジット検証）、書名など                                                                   |
-| TypeSafeEnum                | 会員種別（貸出上限・貸出期間を持たせる）                                                                                         |
-| `IDomainRule<TContext>`     | X1 貸出可否。会員・資料・貸出状況にまたがり、特定の集約に置くのが不自然な判定                                                    |
-| `DeletionToken<T>`          | F6 除籍。B9 を満たす場合のみ、Book 自身が削除トークンを発行する                                                                  |
-| Commit 前のドメインイベント | 返却（F8）で Loan が発行したイベントを受けて、同じトランザクション内で Book の取り置き（B6）と Member の貸出停止（M3）を更新する |
-| Commit 後のドメインイベント | Book が取り置き中になったときに、予約者へ通知する（ログ出力で代用）                                                              |
-| 集約単位の競合検知          | 同じ資料への予約（子エンティティの追加）が同時に行われた場合、一方を競合として 409 で返す                                        |
-| ページング                  | F4 資料一覧                                                                                                                      |
-| `DomainException`           | ドメインルール違反は例外として送出し、UnitOfWork で変更を破棄した上で、画面では日本語エラー、APIではProblemDetailsのHTTPレスポンスに変換する |
+| Feature                              | Where this demo uses it                                                                                                                                        |
+| :----------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aggregate (without child entities)   | Member, Loan                                                                                                                                                   |
+| Aggregate (with child entities)      | Book and Reservation                                                                                                                                           |
+| Value Object                         | Name, email address, ISBN (with check digit validation), title, etc.                                                                                           |
+| TypeSafeEnum                         | Member type (with the loan limit and loan period)                                                                                                              |
+| `IDomainRule<TContext>`              | X1 loan eligibility. A decision that spans the member, the book and the loan status, and would be unnatural in any single aggregate                           |
+| `DeletionToken<T>`                   | F6 withdrawal. Book itself issues the deletion token only when B9 is met                                                                                       |
+| Domain events before commit          | On return (F8), the event raised by Loan updates the hold on Book (B6) and the loan suspension of Member (M3) in the same transaction                         |
+| Domain events after commit           | Notifies the member when Book is placed on hold (substituted by a log)                                                                                         |
+| Conflict detection per aggregate     | When reservations of the same book (adding child entities) happen at the same time, one of them is returned as a 409 conflict                                 |
+| Paging                               | F4 book list                                                                                                                                                   |
+| `DomainException`                    | Domain rule violations are thrown as exceptions; the UnitOfWork discards the changes, and they are converted to errors on the page or ProblemDetails HTTP responses in the API |

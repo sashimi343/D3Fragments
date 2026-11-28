@@ -8,23 +8,23 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityIntegration.Web.Pages;
 
-// UserManager は読み取り（Cookie の発行に使うユーザーの取得など）だけに使い、DB への書き込みは Command で行う
+// UserManager is used only for reading (e.g. getting the user to issue cookies for); writes to the database are done by Commands
 public abstract class AppPageModel(SignInManager<UserAccount> signIn) : PageModel
 {
     protected SignInManager<UserAccount> SignInManager => signIn;
 
     protected UserManager<UserAccount> Users => signIn.UserManager;
 
-    // ログイン中のアカウントの ID（Cookie のクレームから読み取る。DB は参照しない）
+    // ID of the signed-in account (read from the cookie claims; the database is not queried)
     protected UuidV7 CurrentAccountId => UuidV7.Parse(Users.GetUserId(User)!, null);
 
-    // ログイン中のアカウント
+    // The signed-in account
     protected async Task<UserAccount> GetCurrentAccountAsync() =>
-        await Users.GetUserAsync(User) ?? throw new InvalidOperationException("ログイン中のアカウントが見つかりません。");
+        await Users.GetUserAsync(User) ?? throw new InvalidOperationException("The signed-in account was not found.");
 
-    // Command が返したアカウントを取得する（Cookie の発行に使う）
+    // Gets the account returned by a Command (used to issue cookies)
     protected async Task<UserAccount> FindAccountAsync(UuidV7 accountId) =>
-        await Users.FindByIdAsync(accountId.ToString()) ?? throw new InvalidOperationException("アカウントが見つかりません。");
+        await Users.FindByIdAsync(accountId.ToString()) ?? throw new InvalidOperationException("The account was not found.");
 
     protected void AddErrors(Result result)
     {
@@ -34,12 +34,12 @@ public abstract class AppPageModel(SignInManager<UserAccount> signIn) : PageMode
         }
     }
 
-    // ログインできなかった理由の表示
+    // Shows why sign-in failed
     protected void AddSignInError(SignInOutcome outcome) =>
         ModelState.AddModelError(string.Empty, outcome.Status switch
         {
-            SignInStatus.LockedOut => "ログインの失敗が続いたため、アカウントがロックされています。しばらくしてからやり直してください。",
-            SignInStatus.NotAllowed => "メールアドレスの確認が済んでいません。確認メールのリンクを開いてください。",
-            _ => "認証に失敗しました。入力内容を確認してください。",
+            SignInStatus.LockedOut => "The account is locked because of repeated sign-in failures. Please try again later.",
+            SignInStatus.NotAllowed => "Your email address has not been confirmed. Open the link in the confirmation email.",
+            _ => "Authentication failed. Check what you entered.",
         });
 }

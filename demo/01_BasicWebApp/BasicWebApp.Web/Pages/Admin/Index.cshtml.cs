@@ -20,14 +20,14 @@ public sealed class IndexModel(
 {
     public BookInput Input { get; set; } = new();
 
-    [BindProperty(SupportsGet = true), Range(IPager.StartPageNo, int.MaxValue, ErrorMessage = "ページ番号は1以上で指定してください。")]
+    [BindProperty(SupportsGet = true), Range(IPager.StartPageNo, int.MaxValue, ErrorMessage = "The page number must be 1 or greater.")]
     public int PageNo { get; set; } = IPager.StartPageNo;
 
     public Pager<Book> Books { get; private set; } = Pager<Book>.Empty(ListBooksQuery.DefaultPageSize);
 
     public bool CanAdvanceDate => environment.IsDevelopment();
 
-    [BindProperty, Range(1, int.MaxValue, ErrorMessage = "日数は1以上で入力してください。")]
+    [BindProperty, Range(1, int.MaxValue, ErrorMessage = "The number of days must be 1 or greater.")]
     public int Days { get; set; } = 1;
 
     public Task<IActionResult> OnGetAsync() => ExecuteWithErrorsAsync(async () =>
@@ -53,7 +53,7 @@ public sealed class IndexModel(
             return InvalidInput();
         }
         await registerBook.ExecuteAsync(new RegisterBookCommand { Isbn = Input.Isbn, Title = Input.Title, Author = Input.Author }, HttpContext.RequestAborted);
-        TempData["Success"] = "資料を登録しました。";
+        TempData["Success"] = "The book has been registered.";
         return RedirectToPage(new { PageNo });
     }, LoadAsync);
 
@@ -65,7 +65,7 @@ public sealed class IndexModel(
             return InvalidInput();
         }
         await deleteBook.ExecuteAsync(new DeleteBookCommand { BookId = bookId }, HttpContext.RequestAborted);
-        TempData["Success"] = "資料を除籍しました。";
+        TempData["Success"] = "The book has been withdrawn.";
         return RedirectToPage(new { PageNo });
     }, LoadAsync);
 
@@ -80,12 +80,12 @@ public sealed class IndexModel(
             try
             {
                 ((DemoTimeProvider)timeProvider).Advance(Days);
-                TempData["Success"] = $"業務日付を{Days}日進めました。";
+                TempData["Success"] = $"The business date has been advanced by {Days} days.";
                 return RedirectToPage(new { PageNo });
             }
             catch (ArgumentOutOfRangeException)
             {
-                ModelState.AddModelError(nameof(Days), "表現可能な日付の範囲を超えています。");
+                ModelState.AddModelError(nameof(Days), "The date is outside the representable range.");
             }
         }
         await LoadAsync();
@@ -96,13 +96,13 @@ public sealed class IndexModel(
 
     public sealed class BookInput
     {
-        [Required(ErrorMessage = "ISBNを入力してください。"), Display(Name = "ISBN")]
+        [Required(ErrorMessage = "Enter an ISBN."), Display(Name = "ISBN")]
         public string Isbn { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "書名を入力してください。"), StringLength(200, ErrorMessage = "書名は200文字以内で入力してください。"), Display(Name = "書名")]
+        [Required(ErrorMessage = "Enter a title."), StringLength(200, ErrorMessage = "The title must be 200 characters or fewer."), Display(Name = "Title")]
         public string Title { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "著者を入力してください。"), Display(Name = "著者")]
+        [Required(ErrorMessage = "Enter an author."), Display(Name = "Author")]
         public string Author { get; set; } = string.Empty;
     }
 }

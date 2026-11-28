@@ -30,7 +30,7 @@ public class ReturnBookCommandHandler : IRequestHandler<ReturnBookCommand, Loan>
         Loan loan = await _loanRepository.FindAsync(request.LoanId, cancellationToken) ?? throw new EntityNotFoundException(nameof(Loan));
         if (loan.MemberId != request.MemberId)
         {
-            throw new DomainException(Error.Forbidden("他の会員の貸出は返却できません。"));
+            throw new DomainException(Error.Forbidden("You cannot return another member's loan."));
         }
         loan.Return(_timeProvider.GetLocalNow());
         return loan;

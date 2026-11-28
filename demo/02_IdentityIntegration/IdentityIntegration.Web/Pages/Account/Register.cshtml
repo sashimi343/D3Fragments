@@ -1,9 +1,9 @@
 @page
 @model IdentityIntegration.Web.Pages.Account.RegisterModel
 @{
-    ViewData["Title"] = "ユーザー登録";
+    ViewData["Title"] = "Register";
 }
-<h1>ユーザー登録</h1>
+<h1>Register</h1>
 <form method="post" class="col-md-6">
     <div asp-validation-summary="All" class="text-danger" role="alert"></div>
     <div class="mb-3">
@@ -13,7 +13,7 @@
     <div class="mb-3">
         <label asp-for="Input.Nickname" class="form-label"></label>
         <input asp-for="Input.Nickname" class="form-control" autocomplete="nickname" />
-        <div class="form-text">マイページなどに表示する名前です（会員の情報）。ログインにはユーザー名を使います。</div>
+        <div class="form-text">The name shown on My page and elsewhere (member information). Use your user name to sign in.</div>
     </div>
     <div class="mb-3">
         <label asp-for="Input.EmailAddress" class="form-label"></label>
@@ -22,13 +22,13 @@
     <div class="mb-3">
         <label asp-for="Input.Password" class="form-label"></label>
         <input asp-for="Input.Password" class="form-control" autocomplete="new-password" />
-        <div class="form-text">6文字以上で、英大文字・英小文字・数字・記号をそれぞれ1文字以上含めてください。</div>
+        <div class="form-text">At least 6 characters, including at least one uppercase letter, lowercase letter, digit and symbol.</div>
     </div>
     <div class="mb-3">
         <label asp-for="Input.ConfirmPassword" class="form-label"></label>
         <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" />
     </div>
-    <button class="btn btn-primary" type="submit">登録する</button>
+    <button class="btn btn-primary" type="submit">Register</button>
 </form>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -32,14 +32,14 @@ public sealed class TwoFactorModel(
         IsBrowserRemembered = await SignInManager.IsTwoFactorClientRememberedAsync(account);
     }
 
-    // メールの確認コードで二要素認証を有効にする（ユーザー登録でメールアドレスを確認済みのため、すぐ使える）
+    // Enable two-factor authentication with email verification codes (usable right away because the email address was confirmed at registration)
     public async Task<IActionResult> OnPostEnableEmailAsync()
     {
         UserAccount account = await GetCurrentAccountAsync();
         IReadOnlyList<string> codes = await enableEmail.ExecuteAsync(new EnableEmailTwoFactorCommand(account.Id), HttpContext.RequestAborted);
-        // 二要素認証の有効化で security stamp が変わるため、自分の Cookie を作り直す
+        // Enabling two-factor authentication changes the security stamp, so refresh our own cookie
         await SignInManager.RefreshSignInAsync(account);
-        return ShowRecoveryCodes(codes, "二要素認証を有効にしました。");
+        return ShowRecoveryCodes(codes, "Two-factor authentication has been enabled.");
     }
 
     public async Task<IActionResult> OnPostDisableAsync()
@@ -47,7 +47,7 @@ public sealed class TwoFactorModel(
         UserAccount account = await GetCurrentAccountAsync();
         await disable.ExecuteAsync(new DisableTwoFactorCommand(account.Id), HttpContext.RequestAborted);
         await SignInManager.RefreshSignInAsync(account);
-        TempData["Success"] = "二要素認証を無効にしました。";
+        TempData["Success"] = "Two-factor authentication has been disabled.";
         return RedirectToPage();
     }
 
@@ -55,14 +55,14 @@ public sealed class TwoFactorModel(
     {
         UserAccount account = await GetCurrentAccountAsync();
         IReadOnlyList<string> codes = await regenerateRecoveryCodes.ExecuteAsync(new RegenerateRecoveryCodesCommand(account.Id), HttpContext.RequestAborted);
-        return ShowRecoveryCodes(codes, "回復コードを作り直しました。前の回復コードは使えなくなりました。");
+        return ShowRecoveryCodes(codes, "The recovery codes have been regenerated. The previous recovery codes can no longer be used.");
     }
 
-    // 「このブラウザを記憶する」の Cookie を消す（DB は変更しない）
+    // Delete the "remember this browser" cookie (the database is not changed)
     public async Task<IActionResult> OnPostForgetBrowserAsync()
     {
         await SignInManager.ForgetTwoFactorClientAsync();
-        TempData["Success"] = "このブラウザの記憶を解除しました。次回のログインから二要素認証を求めます。";
+        TempData["Success"] = "This browser is no longer remembered. Two-factor authentication will be required from the next sign-in.";
         return RedirectToPage();
     }
 

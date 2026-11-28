@@ -28,7 +28,7 @@ public sealed class LoginModel(IRequestExecutor<FindMemberByEmailAddressQuery, M
             Member? member = await findMember.ExecuteAsync(new FindMemberByEmailAddressQuery { EmailAddress = Input.EmailAddress.Trim() }, HttpContext.RequestAborted);
             if (member is null)
             {
-                ModelState.AddModelError(string.Empty, "登録されていないメールアドレスです。");
+                ModelState.AddModelError(string.Empty, "This email address is not registered.");
                 return InvalidInput();
             }
             Claim[] claims =
@@ -44,8 +44,8 @@ public sealed class LoginModel(IRequestExecutor<FindMemberByEmailAddressQuery, M
 
     public sealed class LoginInput
     {
-        [Required(ErrorMessage = "メールアドレスを入力してください。"), EmailAddress(ErrorMessage = "メールアドレスの形式が不正です。")]
-        [Display(Name = "メールアドレス")]
+        [Required(ErrorMessage = "Enter an email address."), EmailAddress(ErrorMessage = "The email address format is invalid.")]
+        [Display(Name = "Email address")]
         public string EmailAddress { get; set; } = string.Empty;
     }
 }

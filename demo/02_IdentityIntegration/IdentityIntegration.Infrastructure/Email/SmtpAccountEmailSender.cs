@@ -5,20 +5,20 @@ using IdentityIntegration.Core.Accounts;
 
 namespace IdentityIntegration.Infrastructure.Email;
 
-// Mailpit（Aspire が起動する SMTP サーバー）へ送る。送ったメールは Mailpit の Web 画面で確認する
+// Sends to Mailpit (the SMTP server started by Aspire). Sent emails can be checked in the Mailpit web UI
 internal sealed class SmtpAccountEmailSender(SmtpEndpoint endpoint) : IAccountEmailSender
 {
     private const string From = "no-reply@identity-integration.example";
 
     public Task SendConfirmationLinkAsync(string emailAddress, string link, CancellationToken cancellationToken) =>
-        SendAsync(emailAddress, "メールアドレスの確認", $"""
-            <p>次のリンクを開いて、メールアドレスを確認してください。</p>
-            <p><a href="{WebUtility.HtmlEncode(link)}">メールアドレスを確認する</a></p>
+        SendAsync(emailAddress, "Confirm your email address", $"""
+            <p>Open the following link to confirm your email address.</p>
+            <p><a href="{WebUtility.HtmlEncode(link)}">Confirm email address</a></p>
             """, cancellationToken);
 
     public Task SendTwoFactorCodeAsync(string emailAddress, string code, CancellationToken cancellationToken) =>
-        SendAsync(emailAddress, "ログイン用の確認コード", $"""
-            <p>ログイン用の確認コードは <strong>{WebUtility.HtmlEncode(code)}</strong> です。</p>
+        SendAsync(emailAddress, "Your sign-in verification code", $"""
+            <p>Your sign-in verification code is <strong>{WebUtility.HtmlEncode(code)}</strong>.</p>
             """, cancellationToken);
 
     private async Task SendAsync(string to, string subject, string body, CancellationToken cancellationToken)
@@ -31,7 +31,7 @@ internal sealed class SmtpAccountEmailSender(SmtpEndpoint endpoint) : IAccountEm
 
 public sealed record SmtpEndpoint(string Host, int Port)
 {
-    // Aspire が渡す接続文字列（例: Endpoint=smtp://localhost:1025）から読み取る
+    // Reads from the connection string passed by Aspire (e.g. Endpoint=smtp://localhost:1025)
     public static SmtpEndpoint Parse(string connectionString)
     {
         string endpoint = connectionString.Split(';')

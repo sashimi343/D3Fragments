@@ -27,15 +27,15 @@ public class LoanEligibilityRule : IDomainRule<LoanEligibilityRuleContext>
 
         if (member.IsLoanSuspended(today))
         {
-            return Result.Failure(Error.PreconditionFailed("貸出停止中のため貸出できません。"));
+            return Result.Failure(Error.PreconditionFailed("You cannot borrow books while your loans are suspended."));
         }
         if (activeLoans.Any(l => l.GetOverdueDays(today) > 0))
         {
-            return Result.Failure(Error.PreconditionFailed("延滞中の資料があるため貸出できません。"));
+            return Result.Failure(Error.PreconditionFailed("You cannot borrow books while you have overdue books."));
         }
         if (activeLoans.Count >= member.MemberType.LoanLimit)
         {
-            return Result.Failure(Error.PreconditionFailed("貸出冊数の上限に達しているため貸出できません。"));
+            return Result.Failure(Error.PreconditionFailed("You cannot borrow books because you have reached your loan limit."));
         }
 
         switch (book.Status)
@@ -49,10 +49,10 @@ public class LoanEligibilityRule : IDomainRule<LoanEligibilityRuleContext>
                 }
                 else
                 {
-                    return Result.Failure(Error.InvalidState("予約されている資料のため貸出できません。"));
+                    return Result.Failure(Error.InvalidState("This book cannot be borrowed because it is reserved."));
                 }
             default:
-                return Result.Failure(Error.InvalidState("この資料は貸出できません。"));
+                return Result.Failure(Error.InvalidState("This book cannot be borrowed."));
         }
     }
 }

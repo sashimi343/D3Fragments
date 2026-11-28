@@ -1,10 +1,10 @@
 @page
 @model BasicWebApp.Web.Pages.Members.RegisterModel
 @{
-    ViewData["Title"] = "会員登録";
+    ViewData["Title"] = "Member registration";
 }
-<h1>会員登録</h1>
-<p>デモ用の架空の氏名とメールアドレスを入力してください。</p>
+<h1>Member registration</h1>
+<p>Enter a fictitious name and email address for the demo.</p>
 <form method="post">
     <div asp-validation-summary="All" class="text-danger" role="alert"></div>
     <div class="mb-3">
@@ -20,15 +20,15 @@
     <div class="mb-3">
         <label asp-for="Input.MemberTypeKey" class="form-label"></label>
         <select asp-for="Input.MemberTypeKey" class="form-select">
-            <option value="">選択してください</option>
+            <option value="">Select one</option>
             @foreach (var memberType in BasicWebApp.Domain.Members.MemberType.Values)
             {
-                <option value="@memberType.Key">@memberType.Name（@(memberType.LoanLimit)冊・@(memberType.LoanPeriodDays)日）</option>
+                <option value="@memberType.Key">@memberType.Name (@(memberType.LoanLimit) books, @(memberType.LoanPeriodDays) days)</option>
             }
         </select>
         <span asp-validation-for="Input.MemberTypeKey" class="text-danger"></span>
     </div>
-    <button class="btn btn-primary" type="submit">登録</button>
+    <button class="btn btn-primary" type="submit">Register</button>
 </form>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

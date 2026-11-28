@@ -1,43 +1,43 @@
 @page
 @model IdentityIntegration.Web.Pages.MyPage.TwoFactorModel
 @{
-    ViewData["Title"] = "二要素認証の設定";
+    ViewData["Title"] = "Two-factor authentication settings";
 }
-<h1>二要素認証の設定</h1>
+<h1>Two-factor authentication settings</h1>
 
 <table class="table w-auto">
-    <tr><th>二要素認証</th><td>@(Model.IsEnabled ? "有効" : "無効")</td></tr>
-    <tr><th>認証アプリ</th><td>@(Model.HasAuthenticator ? "設定済み" : "未設定")</td></tr>
-    <tr><th>メールの確認コード</th><td>使用可（メールアドレス確認済み）</td></tr>
-    <tr><th>残りの回復コード</th><td>@Model.RecoveryCodesLeft 個</td></tr>
-    <tr><th>このブラウザ</th><td>@(Model.IsBrowserRemembered ? "記憶済み（二要素認証を省略）" : "記憶していない")</td></tr>
+    <tr><th>Two-factor authentication</th><td>@(Model.IsEnabled ? "Enabled" : "Disabled")</td></tr>
+    <tr><th>Authenticator app</th><td>@(Model.HasAuthenticator ? "Set up" : "Not set up")</td></tr>
+    <tr><th>Email verification code</th><td>Available (email address confirmed)</td></tr>
+    <tr><th>Recovery codes left</th><td>@Model.RecoveryCodesLeft</td></tr>
+    <tr><th>This browser</th><td>@(Model.IsBrowserRemembered ? "Remembered (two-factor authentication skipped)" : "Not remembered")</td></tr>
 </table>
 
 <div class="d-flex flex-wrap gap-2">
-    <a asp-page="/MyPage/EnableAuthenticator" class="btn btn-primary">認証アプリを設定する</a>
+    <a asp-page="/MyPage/EnableAuthenticator" class="btn btn-primary">Set up authenticator app</a>
     @if (!Model.IsEnabled)
     {
         <form method="post" asp-page-handler="EnableEmail">
-            <button class="btn btn-outline-primary" type="submit">メールの確認コードで有効にする</button>
+            <button class="btn btn-outline-primary" type="submit">Enable with email verification codes</button>
         </form>
     }
     else
     {
         <form method="post" asp-page-handler="RegenerateRecoveryCodes">
-            <button class="btn btn-outline-secondary" type="submit">回復コードを作り直す</button>
+            <button class="btn btn-outline-secondary" type="submit">Regenerate recovery codes</button>
         </form>
         <form method="post" asp-page-handler="Disable">
-            <button class="btn btn-outline-danger" type="submit">二要素認証を無効にする</button>
+            <button class="btn btn-outline-danger" type="submit">Disable two-factor authentication</button>
         </form>
     }
     @if (Model.IsBrowserRemembered)
     {
         <form method="post" asp-page-handler="ForgetBrowser">
-            <button class="btn btn-outline-secondary" type="submit">このブラウザの記憶を解除する</button>
+            <button class="btn btn-outline-secondary" type="submit">Forget this browser</button>
         </form>
     }
 </div>
 <p class="form-text mt-3">
-    二要素認証を有効にすると、ログイン時に認証アプリ（設定済みの場合）またはメールの確認コードを選べます。
-    パスキーでのログインは、それ自体が多要素のため二要素認証を求めません。
+    When two-factor authentication is enabled, you can choose the authenticator app (if set up) or an email verification code at sign-in.
+    Signing in with a passkey does not require two-factor authentication, because a passkey is multi-factor by itself.
 </p>

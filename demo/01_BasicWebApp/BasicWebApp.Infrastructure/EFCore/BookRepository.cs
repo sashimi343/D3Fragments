@@ -16,8 +16,8 @@ public class BookRepository : RepositoryBase<BasicWebAppDbContext, Book>, IBookR
     {
     }
 
-    // 予約は受付順（UuidV7は時刻順に採番される）で読み込む
-    // ponytail: SQL ServerのuniqueidentifierはUUIDv7の時刻順に並ばないため、DBMSを変える場合は予約日時の列で並べる
+    // Load reservations in the order they were received (UuidV7 values are issued in time order)
+    // ponytail: SQL Server's uniqueidentifier does not sort UUIDv7 in time order, so order by a reservation timestamp column if the DBMS changes
     private IQueryable<Book> BooksWithReservations => Set.Include(b => b.Reservations.OrderBy(r => r.Id));
 
     public override async Task<Book?> FindAsync(UuidV7 id, CancellationToken cancellationToken)

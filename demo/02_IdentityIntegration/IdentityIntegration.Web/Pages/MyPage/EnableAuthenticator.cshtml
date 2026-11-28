@@ -1,24 +1,24 @@
 @page
 @model IdentityIntegration.Web.Pages.MyPage.EnableAuthenticatorModel
 @{
-    ViewData["Title"] = "認証アプリの設定";
+    ViewData["Title"] = "Set up authenticator app";
 }
-<h1>認証アプリの設定</h1>
+<h1>Set up authenticator app</h1>
 <ol>
-    <li>Google Authenticator や Microsoft Authenticator などの認証アプリ（TOTP）を用意します。</li>
+    <li>Get an authenticator app (TOTP) such as Google Authenticator or Microsoft Authenticator.</li>
     <li>
-        次の QR コードを読み取るか、キー <kbd>@Model.SharedKey</kbd> を入力します。
+        Scan the following QR code, or enter the key <kbd>@Model.SharedKey</kbd>.
         <div id="qr-code" class="my-3" data-uri="@Model.AuthenticatorUri"></div>
     </li>
     <li>
-        認証アプリに表示された6桁のコードを入力して、設定を確認します。
+        Enter the 6-digit code shown in the authenticator app to verify the setup.
         <form method="post" class="col-md-6 mt-2">
             <div asp-validation-summary="All" class="text-danger" role="alert"></div>
             <div class="mb-3">
-                <label asp-for="Code" class="form-label">確認コード</label>
+                <label asp-for="Code" class="form-label">Verification code</label>
                 <input asp-for="Code" class="form-control" autocomplete="one-time-code" inputmode="numeric" />
             </div>
-            <button class="btn btn-primary" type="submit">確認して有効にする</button>
+            <button class="btn btn-primary" type="submit">Verify and enable</button>
         </form>
     </li>
 </ol>

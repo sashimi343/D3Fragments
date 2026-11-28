@@ -8,17 +8,17 @@ public enum TwoFactorMethod
     Email,
 }
 
-// サインインの検証（DB 側の処理）。実装は Infrastructure 層（ASP.NET Core Identity）
+// Sign-in verification (the database side). Implemented in the Infrastructure layer (ASP.NET Core Identity)
 public interface IAccountAuthenticator
 {
-    // rememberedAccountId: 「このブラウザを記憶する」の Cookie に記録されたアカウントの ID
+    // rememberedAccountId: the account ID recorded in the "remember this browser" cookie
     Task<SignInOutcome> SignInWithPasswordAsync(string userName, string password, string? rememberedAccountId);
 
     Task<SignInOutcome> SignInWithTwoFactorCodeAsync(UuidV7 accountId, TwoFactorMethod method, string code);
 
     Task<SignInOutcome> SignInWithRecoveryCodeAsync(UuidV7 accountId, string recoveryCode);
 
-    // パスキーの検証（署名の確認）はプレゼンテーション層で済ませ、その結果を反映する
+    // Passkey verification (checking the signature) is done in the presentation layer, and its result is applied here
     Task<SignInOutcome> SignInWithPasskeyAsync(UuidV7 accountId, byte[] credentialId, uint signCount, bool isBackedUp);
 
     Task<SignInOutcome> SignInWithExternalLoginAsync(string loginProvider, string providerKey, string? rememberedAccountId);

@@ -7,7 +7,7 @@ using D3Fragments.Application;
 
 namespace BasicWebApp.Application.Books;
 
-// 取り置き期限切れの資料を一括処理し、処理した資料の件数を返す（日次バッチ想定）
+// Processes all books whose hold has expired and returns the number of processed books (intended as a daily batch)
 public class ExpireHoldsCommand : ICommand<int>
 {
 }
@@ -23,7 +23,7 @@ public class ExpireHoldsCommandHandler : IRequestHandler<ExpireHoldsCommand, int
         _timeProvider = timeProvider;
     }
 
-    // ponytail: 全件を1トランザクションで処理するため、1件でも競合すると全体が失敗する。件数が増えたら資料ごとにCommandを分ける
+    // ponytail: all books are processed in one transaction, so a single conflict fails the whole batch. Split into one Command per book if the count grows
     public async Task<int> HandleAsync(ExpireHoldsCommand request, CancellationToken cancellationToken)
     {
         DateTimeOffset now = _timeProvider.GetLocalNow();

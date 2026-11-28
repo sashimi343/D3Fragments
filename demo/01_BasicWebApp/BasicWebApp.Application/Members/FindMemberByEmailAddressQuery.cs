@@ -7,7 +7,7 @@ using D3Fragments.Application;
 
 namespace BasicWebApp.Application.Members;
 
-// ログインとCookie検証用。見つからなければnullを返す
+// For sign-in and cookie validation. Returns null if not found
 public class FindMemberByEmailAddressQuery : IQuery<Member?>
 {
     public required string EmailAddress { get; init; }

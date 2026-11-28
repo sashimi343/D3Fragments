@@ -30,10 +30,10 @@ public sealed class IndexModel(
     });
 
     public Task<IActionResult> OnPostReturnAsync() => ExecuteCommandAsync(async () =>
-        await returnBook.ExecuteAsync(new ReturnBookCommand { LoanId = LoanId, MemberId = MemberId }, HttpContext.RequestAborted), "返却が完了しました。");
+        await returnBook.ExecuteAsync(new ReturnBookCommand { LoanId = LoanId, MemberId = MemberId }, HttpContext.RequestAborted), "The book has been returned.");
 
     public Task<IActionResult> OnPostRenewAsync() => ExecuteCommandAsync(async () =>
-        await renewLoan.ExecuteAsync(new RenewLoanCommand { LoanId = LoanId, MemberId = MemberId }, HttpContext.RequestAborted), "貸出期限を延長しました。");
+        await renewLoan.ExecuteAsync(new RenewLoanCommand { LoanId = LoanId, MemberId = MemberId }, HttpContext.RequestAborted), "The loan has been renewed.");
 
     private async Task LoadAsync()
     {

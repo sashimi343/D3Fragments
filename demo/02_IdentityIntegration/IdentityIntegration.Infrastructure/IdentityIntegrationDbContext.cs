@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityIntegration.Infrastructure;
 
-// Identity のテーブル（AspNetUsers など）と会員のテーブルを1つのコンテキストに持ち、同じ UnitOfWork で保存する。
-// IdentityUserContext を継承するため D3DbContext は継承できない。
-// D3DbContext と同じ規約は ApplyD3FragmentsConventions で、保存時の処理は UseD3Fragments（AddD3FragmentsEFCore が呼び出す）で適用する
+// Holds the Identity tables (AspNetUsers, etc.) and the member table in one context, saved in the same UnitOfWork.
+// It inherits IdentityUserContext, so it cannot inherit D3DbContext.
+// The same conventions as D3DbContext are applied by ApplyD3FragmentsConventions, and the save-time processing by UseD3Fragments (called by AddD3FragmentsEFCore)
 public sealed class IdentityIntegrationDbContext(DbContextOptions<IdentityIntegrationDbContext> options)
     : IdentityUserContext<UserAccount, UuidV7>(options)
 {
@@ -22,13 +22,13 @@ public sealed class IdentityIntegrationDbContext(DbContextOptions<IdentityIntegr
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        // Identity のテーブルの定義
+        // Definitions of the Identity tables
         base.OnModelCreating(builder);
 
         builder.Entity<Member>(member =>
         {
             member.ComplexValueObject(x => x.Nickname);
-            // 1つの Identity のユーザーに会員は1人
+            // One member per Identity user
             member.HasIndex(x => x.AccountId).IsUnique();
         });
     }
