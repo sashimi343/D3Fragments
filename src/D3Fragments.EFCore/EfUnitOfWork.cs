@@ -48,15 +48,7 @@ public sealed class EfUnitOfWork<TContext>(
 
         await dispatchStrategy.PrepareAsync(dbContext, newEvents, cancellationToken).ConfigureAwait(false);
 
-        int affectedRows;
-        try
-        {
-            affectedRows = await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        }
-        catch (DbUpdateConcurrencyException ex)
-        {
-            throw new ConflictOccurredException(ex, ExceptionMessages.ConflictOccurredException_ConcurrencyConflict);
-        }
+        var affectedRows = await SaveChangesConvertingConflictAsync(dbContext, cancellationToken).ConfigureAwait(false);
 
         if (_transaction is null)
         {
@@ -101,6 +93,19 @@ public sealed class EfUnitOfWork<TContext>(
         // トランザクションを破棄してから配信する。Commit後のハンドラーがトランザクション付きのCommandを実行できるようにするため
         await CompleteDomainEventsAsync().ConfigureAwait(false);
         return response;
+    }
+
+    // 楽観ロックの競合をConflictOccurredExceptionに変換して保存する。RepositoryBaseの即時の操作の前の保存でも使う
+    internal static async Task<int> SaveChangesConvertingConflictAsync(TContext dbContext, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            throw new ConflictOccurredException(ex, ExceptionMessages.ConflictOccurredException_ConcurrencyConflict);
+        }
     }
 
     /// <inheritdoc />

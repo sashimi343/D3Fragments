@@ -36,6 +36,8 @@ public sealed record ReserveSeatCommand(UuidV7 SeatId, UuidV7 MemberId)
 `TransactionBehavior` は、Pipeline の残りの処理を `IUnitOfWork.ExecuteInTransactionAsync` の中で実行します。
 例外がスローされなければ Commit し、スローされれば Rollback します。
 
+リポジトリの `ExecuteImmediateAsync`（`ExecuteUpdate`・`ExecuteDelete`・`ExecuteSql*` などの即時の操作）を使う Command にも、`ITransactionalCommand` が必要です（[即時の操作を実行する](../05-efcore/02-repositories.md#即時の操作を実行する)）。
+
 ## 別のスコープで Command を実行する
 
 1回の `IRequestExecutor` の呼び出しが、1つの保存の単位です。

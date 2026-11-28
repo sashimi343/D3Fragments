@@ -75,6 +75,15 @@ namespace D3Fragments.EFCore.Resources {
         }
 
         /// <summary>
+        ///   An immediate operation must be executed within a transaction. Make the command implement ITransactionalCommand. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string InvalidOperationException_ImmediateOperationOutsideTransaction {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_ImmediateOperationOutsideTransaction", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   A transaction cannot be nested within another transaction. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string InvalidOperationException_TransactionAlreadyStarted {

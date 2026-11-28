@@ -31,6 +31,7 @@ internal sealed class KnownTypes
         DatabaseFacade = compilation.GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Infrastructure.DatabaseFacade");
         IDbContextTransaction = compilation.GetTypeByMetadataName("Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction");
         EntityFrameworkQueryableExtensions = compilation.GetTypeByMetadataName("Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions");
+        RelationalDatabaseFacadeExtensions = compilation.GetTypeByMetadataName("Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions");
         ControllerBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.ControllerBase");
         PageBase = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.RazorPages.PageBase");
         PageModel = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.RazorPages.PageModel");
@@ -65,6 +66,7 @@ internal sealed class KnownTypes
     public INamedTypeSymbol? DatabaseFacade { get; }
     public INamedTypeSymbol? IDbContextTransaction { get; }
     public INamedTypeSymbol? EntityFrameworkQueryableExtensions { get; }
+    public INamedTypeSymbol? RelationalDatabaseFacadeExtensions { get; }
     public INamedTypeSymbol? ControllerBase { get; }
     public INamedTypeSymbol? PageBase { get; }
     public INamedTypeSymbol? PageModel { get; }

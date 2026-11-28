@@ -91,4 +91,7 @@
   <data name="InvalidOperationException_ConventionsNotApplied" xml:space="preserve">
     <value>{0} にD3Fragmentsの規約が適用されていません。ConfigureConventionsでApplyD3FragmentsConventionsを呼び出すか、D3DbContextを継承してください。</value>
   </data>
+  <data name="InvalidOperationException_ImmediateOperationOutsideTransaction" xml:space="preserve">
+    <value>即時の操作はトランザクションの中で実行する必要があります。CommandにITransactionalCommandを実装してください。</value>
+  </data>
 </root>

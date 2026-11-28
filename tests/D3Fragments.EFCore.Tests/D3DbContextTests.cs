@@ -54,6 +54,8 @@ internal sealed class Member : AggregateRoot
     public void ChangeEmail(Email email) => Email = email;
 
     public DeletionToken<Member> Delete() => IssueDeletionToken(this);
+
+    public void Raise(IDomainEvent domainEvent) => AddDomainEvent(domainEvent);
 }
 
 internal sealed class MemberDbContext(DbContextOptions<MemberDbContext> options) : D3DbContext(options)

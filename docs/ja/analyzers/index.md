@@ -75,3 +75,4 @@ using D3Fragments;
 | [DFR0017: DBへの書き込みとCookieの操作を同時に行う SignInManager のメソッドを呼び出さないでください](DFR0017.md) | ASP.NET Core Identity の `SignInManager` の、DBへの書き込みとCookieの操作を1回の呼び出しで行うメソッドが呼び出されています。DBへの書き込みは Command で、Cookieの発行はプレゼンテーション層で行うべきです。 |
 | [DFR0018: Handler から Command を実行するときは IIsolatedRequestExecutor を使ってください](DFR0018.md) | Command の Handler・Commit 前のドメインイベントハンドラが、Command を同じスコープで実行する `IRequestExecutor<TRequest, TResponse>` を注入しています。内側の Command の保存が、呼び出し元のまだ保存していない変更まで保存してしまいます。 |
 | [DFR0019: Query の Handler から Command を実行しないでください](DFR0019.md) | Query の Handler が、Command を実行する `IRequestExecutor<TRequest, TResponse>` または `IIsolatedRequestExecutor<TRequest, TResponse>` を注入しています。データを読み取るだけのはずの Query が DB を更新します。 |
+| [DFR0020: リポジトリの即時の操作は ExecuteImmediateAsync の中で実行してください](DFR0020.md) | リポジトリで `ExecuteUpdate`・`ExecuteDelete`・`ExecuteSql*` が `ExecuteImmediateAsync` を経由せずに呼び出されています。未保存の変更より先に実行され、トランザクションの外ではその場で確定します。 |
