@@ -59,31 +59,12 @@ public sealed class RequestExecutorInjectionAnalyzer : DiagnosticAnalyzer
 
         foreach (var parameter in type.InstanceConstructors.SelectMany(c => c.Parameters))
         {
-            if (parameter.Type.FindInterface(knownTypes.IRequestExecutor) is not { } executor)
+            if (FindViolation(parameter.Type, isQueryHandler, knownTypes) is not { } violation)
             {
                 continue;
             }
 
-            // 型パラメータは Command か Query かを判定できない。Query は保存されないため同じスコープで実行してよい
-            var request = executor.TypeArguments[0];
-            if (request is ITypeParameterSymbol || !request.Implements(knownTypes.ICommand))
-            {
-                continue;
-            }
-
-            DiagnosticDescriptor descriptor;
-            if (isQueryHandler)
-            {
-                descriptor = DiagnosticDescriptors.DFR0019;
-            }
-            else if (!parameter.Type.Implements(knownTypes.IIsolatedRequestExecutor))
-            {
-                descriptor = DiagnosticDescriptors.DFR0018;
-            }
-            else
-            {
-                continue;
-            }
+            var (descriptor, request) = violation;
 
             var location = (parameter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(context.CancellationToken) as ParameterSyntax)?.Type?.GetLocation()
                 ?? parameter.Locations[0];
@@ -94,5 +75,37 @@ public sealed class RequestExecutorInjectionAnalyzer : DiagnosticAnalyzer
                 parameter.Type.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat),
                 request.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat)));
         }
+    }
+
+    // 型が実装する構築済みの IRequestExecutor（型自身を含む）のうち、最初に違反するものの規則とリクエスト型を返す。
+    // 1つの型が複数のリクエストの Executor を兼ねる場合があるため、リクエストと応答の組ごとに判定する
+    private static (DiagnosticDescriptor Descriptor, ITypeSymbol Request)? FindViolation(ITypeSymbol type, bool isQueryHandler, KnownTypes knownTypes)
+    {
+        var interfaces = type is INamedTypeSymbol { TypeKind: TypeKind.Interface } self ? type.AllInterfaces.Insert(0, self) : type.AllInterfaces;
+        foreach (var executor in interfaces.Where(i => SymbolEqualityComparer.Default.Equals(i.OriginalDefinition, knownTypes.IRequestExecutor)))
+        {
+            // 型パラメータは Command か Query かを判定できない。Query は保存されないため同じスコープで実行してよい
+            var request = executor.TypeArguments[0];
+            if (request is ITypeParameterSymbol || !request.Implements(knownTypes.ICommand))
+            {
+                continue;
+            }
+
+            if (isQueryHandler)
+            {
+                return (DiagnosticDescriptors.DFR0019, request);
+            }
+
+            // 同じリクエストと応答の組を別のスコープで実行する場合だけを除外する
+            var isolated = interfaces.Any(i =>
+                SymbolEqualityComparer.Default.Equals(i.OriginalDefinition, knownTypes.IIsolatedRequestExecutor)
+                && i.AllInterfaces.Contains(executor, SymbolEqualityComparer.Default));
+            if (!isolated)
+            {
+                return (DiagnosticDescriptors.DFR0018, request);
+            }
+        }
+
+        return null;
     }
 }

@@ -102,6 +102,47 @@ public sealed class RequestExecutorInjectionAnalyzerTests
             .WithArguments("GetShelfHandler", "IRequestExecutor<AddLog, int>", "AddLog"));
     }
 
+    // 最初に見つかる Executor が Query 用でも、Command 用の Executor を見逃さない
+    [Fact]
+    public async Task ExecutorOfQueryAndCommand_ReportsViolatingContract()
+    {
+        const string source = """
+            public interface ILogExecutors : IRequestExecutor<CountLogs, int>, IRequestExecutor<AddLog, int> { }
+
+            public sealed class AddShelfHandler({|#0:ILogExecutors|} logs) : IRequestHandler<AddShelf, int>
+            {
+                public Task<int> HandleAsync(AddShelf request, CancellationToken cancellationToken) => Task.FromResult(0);
+            }
+
+            public sealed class GetShelfHandler({|#1:ILogExecutors|} logs) : IRequestHandler<GetShelf, int>
+            {
+                public Task<int> HandleAsync(GetShelf request, CancellationToken cancellationToken) => Task.FromResult(0);
+            }
+            """;
+
+        await VerifyAsync(source,
+            Verifier.Diagnostic(DiagnosticDescriptors.DFR0018).WithLocation(0).WithArguments("AddShelfHandler", "ILogExecutors", "AddLog"),
+            Verifier.Diagnostic(DiagnosticDescriptors.DFR0019).WithLocation(1).WithArguments("GetShelfHandler", "ILogExecutors", "AddLog"));
+    }
+
+    // 別の Command を別スコープで実行できても、同じスコープで実行する Command の違反は除外しない
+    [Fact]
+    public async Task IsolatedExecutorOfAnotherCommand_ReportsDfr0018()
+    {
+        const string source = """
+            public interface IShelfExecutors : IRequestExecutor<AddLog, int>, IIsolatedRequestExecutor<AddShelf, int> { }
+
+            public sealed class AddShelfHandler({|#0:IShelfExecutors|} executors) : IRequestHandler<AddShelf, int>
+            {
+                public Task<int> HandleAsync(AddShelf request, CancellationToken cancellationToken) => Task.FromResult(0);
+            }
+            """;
+
+        await VerifyAsync(source, Verifier.Diagnostic(DiagnosticDescriptors.DFR0018)
+            .WithLocation(0)
+            .WithArguments("AddShelfHandler", "IShelfExecutors", "AddLog"));
+    }
+
     [Fact]
     public async Task CommandSideInjectingIsolatedRequestExecutorOfCommand_ReportsNothing()
     {
