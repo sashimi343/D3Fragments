@@ -1,14 +1,6 @@
 ; Shipped analyzer releases
 ; https://github.com/dotnet/roslyn-analyzers/blob/main/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
 
-## Release 0.4.0
-
-### Changed Rules
-
-Rule ID | Category | Severity | Notes
---------|----------|----------|-------
-DFR0002 | Architecture | Warning | DiagnosticDescriptors
-
 ## Release 0.3.0
 
 ### New Rules
