@@ -182,6 +182,8 @@ ASP.NET Core の [PageBase](https://learn.microsoft.com/dotnet/api/microsoft.asp
 
 ドメイン層のクラス・インターフェースのうち、上記のどれにも当てはまらないものです。
 
+ドメインサービスはここに含まれます。ドメインサービスからリポジトリインターフェースは参照できません（[DFR0002](../analyzers/DFR0002.md)）。I/O を伴う処理は Command Handler に置き、取得した集約や値をドメインサービスに渡してください。
+
 ### インフラストラクチャ層
 
 #### Infrastructure_RepositoryImplementation

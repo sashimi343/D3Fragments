@@ -129,6 +129,82 @@ public sealed class ModuleReferenceAnalyzerTests
             Verifier.Diagnostic(DiagnosticDescriptors.DFR0002).WithLocation(0).WithArguments("Domain_DomainRule", "ShelfRule", "Domain_RepositoryInterface", "IShelfRepository"));
     }
 
+    // Domain_Other はドメイン層のみのアセンブリでだけ判定される
+    private const string DomainTypes = """
+        using System.Threading.Tasks;
+        using D3Fragments;
+
+        public sealed class Shelf : AggregateRoot { }
+        public interface IShelfRepository : IRepository<Shelf> { }
+        public sealed class ShelfRule : IDomainRule<Shelf>
+        {
+            public Result Check(Shelf context) => Result.Success();
+        }
+        """;
+
+    [Fact]
+    public async Task DomainServiceReferencingRepository_ReportsDiagnostic()
+    {
+        const string source = DomainTypes + """
+            public sealed class ShelfService({|#0:IShelfRepository|} repository)
+            {
+                public Task Run({|#1:IShelfRepository|} other) => Task.CompletedTask;
+            }
+            public interface IShelfChecker
+            {
+                bool Check({|#2:IShelfRepository|} repository);
+            }
+            """;
+
+        await Verifier.VerifyAsync(source, ArchitectureLayerType.Domain,
+            Verifier.Diagnostic(DiagnosticDescriptors.DFR0002).WithLocation(0).WithArguments("Domain_Other", "ShelfService", "Domain_RepositoryInterface", "IShelfRepository"),
+            Verifier.Diagnostic(DiagnosticDescriptors.DFR0002).WithLocation(1).WithArguments("Domain_Other", "ShelfService", "Domain_RepositoryInterface", "IShelfRepository"),
+            Verifier.Diagnostic(DiagnosticDescriptors.DFR0002).WithLocation(2).WithArguments("Domain_Other", "IShelfChecker", "Domain_RepositoryInterface", "IShelfRepository"));
+    }
+
+    [Fact]
+    public async Task DomainServiceReferencingApplicationHandler_ReportsDiagnostic()
+    {
+        const string source = """
+            public sealed class ShelfService
+            {
+                public object Run() => new {|#0:GetShelfHandler|}();
+            }
+            """;
+        const string applicationSource = """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using D3Fragments.Application;
+
+            public sealed record GetShelf(int Id) : IQuery<int>;
+            public sealed class GetShelfHandler : IRequestHandler<GetShelf, int>
+            {
+                public Task<int> HandleAsync(GetShelf request, CancellationToken cancellationToken) => Task.FromResult(0);
+            }
+            """;
+
+        var test = Verifier.CreateTest(source, ArchitectureLayerType.Domain);
+        test.AddReferencedProject("Application", applicationSource, ArchitectureLayerType.Application);
+        test.ExpectedDiagnostics.Add(Verifier.Diagnostic(DiagnosticDescriptors.DFR0002)
+            .WithLocation(0)
+            .WithArguments("Domain_Other", "ShelfService", "Application_RequestHandler", "GetShelfHandler"));
+
+        await test.RunAsync(TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
+    public async Task DomainServiceReferencingDomainModel_ReportsNothing()
+    {
+        const string source = DomainTypes + """
+            public sealed class ShelfService(ShelfRule rule)
+            {
+                public Result Check(Shelf shelf) => rule.Check(shelf);
+            }
+            """;
+
+        await Verifier.VerifyAsync(source, ArchitectureLayerType.Domain);
+    }
+
     [Fact]
     public async Task ControllerReferencingDomainRule_ReportsDiagnostic()
     {
