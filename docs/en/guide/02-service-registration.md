@@ -56,6 +56,7 @@ It registers the following services.
 | Service | Implementation | Lifetime |
 |---|---|---|
 | `IRequestExecutor<TRequest, TResponse>` | `RequestExecutor<TRequest, TResponse>` | Scoped |
+| `IIsolatedRequestExecutor<TRequest, TResponse>` | `IsolatedRequestExecutor<TRequest, TResponse>` | Scoped |
 | `IPipelineBehavior<TRequest, TResponse>` | `TransactionBehavior<TRequest, TResponse>`, `UnitOfWorkBehavior<TRequest, TResponse>` | Scoped |
 | `IDomainEventDispatcher` | `DomainEventDispatcher` | Scoped |
 | `IRequestHandler<TRequest, TResponse>` | Implementations in `assemblies` | Scoped |

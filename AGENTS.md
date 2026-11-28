@@ -63,4 +63,4 @@ dotnet run scripts/TestQualityCheck.cs               # テスト品質の静的�
 - public / protected な API の XML ドキュメントコメントは英語・日本語の両方で書く（`xml-commenting` スキル）。例外メッセージ等のリソースも `*.resx`（英語）と `*.ja.resx` の両方を更新する
 - resx にエントリを追加・削除したら、対応する `*.Designer.cs` も手で更新する（`ResXFileCodeGenerator` は Visual Studio の中でしか動かず、CLI のビルドでは再生成されない）
 - アナライザの規則の追加・変更は `analyzer-rule` スキルの手順に従う（ドキュメントの更新も同じ変更で行う）
-- アナライザ以外の機能のドキュメント（`docs/`）はリリース前にまとめて書く。機能の実装中は書かない
+- アナライザ以外の機能のドキュメント（`docs/`）は機能実装時に適宜更新する
