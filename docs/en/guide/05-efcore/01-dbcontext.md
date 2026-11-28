@@ -81,7 +81,7 @@ Use `ComplexValueObject` in most cases, and use `HasValueObjectConversion` only 
 | When to use | Value objects without an index | Value objects with a unique constraint or an index |
 | Index | Cannot be defined | Can be defined |
 | Using the wrapped value in queries (`x.Email.Value.EndsWith(...)`) | Supported | Not supported (compare value objects, such as `x.Email == email`) |
-| Column name | Property name (naming conventions are not applied) | Follows the naming convention |
+| Column name | Follows the naming convention | Follows the naming convention |
 
 ### Mapping as a complex type
 
@@ -106,12 +106,15 @@ var members = await DbContext.Members
     .ToListAsync(cancellationToken);
 ```
 
-Because the column name is set explicitly to the property name, naming conventions such as `UseSnakeCaseNamingConvention()` are not applied.
-To match the naming convention, specify the column name for each property.
+As with `HasValueObjectConversion`, the column name follows the naming convention of the DbContext.
+For example, with `UseSnakeCaseNamingConvention()` of EFCore.NamingConventions, the column name is `email_address`, not `email_address_value`.
+This is because the trailing `_value` (case-insensitive) is removed from the column name converted by the naming convention.
+So with a custom naming convention that changes the separator, the suffix is not removed and the converted column name is kept as is.
+In that case, specify the column name with the returned builder.
 
 ```csharp
 builder.ComplexValueObject(x => x.EmailAddress)
-    .Property(x => x.Value).HasColumnName("email_address");
+    .Property(x => x.Value).HasColumnName("email-address");
 ```
 
 ### Mapping with a value converter
