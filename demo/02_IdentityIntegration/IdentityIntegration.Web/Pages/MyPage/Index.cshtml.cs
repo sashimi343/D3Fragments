@@ -11,7 +11,7 @@ public sealed class IndexModel(SignInManager<UserAccount> signIn, IRequestExecut
 {
     public MemberProfile? Profile { get; private set; }
 
-    // ログイン中の Identity のユーザーの ID から、紐づく会員（業務上の利用者）を取得する
+    // Gets the linked member (the business user) from the ID of the signed-in Identity user
     public async Task OnGetAsync() =>
         Profile = await getProfile.ExecuteAsync(new GetMemberProfileQuery(CurrentAccountId), HttpContext.RequestAborted);
 }

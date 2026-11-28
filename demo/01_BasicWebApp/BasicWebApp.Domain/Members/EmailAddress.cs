@@ -12,19 +12,19 @@ public class EmailAddress : ValueObjectBase<EmailAddress, string>, IValueObject<
     {
     }
 
-    // 検証はValueObjectBaseのコンストラクタで行われる
+    // Validation is performed by the ValueObjectBase constructor
     public static EmailAddress Create(string value) => new(value.Trim());
 
     public static bool ValidateValue(string value, [NotNullWhen(false)] out string? errorMessage)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            errorMessage = "メールアドレスを指定してください。";
+            errorMessage = "Specify an email address.";
             return false;
         }
         if (!System.Net.Mail.MailAddress.TryCreate(value, out var _))
         {
-            errorMessage = "メールアドレスの形式が不正です。";
+            errorMessage = "The email address format is invalid.";
             return false;
         }
 

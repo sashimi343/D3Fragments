@@ -1,7 +1,7 @@
 {
   "realm": "identity-integration",
   "enabled": true,
-  "displayName": "IdentityIntegration デモ",
+  "displayName": "IdentityIntegration Demo",
   "sslRequired": "none",
   "registrationAllowed": false,
   "clients": [

@@ -1,17 +1,17 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// メールの送信先。送ったメールは Mailpit の Web 画面で確認する
+// Destination of emails. Sent emails can be checked in the Mailpit web UI
 var mailpit = builder.AddMailPit("mailpit");
 
-// 外部ログインの OIDC プロバイダー。ブラウザからもアプリからも同じ URL で参照するため、ポートを固定する。
-// Realms フォルダーの realm（クライアントとデモ用のユーザー）を起動時に取り込む
+// OIDC provider for external login. The port is fixed because both the browser and the app refer to the same URL.
+// Imports the realm in the Realms folder (the client and the demo user) at startup
 var keycloak = builder.AddKeycloak("keycloak", port: 8080)
     .WithRealmImport("./Realms");
 
 builder.AddDotnetProject("web", "../IdentityIntegration.Web/IdentityIntegration.Web.csproj")
     .WithReference(mailpit)
     .WithReference(keycloak)
-    // 画面から Mailpit を開くリンク用
+    // For the link that opens Mailpit from the pages
     .WithEnvironment("MAILPIT_UI_URL", mailpit.GetEndpoint("http"))
     .WaitFor(mailpit)
     .WaitFor(keycloak);

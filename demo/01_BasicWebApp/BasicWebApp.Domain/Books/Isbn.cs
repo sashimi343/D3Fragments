@@ -21,7 +21,7 @@ public partial class Isbn : ValueObjectBase<Isbn, string>, IValueObject<Isbn, st
         {
             throw new DomainValidationException(errorMessage);
         }
-        // ハイフン有無で別の値にならないよう、ハイフンなしに正規化する
+        // Normalize to the form without hyphens so that values with and without hyphens are equal
         return new Isbn(value.Replace("-", ""));
     }
 
@@ -29,22 +29,22 @@ public partial class Isbn : ValueObjectBase<Isbn, string>, IValueObject<Isbn, st
     {
         if (string.IsNullOrEmpty(value))
         {
-            errorMessage = "ISBNを指定してください。";
+            errorMessage = "Specify an ISBN.";
             return false;
         }
         if (!IsValidFormat(value))
         {
-            errorMessage = "ISBNの形式が不正です。";
+            errorMessage = "The ISBN format is invalid.";
             return false;
         }
         if (!IsValidPrefix(value))
         {
-            errorMessage = "ISBNの接頭辞が不正です。";
+            errorMessage = "The ISBN prefix is invalid.";
             return false;
         }
         if (!IsValidCheckDigit(value))
         {
-            errorMessage = "ISBNのチェックディジットが不正です。";
+            errorMessage = "The ISBN check digit is invalid.";
             return false;
         }
 

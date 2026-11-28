@@ -19,7 +19,7 @@ public sealed class LoginModel(
     [BindProperty]
     public LoginInput Input { get; set; } = new();
 
-    // パスワードでのログイン
+    // Sign-in with a password
     public async Task<IActionResult> OnPostAsync(string? returnUrl)
     {
         if (!ModelState.IsValid)
@@ -27,14 +27,14 @@ public sealed class LoginModel(
             return Page();
         }
 
-        // 1. Cookie から「このブラウザを記憶する」のアカウントを読み取る（Cookie 側）
+        // 1. Read the "remember this browser" account from the cookie (cookie side)
         string? rememberedAccountId = await SignInManager.GetTwoFactorClientRememberedUserIdAsync();
 
-        // 2. パスワードを検証する（DB 側。アクセス失敗回数とロックアウトは UnitOfWork が保存する）
+        // 2. Verify the password (database side; the UnitOfWork saves the access failure count and lockout)
         SignInOutcome outcome = await signInWithPassword.ExecuteAsync(
             new SignInWithPasswordCommand(Input.UserName.Trim(), Input.Password, rememberedAccountId), HttpContext.RequestAborted);
 
-        // 3. Commit 後に Cookie を発行する（Cookie 側）
+        // 3. Issue the cookie after the commit (cookie side)
         switch (outcome.Status)
         {
             case SignInStatus.Succeeded:
@@ -49,25 +49,25 @@ public sealed class LoginModel(
         }
     }
 
-    // パスキーでのログイン（1/2）: ブラウザに渡すオプションを作る。チャレンジは Cookie に保存される（DB は変更しない）
+    // Sign-in with a passkey (1/2): create the options to pass to the browser. The challenge is stored in a cookie (the database is not changed)
     public async Task<IActionResult> OnPostPasskeyOptionsAsync() =>
         Content(await SignInManager.MakePasskeyRequestOptionsAsync(null), "application/json");
 
-    // パスキーでのログイン（2/2）: 署名を検証し、署名回数を保存してから Cookie を発行する
+    // Sign-in with a passkey (2/2): verify the signature, save the signature count, then issue the cookie
     public async Task<IActionResult> OnPostPasskeyAsync(string? credentialJson, string? returnUrl)
     {
         ModelState.Clear();
         if (string.IsNullOrEmpty(credentialJson))
         {
-            ModelState.AddModelError(string.Empty, "パスキーでの認証が取り消されました。");
+            ModelState.AddModelError(string.Empty, "Passkey authentication was canceled.");
             return Page();
         }
 
-        // 署名とオリジンの検証（DB は変更しない）
+        // Verify the signature and origin (the database is not changed)
         PasskeyAssertionResult<UserAccount> assertion = await SignInManager.PerformPasskeyAssertionAsync(credentialJson);
         if (!assertion.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, $"パスキーでの認証に失敗しました。（{assertion.Failure.Message}）");
+            ModelState.AddModelError(string.Empty, $"Passkey authentication failed. ({assertion.Failure.Message})");
             return Page();
         }
 
@@ -80,22 +80,22 @@ public sealed class LoginModel(
             return Page();
         }
 
-        // パスキーはそれ自体が多要素（所持と生体認証・PIN）のため、二要素認証を求めない（Identity と同じ）
+        // A passkey is multi-factor by itself (possession plus biometrics or PIN), so two-factor authentication is not required (same as Identity)
         await SignInManager.CompleteSignInAsync(assertion.User, isPersistent: false);
         return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/MyPage");
     }
 
     public sealed class LoginInput
     {
-        [Required(ErrorMessage = "ユーザー名を入力してください。")]
-        [Display(Name = "ユーザー名")]
+        [Required(ErrorMessage = "Enter a user name.")]
+        [Display(Name = "User name")]
         public string UserName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "パスワードを入力してください。"), DataType(DataType.Password)]
-        [Display(Name = "パスワード")]
+        [Required(ErrorMessage = "Enter a password."), DataType(DataType.Password)]
+        [Display(Name = "Password")]
         public string Password { get; set; } = string.Empty;
 
-        [Display(Name = "ログイン状態を保持する")]
+        [Display(Name = "Keep me signed in")]
         public bool RememberMe { get; set; }
     }
 }

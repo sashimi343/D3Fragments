@@ -9,11 +9,11 @@ public enum SignInStatus
     LockedOut,
     NotAllowed,
     Failed,
-    // 外部ログインに紐づくアカウントがない
+    // No account is linked to the external login
     NotRegistered,
 }
 
-// サインインの結果。失敗も例外ではなく結果で返す（Command が例外で終わると、UnitOfWork がアクセス失敗回数の記録まで破棄するため）
+// The result of a sign-in. Failures are also returned as a result, not an exception (if a Command ends with an exception, the UnitOfWork also discards the recorded access failure count)
 public sealed record SignInOutcome(SignInStatus Status, UuidV7? AccountId = null)
 {
     public static SignInOutcome Failed { get; } = new(SignInStatus.Failed);

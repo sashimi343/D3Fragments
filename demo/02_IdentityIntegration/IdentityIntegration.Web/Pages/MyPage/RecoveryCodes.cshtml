@@ -1,21 +1,21 @@
 @page
 @{
-    ViewData["Title"] = "回復コード";
+    ViewData["Title"] = "Recovery codes";
     string[] codes = TempData["RecoveryCodes"] is string value ? value.Split(' ') : [];
 }
-<h1>回復コード</h1>
+<h1>Recovery codes</h1>
 @if (codes.Length == 0)
 {
-    <p>表示する回復コードはありません。<a asp-page="/MyPage/TwoFactor">二要素認証の設定</a>へ戻ってください。</p>
+    <p>There are no recovery codes to show. Go back to <a asp-page="/MyPage/TwoFactor">two-factor authentication settings</a>.</p>
 }
 else
 {
-    <p class="alert alert-warning">回復コードはこの画面でしか表示しません。安全な場所に控えてください。認証アプリもメールも使えないときに、1つずつ使ってログインできます。</p>
+    <p class="alert alert-warning">Recovery codes are shown only on this page. Keep them in a safe place. When you cannot use either the authenticator app or email, you can sign in with them, one code at a time.</p>
     <ul class="list-unstyled font-monospace fs-5">
         @foreach (string code in codes)
         {
             <li>@code</li>
         }
     </ul>
-    <a asp-page="/MyPage/TwoFactor" class="btn btn-primary">二要素認証の設定へ戻る</a>
+    <a asp-page="/MyPage/TwoFactor" class="btn btn-primary">Back to two-factor authentication settings</a>
 }

@@ -20,7 +20,7 @@ public class Book : AggregateRoot
         Status = status;
     }
 
-    // EF Core用（Complex Typeはコンストラクタ引数にバインドできない）
+    // For EF Core (Complex Types cannot be bound to constructor parameters)
     private Book()
     {
         Isbn = null!;
@@ -55,17 +55,17 @@ public class Book : AggregateRoot
     {
         if (Status == BookStatus.OnHold)
         {
-            // 取り置き対象の会員が借りた時点で、その予約は消化される（B7）
+            // The reservation is fulfilled when the member the book is held for borrows it (B7)
             Reservation hold = _reservations[0];
             if (hold.MemberId != member.Id)
             {
-                throw new DomainException(Error.InvalidState("予約されている資料のため貸出できません。"));
+                throw new DomainException(Error.InvalidState("This book cannot be borrowed because it is reserved."));
             }
             _reservations.Remove(hold);
         }
         else if (Status != BookStatus.Available)
         {
-            throw new DomainException(Error.InvalidState("この資料は貸出できません。"));
+            throw new DomainException(Error.InvalidState("This book cannot be borrowed."));
         }
 
         Status = BookStatus.OnLoan;
@@ -81,19 +81,19 @@ public class Book : AggregateRoot
     {
         if (!(Status == BookStatus.OnLoan || Status == BookStatus.OnHold))
         {
-            throw new DomainException(Error.InvalidState("在架の資料は予約できません（貸出可能です）"));
+            throw new DomainException(Error.InvalidState("A book on the shelf cannot be reserved (it can be borrowed)."));
         }
         if (member.IsLoanSuspended(reservedOn))
         {
-            throw new DomainException(Error.PreconditionFailed("貸出停止中のため予約できません。"));
+            throw new DomainException(Error.PreconditionFailed("You cannot reserve books while your loans are suspended."));
         }
         if (borrowerId == member.Id)
         {
-            throw new DomainException(Error.PreconditionFailed("借りている資料は予約できません。"));
+            throw new DomainException(Error.PreconditionFailed("You cannot reserve a book you are borrowing."));
         }
         if (_reservations.Any(r => r.MemberId == member.Id))
         {
-            throw new DomainException(Error.Conflict("既に予約済みです"));
+            throw new DomainException(Error.Conflict("You have already reserved this book."));
         }
 
         _reservations.Add(new Reservation(Id, member.Id, reservedOn));
@@ -104,10 +104,10 @@ public class Book : AggregateRoot
         Reservation? reservation = _reservations.FirstOrDefault(r => r.MemberId == member.Id);
         if (reservation is null)
         {
-            throw new DomainException(Error.InvalidState("予約が存在しません"));
+            throw new DomainException(Error.InvalidState("The reservation does not exist."));
         }
 
-        // 取り置き対象の会員が取り消した場合のみ、次の予約者へ繰り上げる（B8）
+        // Move the hold to the next reservation only when the member the book is held for cancels (B8)
         bool isHoldTarget = Status == BookStatus.OnHold && reservation == _reservations[0];
         _reservations.Remove(reservation);
         if (isHoldTarget)
@@ -129,24 +129,24 @@ public class Book : AggregateRoot
         HoldForNextReservation(today, now);
     }
 
-    // 取り置き対象の会員ID（取り置き中でなければnull）
+    // ID of the member the book is held for (null if not on hold)
     public UuidV7? HoldMemberId => Status == BookStatus.OnHold ? _reservations[0].MemberId : null;
 
     public DeletionToken<Book> IssueDeletionToken()
     {
         if (Status != BookStatus.Available)
         {
-            throw new DomainException(ErrorType.InvalidState, "在架でない資料は除籍できません。");
+            throw new DomainException(ErrorType.InvalidState, "Only books on the shelf can be withdrawn.");
         }
         if (Reservations.Any())
         {
-            throw new DomainException(ErrorType.InvalidState, "予約がある資料は除籍できません。");
+            throw new DomainException(ErrorType.InvalidState, "A reserved book cannot be withdrawn.");
         }
 
         return base.IssueDeletionToken(this);
     }
 
-    // 先頭の予約者向けに取り置きする。予約がなければ在架に戻す（B6, B8）
+    // Place the book on hold for the first reservation. If there are no reservations, return it to the shelf (B6, B8)
     private void HoldForNextReservation(DateOnly today, DateTimeOffset now)
     {
         Reservation? nextReservation = _reservations.FirstOrDefault();

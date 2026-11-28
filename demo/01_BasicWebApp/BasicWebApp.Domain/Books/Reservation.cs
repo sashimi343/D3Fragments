@@ -20,7 +20,7 @@ public class Reservation : Entity
     public UuidV7 MemberId { get; private set; }
     public DateOnly ReservedOn { get; private set; }
 
-    // 取り置き期限（取り置き中の予約のみ値を持つ）
+    // Hold expiration date (only a reservation on hold has a value)
     public DateOnly? HoldUntil { get; private set; }
 
     internal void StartHold(DateOnly today)

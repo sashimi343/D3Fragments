@@ -3,8 +3,8 @@ using D3Fragments.Application;
 
 namespace IdentityIntegration.Core.Accounts;
 
-// サインインの Command は DB 側の処理（アクセス失敗回数・ロックアウト・回復コードの消費・パスキーの署名回数）だけを行う。
-// Cookie の発行は、Commit 後にプレゼンテーション層が行う
+// Sign-in Commands only do the database side (access failure count, lockout, recovery code redemption, passkey signature count).
+// The presentation layer issues the cookie after the commit
 
 public sealed record SignInWithPasswordCommand(string UserName, string Password, string? RememberedAccountId) : ICommand<SignInOutcome>;
 
@@ -46,7 +46,7 @@ public sealed class SignInWithExternalLoginCommandHandler(IAccountAuthenticator 
         authenticator.SignInWithExternalLoginAsync(request.LoginProvider, request.ProviderKey, request.RememberedAccountId);
 }
 
-// ponytail: 送信回数の制限はしない。公開するアプリでは、ASP.NET Core のレート制限などでアプリが制限する
+// ponytail: the number of sends is not limited. Public apps should limit it themselves, e.g. with ASP.NET Core rate limiting
 public sealed record SendTwoFactorEmailCodeCommand(UuidV7 AccountId) : ICommand<Result>;
 
 public sealed class SendTwoFactorEmailCodeCommandHandler(IAccountAuthenticator authenticator, IAccountEmailSender sender)

@@ -12,10 +12,10 @@ namespace BasicWebApp.Web.Pages.Books;
 
 public sealed class IndexModel(IRequestExecutor<ListBooksQuery, Pager<Book>> listBooks, PageErrorHandler errors) : AppPageModel(errors)
 {
-    [BindProperty(SupportsGet = true), Range(IPager.StartPageNo, int.MaxValue, ErrorMessage = "ページ番号は1以上で指定してください。")]
+    [BindProperty(SupportsGet = true), Range(IPager.StartPageNo, int.MaxValue, ErrorMessage = "The page number must be 1 or greater.")]
     public int PageNo { get; set; } = IPager.StartPageNo;
 
-    [BindProperty(SupportsGet = true), EnumDataType(typeof(BookStatus), ErrorMessage = "資料の状態が不正です。")]
+    [BindProperty(SupportsGet = true), EnumDataType(typeof(BookStatus), ErrorMessage = "The book status is invalid.")]
     public BookStatus? Status { get; set; }
 
     public Pager<Book> Books { get; private set; } = Pager<Book>.Empty(ListBooksQuery.DefaultPageSize);

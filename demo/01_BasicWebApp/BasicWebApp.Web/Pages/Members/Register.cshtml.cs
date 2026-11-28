@@ -19,7 +19,7 @@ public sealed class RegisterModel(IRequestExecutor<RegisterMemberCommand, Member
         MemberType? memberType = null;
         if (Input.MemberTypeKey is int key && !MemberType.TryParse(key, out memberType))
         {
-            ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.MemberTypeKey)}", "会員種別を選択してください。");
+            ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.MemberTypeKey)}", "Select a member type.");
         }
         if (!ModelState.IsValid || memberType is null)
         {
@@ -33,20 +33,20 @@ public sealed class RegisterModel(IRequestExecutor<RegisterMemberCommand, Member
                 EmailAddress = Input.EmailAddress,
                 MemberType = memberType,
             }, HttpContext.RequestAborted);
-            TempData["Success"] = "会員登録が完了しました。メールアドレスでログインしてください。";
+            TempData["Success"] = "Registration is complete. Sign in with your email address.";
             return RedirectToPage("/Account/Login");
         });
     }
 
     public sealed class MemberInput
     {
-        [Required(ErrorMessage = "氏名を入力してください。"), StringLength(50, ErrorMessage = "氏名は50文字以内で入力してください。"), Display(Name = "氏名")]
+        [Required(ErrorMessage = "Enter a name."), StringLength(50, ErrorMessage = "The name must be 50 characters or fewer."), Display(Name = "Name")]
         public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "メールアドレスを入力してください。"), EmailAddress(ErrorMessage = "メールアドレスの形式が不正です。"), Display(Name = "メールアドレス")]
+        [Required(ErrorMessage = "Enter an email address."), EmailAddress(ErrorMessage = "The email address format is invalid."), Display(Name = "Email address")]
         public string EmailAddress { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "会員種別を選択してください。"), Display(Name = "会員種別")]
+        [Required(ErrorMessage = "Select a member type."), Display(Name = "Member type")]
         public int? MemberTypeKey { get; set; }
     }
 }

@@ -30,11 +30,11 @@ public sealed class LoginWithRecoveryCodeModel(
         }
         if (string.IsNullOrWhiteSpace(RecoveryCode))
         {
-            ModelState.AddModelError(nameof(RecoveryCode), "回復コードを入力してください。");
+            ModelState.AddModelError(nameof(RecoveryCode), "Enter a recovery code.");
             return Page();
         }
 
-        // DB 側: 回復コードを消費する（使ったコードは次から使えない）
+        // Database side: redeem the recovery code (a used code cannot be used again)
         SignInOutcome outcome = await signInWithRecoveryCode.ExecuteAsync(new SignInWithRecoveryCodeCommand(account.Id, RecoveryCode), HttpContext.RequestAborted);
         if (outcome.Status != SignInStatus.Succeeded)
         {
@@ -42,9 +42,9 @@ public sealed class LoginWithRecoveryCodeModel(
             return Page();
         }
 
-        // Cookie 側: 回復コードではログイン状態を保持せず、ブラウザも記憶しない（Identity と同じ）
+        // Cookie side: with a recovery code, neither keep the sign-in nor remember the browser (same as Identity)
         await SignInManager.CompleteTwoFactorSignInAsync(account, isPersistent: false, rememberClient: false);
-        TempData["Success"] = "回復コードでログインしました。残りの回復コードが少ない場合は、マイページで作り直してください。";
+        TempData["Success"] = "You have signed in with a recovery code. If you have few recovery codes left, regenerate them on My page.";
         return LocalRedirect(Url.IsLocalUrl(ReturnUrl) ? ReturnUrl : "/MyPage");
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,15 +15,15 @@
                 <div class="d-flex gap-2">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <a asp-page="/MyPage/Index" class="btn btn-link">マイページ</a>
+                        <a asp-page="/MyPage/Index" class="btn btn-link">My page</a>
                         <form method="post" asp-page="/Account/Logout">
-                            <button type="submit" class="btn btn-outline-secondary">ログアウト</button>
+                            <button type="submit" class="btn btn-outline-secondary">Sign out</button>
                         </form>
                     }
                     else
                     {
-                        <a asp-page="/Account/Register" class="btn btn-link">ユーザー登録</a>
-                        <a asp-page="/Account/Login" class="btn btn-outline-primary">ログイン</a>
+                        <a asp-page="/Account/Register" class="btn btn-link">Register</a>
+                        <a asp-page="/Account/Login" class="btn btn-outline-primary">Sign in</a>
                     }
                 </div>
             </div>

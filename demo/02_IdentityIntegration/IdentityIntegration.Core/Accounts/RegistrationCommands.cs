@@ -6,7 +6,7 @@ using IdentityIntegration.Core.Members;
 
 namespace IdentityIntegration.Core.Accounts;
 
-// Identity のユーザー（認証）と会員（業務上の利用者）を、同じ UnitOfWork で登録する。どちらかだけが保存されることはない
+// Registers the Identity user (authentication) and the member (the business user) in the same UnitOfWork. One is never saved without the other
 public sealed record RegisterAccountCommand(string UserName, string EmailAddress, string Password, string Nickname) : ICommand<Result<RegisteredAccount>>;
 
 public sealed class RegisterAccountCommandHandler(IAccountManager accounts, IMemberRepository members, TimeProvider timeProvider)
@@ -14,14 +14,14 @@ public sealed class RegisterAccountCommandHandler(IAccountManager accounts, IMem
 {
     public async Task<Result<RegisteredAccount>> HandleAsync(RegisterAccountCommand request, CancellationToken cancellationToken)
     {
-        // 失敗を Result で返しても UnitOfWork は保存するため、Identity のユーザーを作る前に会員の入力を検証する
+        // The UnitOfWork saves changes even when a failure is returned as a Result, so validate the member input before creating the Identity user
         Result<Nickname> nickname = Nickname.TryCreate(request.Nickname);
         if (nickname.IsFailure)
         {
             return Result<RegisteredAccount>.Failure(nickname.Errors);
         }
 
-        // Identity の検証（ユーザー名の重複・パスワードの規則など）で失敗した場合、ユーザーは追加されない
+        // If Identity validation (duplicate user name, password rules, etc.) fails, the user is not added
         Result<RegisteredAccount> account = await accounts.RegisterAsync(request.UserName, request.EmailAddress, request.Password);
         if (account.IsSuccess)
         {
@@ -31,7 +31,7 @@ public sealed class RegisterAccountCommandHandler(IAccountManager accounts, IMem
     }
 }
 
-// 確認メールは登録の Commit 後に送る（登録が保存されなかったのにメールだけ届くことがないように）
+// The confirmation email is sent after the registration is committed (so that an email never arrives for a registration that was not saved)
 public sealed record SendConfirmationEmailCommand(string EmailAddress, string ConfirmationLink) : ICommand<Result>;
 
 public sealed class SendConfirmationEmailCommandHandler(IAccountEmailSender sender) : IRequestHandler<SendConfirmationEmailCommand, Result>

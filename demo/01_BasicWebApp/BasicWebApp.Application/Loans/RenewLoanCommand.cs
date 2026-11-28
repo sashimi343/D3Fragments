@@ -37,7 +37,7 @@ public class RenewLoanCommandHandler : IRequestHandler<RenewLoanCommand, Loan>
         Loan loan = await _loanRepository.FindAsync(request.LoanId, cancellationToken) ?? throw new EntityNotFoundException(nameof(Loan));
         if (loan.MemberId != request.MemberId)
         {
-            throw new DomainException(Error.Forbidden("他の会員の貸出は延長できません。"));
+            throw new DomainException(Error.Forbidden("You cannot renew another member's loan."));
         }
         Member member = await _memberRepository.FindAsync(loan.MemberId, cancellationToken) ?? throw new EntityNotFoundException(nameof(Member));
         Book book = await _bookRepository.FindAsync(loan.BookId, cancellationToken) ?? throw new EntityNotFoundException(nameof(Book));

@@ -36,7 +36,7 @@ public sealed class RegisterModel(
             return Page();
         }
 
-        // 登録の Commit 後に確認メールを送る
+        // Send the confirmation email after the registration is committed
         string token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(result.Value!.EmailConfirmationToken));
         string link = Url.Page("/Account/ConfirmEmail", null, new { accountId = result.Value.AccountId.ToString(), token }, Request.Scheme)!;
         await sendConfirmation.ExecuteAsync(new SendConfirmationEmailCommand(Input.EmailAddress.Trim(), link), HttpContext.RequestAborted);
@@ -45,24 +45,24 @@ public sealed class RegisterModel(
 
     public sealed class RegisterInput
     {
-        [Required(ErrorMessage = "ユーザー名を入力してください。")]
-        [Display(Name = "ユーザー名")]
+        [Required(ErrorMessage = "Enter a user name.")]
+        [Display(Name = "User name")]
         public string UserName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "ニックネームを入力してください。")]
-        [Display(Name = "ニックネーム")]
+        [Required(ErrorMessage = "Enter a nickname.")]
+        [Display(Name = "Nickname")]
         public string Nickname { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "メールアドレスを入力してください。"), EmailAddress(ErrorMessage = "メールアドレスの形式が正しくありません。")]
-        [Display(Name = "メールアドレス")]
+        [Required(ErrorMessage = "Enter an email address."), EmailAddress(ErrorMessage = "The email address format is invalid.")]
+        [Display(Name = "Email address")]
         public string EmailAddress { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "パスワードを入力してください。"), DataType(DataType.Password)]
-        [Display(Name = "パスワード")]
+        [Required(ErrorMessage = "Enter a password."), DataType(DataType.Password)]
+        [Display(Name = "Password")]
         public string Password { get; set; } = string.Empty;
 
-        [DataType(DataType.Password), Compare(nameof(Password), ErrorMessage = "パスワードが一致しません。")]
-        [Display(Name = "パスワード（確認）")]
+        [DataType(DataType.Password), Compare(nameof(Password), ErrorMessage = "The passwords do not match.")]
+        [Display(Name = "Password (confirm)")]
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 }

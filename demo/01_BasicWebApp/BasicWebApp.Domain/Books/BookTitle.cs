@@ -12,19 +12,19 @@ public class BookTitle : ValueObjectBase<BookTitle, string>, IValueObject<BookTi
     {
     }
 
-    // 検証はValueObjectBaseのコンストラクタで行われる
+    // Validation is performed by the ValueObjectBase constructor
     public static BookTitle Create(string value) => new(value.Trim());
 
     public static bool ValidateValue(string value, [NotNullWhen(false)] out string? errorMessage)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            errorMessage = "書名を指定してください。";
+            errorMessage = "Specify a title.";
             return false;
         }
         if (value.Trim().Length > 200)
         {
-            errorMessage = "書名は1文字以上、200文字以内で指定してください。";
+            errorMessage = "The title must be between 1 and 200 characters.";
             return false;
         }
         errorMessage = null;

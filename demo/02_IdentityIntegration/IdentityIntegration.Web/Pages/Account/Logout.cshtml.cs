@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityIntegration.Web.Pages.Account;
 
-// ログアウトは Cookie を消すだけで DB を変更しないため、Command を使わない
+// Signing out only deletes cookies and does not change the database, so no Command is used
 public sealed class LogoutModel(SignInManager<UserAccount> signIn) : AppPageModel(signIn)
 {
     public IActionResult OnGet() => RedirectToPage("/Index");
@@ -14,7 +14,7 @@ public sealed class LogoutModel(SignInManager<UserAccount> signIn) : AppPageMode
     public async Task<IActionResult> OnPostAsync()
     {
         await SignInManager.SignOutAsync();
-        TempData["Success"] = "ログアウトしました。";
+        TempData["Success"] = "You have signed out.";
         return RedirectToPage("/Index");
     }
 }

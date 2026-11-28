@@ -15,7 +15,7 @@ public class Member : AggregateRoot
         LoanSuspendedUntil = loanSuspendedUntil;
     }
 
-    // EF Core用（Complex Typeはコンストラクタ引数にバインドできない）
+    // For EF Core (Complex Types cannot be bound to constructor parameters)
     private Member()
     {
         Name = null!;
@@ -53,7 +53,7 @@ public class Member : AggregateRoot
 
     public void SuspendLoan(DateOnly returnedOn, int suspensionDays)
     {
-        // 返却日の翌日からsuspensionDays日間（停止期限は当日を含む）
+        // For suspensionDays days starting the day after the return date (the suspension end date is inclusive)
         DateOnly newSuspendedFrom = returnedOn.AddDays(1);
         DateOnly newSuspendedUntil = returnedOn.AddDays(suspensionDays);
         if (!LoanSuspendedUntil.HasValue || LoanSuspendedUntil.Value < returnedOn)

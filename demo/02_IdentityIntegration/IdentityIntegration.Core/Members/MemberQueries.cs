@@ -7,7 +7,7 @@ namespace IdentityIntegration.Core.Members;
 
 public sealed record MemberProfile(string Nickname, DateOnly JoinedOn);
 
-// ログイン中のアカウント（Identity のユーザー）に紐づく会員を取得する
+// Gets the member linked to the signed-in account (Identity user)
 public sealed record GetMemberProfileQuery(UuidV7 AccountId) : IQuery<MemberProfile?>;
 
 public sealed class GetMemberProfileQueryHandler(IMemberRepository members) : IRequestHandler<GetMemberProfileQuery, MemberProfile?>
@@ -18,13 +18,13 @@ public sealed class GetMemberProfileQueryHandler(IMemberRepository members) : IR
             : null;
 }
 
-// 会員登録の Commit 後に1回だけ呼ばれる。保存を UnitOfWork に任せるストア（AddD3FragmentsStores）を使うため、
-// UserManager の操作ごとに SaveChanges が呼ばれてドメインイベントが途中で発行されることはない（デモではログ出力だけ）
+// Called only once after the member registration is committed. Because the stores that leave saving to the UnitOfWork (AddD3FragmentsStores) are used,
+// SaveChanges is not called for each UserManager operation, so domain events are never dispatched midway (the demo only writes a log)
 public sealed class LogMemberRegisteredHandler(ILogger<LogMemberRegisteredHandler> logger) : IAfterCommitDomainEventHandler<MemberRegisteredDomainEvent>
 {
     public Task HandleAsync(MemberRegisteredDomainEvent domainEvent, CancellationToken cancellationToken)
     {
-        logger.LogInformation("会員を登録しました。MemberId = '{MemberId}', AccountId = '{AccountId}'", domainEvent.MemberId, domainEvent.AccountId);
+        logger.LogInformation("The member has been registered. MemberId = '{MemberId}', AccountId = '{AccountId}'", domainEvent.MemberId, domainEvent.AccountId);
         return Task.CompletedTask;
     }
 }

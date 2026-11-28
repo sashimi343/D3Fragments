@@ -28,10 +28,10 @@ public class RegisterMemberCommandHandler : IRequestHandler<RegisterMemberComman
     {
         Member member = Member.Create(request.MemberName, request.EmailAddress, request.MemberType);
 
-        // ponytail: 同時登録はすり抜ける。EF Core 10はComplex Typeのプロパティにインデックスを張れないため、必要になったらマイグレーションで一意制約を追加する
+        // ponytail: concurrent registrations slip through. EF Core 10 cannot index Complex Type properties, so add a unique constraint in a migration when needed
         if (await _memberRepository.ExistsByEmailAddressAsync(member.EmailAddress.Value, cancellationToken))
         {
-            throw new DomainException(Error.Conflict("指定されたメールアドレスは既に登録されています。"));
+            throw new DomainException(Error.Conflict("The specified email address is already registered."));
         }
 
         _memberRepository.Add(member);

@@ -31,7 +31,7 @@ public sealed class EnableAuthenticatorModel(
     {
         if (string.IsNullOrWhiteSpace(Code))
         {
-            ModelState.AddModelError(nameof(Code), "確認コードを入力してください。");
+            ModelState.AddModelError(nameof(Code), "Enter the verification code.");
             await LoadAsync();
             return Page();
         }
@@ -45,9 +45,9 @@ public sealed class EnableAuthenticatorModel(
             return Page();
         }
 
-        // 二要素認証の有効化で security stamp が変わるため、自分の Cookie を作り直す
+        // Enabling two-factor authentication changes the security stamp, so refresh our own cookie
         await SignInManager.RefreshSignInAsync(account);
-        TempData["Success"] = "認証アプリを設定し、二要素認証を有効にしました。";
+        TempData["Success"] = "The authenticator app has been set up and two-factor authentication is enabled.";
         if (result.Value!.Count == 0)
         {
             return RedirectToPage("/MyPage/TwoFactor");
@@ -59,7 +59,7 @@ public sealed class EnableAuthenticatorModel(
     private async Task LoadAsync()
     {
         UserAccount account = await GetCurrentAccountAsync();
-        // キーがまだなければ作る（DB への書き込みのため Command で行う。security stamp も変わる）
+        // Create the key if it does not exist yet (done with a Command because it writes to the database; the security stamp also changes)
         string key = await prepareKey.ExecuteAsync(new PrepareAuthenticatorKeyCommand(account.Id), HttpContext.RequestAborted);
         await SignInManager.RefreshSignInAsync(account);
 
@@ -68,7 +68,7 @@ public sealed class EnableAuthenticatorModel(
         AuthenticatorUri = $"otpauth://totp/{label}?secret={key}&issuer={Uri.EscapeDataString(Issuer)}&digits=6";
     }
 
-    // 手入力しやすいよう4文字ずつ区切る
+    // Split into groups of 4 characters for easier manual entry
     private static string FormatKey(string key)
     {
         var builder = new StringBuilder();

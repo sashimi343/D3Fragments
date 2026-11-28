@@ -1,27 +1,27 @@
 @page
 @model IdentityIntegration.Web.Pages.Account.ExternalLoginModel
 @{
-    ViewData["Title"] = "外部ログイン";
+    ViewData["Title"] = "External login";
 }
-<h1>外部ログイン</h1>
+<h1>External login</h1>
 <div asp-validation-summary="All" class="text-danger" role="alert"></div>
 @if (Model.EmailAddress is not null)
 {
-    <p>@Model.ProviderDisplayName で認証しました。このサイトで使うユーザー名とニックネームを決めて、アカウントを作成してください。</p>
+    <p>You have been authenticated with @Model.ProviderDisplayName. Choose a user name and nickname for this site to create your account.</p>
     <form method="post" asp-page-handler="Confirmation" class="col-md-6">
         <div class="mb-3">
-            <label class="form-label" for="email">メールアドレス（@Model.ProviderDisplayName から取得）</label>
+            <label class="form-label" for="email">Email address (from @Model.ProviderDisplayName)</label>
             <input id="email" class="form-control" value="@Model.EmailAddress" readonly />
         </div>
         <div class="mb-3">
-            <label asp-for="UserName" class="form-label">ユーザー名</label>
+            <label asp-for="UserName" class="form-label">User name</label>
             <input asp-for="UserName" class="form-control" />
         </div>
         <div class="mb-3">
-            <label asp-for="Nickname" class="form-label">ニックネーム</label>
+            <label asp-for="Nickname" class="form-label">Nickname</label>
             <input asp-for="Nickname" class="form-control" />
         </div>
-        <button class="btn btn-primary" type="submit">アカウントを作成してログイン</button>
+        <button class="btn btn-primary" type="submit">Create account and sign in</button>
     </form>
 }
-<p class="mt-3"><a asp-page="/Account/Login">ログイン画面へ戻る</a></p>
+<p class="mt-3"><a asp-page="/Account/Login">Back to sign-in</a></p>

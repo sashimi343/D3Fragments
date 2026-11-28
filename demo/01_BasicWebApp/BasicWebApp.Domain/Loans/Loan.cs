@@ -37,19 +37,19 @@ public class Loan : AggregateRoot
     {
         if (IsReturned())
         {
-            throw new DomainException(Error.InvalidState("既に返却済みのため延長できません。"));
+            throw new DomainException(Error.InvalidState("This loan cannot be renewed because it has already been returned."));
         }
         if (RenewalCount >= 1)
         {
-            throw new DomainException(Error.PreconditionFailed("延長は1回までしかできません。"));
+            throw new DomainException(Error.PreconditionFailed("A loan can be renewed only once."));
         }
         if (DueDate < today)
         {
-            throw new DomainException(Error.PreconditionFailed("返却期限を過ぎているため延長できません。"));
+            throw new DomainException(Error.PreconditionFailed("This loan cannot be renewed because it is past the due date."));
         }
         if (hasReservations)
         {
-            throw new DomainException(Error.PreconditionFailed("他の会員に予約されているため延長できません。"));
+            throw new DomainException(Error.PreconditionFailed("This loan cannot be renewed because the book is reserved by another member."));
         }
 
         DateOnly newDueDate = today.AddDays(loanPeriodDays);
@@ -61,7 +61,7 @@ public class Loan : AggregateRoot
     {
         if (IsReturned())
         {
-            throw new DomainException(Error.InvalidState("既に返却済みのため返却できません。"));
+            throw new DomainException(Error.InvalidState("This loan cannot be returned because it has already been returned."));
         }
 
         ReturnedOn = DateOnly.FromDateTime(now.DateTime);
@@ -70,7 +70,7 @@ public class Loan : AggregateRoot
 
     public int GetOverdueDays(DateOnly today)
     {
-        // 返却済みなら返却日で確定する（L4）
+        // If returned, the count is fixed by the return date (L4)
         int days = (ReturnedOn ?? today).DayNumber - DueDate.DayNumber;
         return Math.Max(0, days);
     }

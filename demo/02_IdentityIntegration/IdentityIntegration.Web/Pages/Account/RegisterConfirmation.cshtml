@@ -1,12 +1,12 @@
 @page
 @inject IConfiguration Configuration
 @{
-    ViewData["Title"] = "確認メールを送信しました";
+    ViewData["Title"] = "Confirmation email sent";
     string? mailpitUrl = Configuration["MAILPIT_UI_URL"];
 }
-<h1>確認メールを送信しました</h1>
-<p>メールのリンクを開いてメールアドレスを確認すると、ログインできるようになります。</p>
+<h1>Confirmation email sent</h1>
+<p>Open the link in the email to confirm your email address, and then you can sign in.</p>
 @if (mailpitUrl is not null)
 {
-    <p>メールは <a href="@mailpitUrl" target="_blank" rel="noopener">Mailpit</a> で確認できます。</p>
+    <p>You can check the email in <a href="@mailpitUrl" target="_blank" rel="noopener">Mailpit</a>.</p>
 }

@@ -21,11 +21,11 @@ builder.Services.AddControllers();
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.MvcOptions>(options =>
 {
     var messages = options.ModelBindingMessageProvider;
-    messages.SetAttemptedValueIsInvalidAccessor((_, field) => $"{field}の入力値が不正です。");
-    messages.SetValueIsInvalidAccessor(_ => "入力値が不正です。");
-    messages.SetValueMustNotBeNullAccessor(_ => "値を入力してください。");
-    messages.SetValueMustBeANumberAccessor(field => $"{field}には数値を入力してください。");
-    messages.SetNonPropertyAttemptedValueIsInvalidAccessor(_ => "入力値が不正です。");
+    messages.SetAttemptedValueIsInvalidAccessor((_, field) => $"The value entered for {field} is invalid.");
+    messages.SetValueIsInvalidAccessor(_ => "The value entered is invalid.");
+    messages.SetValueMustNotBeNullAccessor(_ => "Enter a value.");
+    messages.SetValueMustBeANumberAccessor(field => $"Enter a number for {field}.");
+    messages.SetNonPropertyAttemptedValueIsInvalidAccessor(_ => "The value entered is invalid.");
 });
 builder.Services.AddScoped<PageErrorHandler>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
@@ -34,7 +34,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.TimeProvider = TimeProvider.System;
     options.Events.OnValidatePrincipal = async context =>
     {
-        // 再起動でDBが消えた後の古いCookieを拒否する
+        // Reject old cookies after the database is lost on restart
         string? email = context.Principal?.FindFirstValue(ClaimTypes.Email);
         string? id = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
         if (email is not null && id is not null)
@@ -51,7 +51,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     };
 });
 
-// Development以外ではAddD3FragmentsApplicationがTimeProvider.Systemを登録する（TryAddのため、ここでの登録が優先される）
+// Outside Development, AddD3FragmentsApplication registers TimeProvider.System (it uses TryAdd, so the registration here takes precedence)
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddSingleton<DemoTimeProvider>();
@@ -61,7 +61,7 @@ if (builder.Environment.IsDevelopment())
 string connectionString = $"Data Source=BasicWebApp-{Guid.NewGuid():N};Mode=Memory;Cache=Shared";
 builder.Services.AddSingleton(_ => new SqliteConnection(connectionString));
 
-// D3Fragments関連クラスの登録
+// Register D3Fragments-related classes
 builder.Services.AddD3FragmentsApplication([typeof(BasicWebApp.Application.Books.GetBookQuery).Assembly]);
 builder.Services.AddD3FragmentsEFCore<BasicWebAppDbContext>(
     [typeof(MemberType).Assembly, typeof(BookRepository).Assembly],
@@ -76,7 +76,7 @@ await using (var scope = app.Services.CreateAsyncScope())
     await scope.ServiceProvider.GetRequiredService<BasicWebAppDbContext>().Database.EnsureCreatedAsync();
 }
 
-app.UseRequestLocalization("ja-JP");
+app.UseRequestLocalization("en-US");
 app.UseExceptionHandler("/Error");
 
 app.UseRouting();

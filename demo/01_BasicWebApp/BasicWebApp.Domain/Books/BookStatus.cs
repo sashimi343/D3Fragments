@@ -6,12 +6,12 @@ namespace BasicWebApp.Domain.Books;
 
 public enum BookStatus
 {
-    [Display(Name = "在架")]
+    [Display(Name = "On shelf")]
     Available,
 
-    [Display(Name = "貸出中")]
+    [Display(Name = "On loan")]
     OnLoan,
 
-    [Display(Name = "取り置き中")]
+    [Display(Name = "On hold")]
     OnHold
 }

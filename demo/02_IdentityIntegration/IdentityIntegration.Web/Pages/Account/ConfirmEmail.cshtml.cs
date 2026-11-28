@@ -16,7 +16,7 @@ public sealed class ConfirmEmailModel(SignInManager<UserAccount> signIn, IReques
 {
     public bool Confirmed { get; private set; }
 
-    // メールのリンクから開くため GET で確認する（Identity のテンプレートと同じ）
+    // Confirmed with GET because it is opened from the link in the email (same as the Identity template)
     public async Task<IActionResult> OnGetAsync(string? accountId, string? token)
     {
         if (!UuidV7.TryParse(accountId, null, out UuidV7 id) || token is null)
@@ -31,7 +31,7 @@ public sealed class ConfirmEmailModel(SignInManager<UserAccount> signIn, IReques
         }
         catch (FormatException)
         {
-            ModelState.AddModelError(string.Empty, "確認用のリンクが正しくありません。");
+            ModelState.AddModelError(string.Empty, "The confirmation link is invalid.");
             return Page();
         }
 

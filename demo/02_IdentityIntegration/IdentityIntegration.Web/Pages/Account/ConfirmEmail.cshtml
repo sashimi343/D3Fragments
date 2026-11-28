@@ -1,12 +1,12 @@
 @page
 @model IdentityIntegration.Web.Pages.Account.ConfirmEmailModel
 @{
-    ViewData["Title"] = "メールアドレスの確認";
+    ViewData["Title"] = "Email confirmation";
 }
-<h1>メールアドレスの確認</h1>
+<h1>Email confirmation</h1>
 @if (Model.Confirmed)
 {
-    <p>メールアドレスを確認しました。<a asp-page="/Account/Login">ログイン</a>してください。</p>
+    <p>Your email address has been confirmed. Please <a asp-page="/Account/Login">sign in</a>.</p>
 }
 else
 {

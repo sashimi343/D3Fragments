@@ -1,10 +1,10 @@
 @page
 @model BasicWebApp.Web.Pages.Account.LoginModel
 @{
-    ViewData["Title"] = "会員ログイン";
+    ViewData["Title"] = "Member sign-in";
 }
-<h1>会員ログイン</h1>
-<p class="alert alert-warning">デモ専用の暫定ログインです。登録済みのメールアドレスだけでログインできます。実在する個人情報は使用しないでください。</p>
+<h1>Member sign-in</h1>
+<p class="alert alert-warning">This is a temporary sign-in for the demo only. You can sign in with just a registered email address. Do not use real personal information.</p>
 <form method="post">
     <div asp-validation-summary="All" class="text-danger" role="alert"></div>
     <div class="mb-3">
@@ -12,8 +12,8 @@
         <input asp-for="Input.EmailAddress" class="form-control" autocomplete="email" />
         <span asp-validation-for="Input.EmailAddress" class="text-danger"></span>
     </div>
-    <button class="btn btn-primary" type="submit">ログイン</button>
-    <a asp-page="/Members/Register" class="btn btn-link">会員登録</a>
+    <button class="btn btn-primary" type="submit">Sign in</button>
+    <a asp-page="/Members/Register" class="btn btn-link">Register as a member</a>
 </form>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

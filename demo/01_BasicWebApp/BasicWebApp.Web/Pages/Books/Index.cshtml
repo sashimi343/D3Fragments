@@ -3,26 +3,26 @@
 @using BasicWebApp.Domain.Books
 @model BasicWebApp.Web.Pages.Books.IndexModel
 @{
-    ViewData["Title"] = "資料一覧";
+    ViewData["Title"] = "Books";
 }
-<h1>資料一覧</h1>
+<h1>Books</h1>
 <div asp-validation-summary="All" class="text-danger" role="alert"></div>
 <form method="get" class="d-flex gap-2 mb-3">
-    <label asp-for="Status" class="form-label">状態</label>
+    <label asp-for="Status" class="form-label">Status</label>
     <select asp-for="Status" asp-items="Html.GetEnumSelectList<BookStatus>()" class="form-select w-auto">
-        <option value="">すべて</option>
+        <option value="">All</option>
     </select>
-    <button class="btn btn-primary" type="submit">絞り込み</button>
+    <button class="btn btn-primary" type="submit">Filter</button>
 </form>
 @if (Model.Books.Items.Count == 0)
 {
-    <p>資料はありません。</p>
+    <p>There are no books.</p>
 }
 else
 {
     <div class="table-responsive">
         <table class="table">
-            <thead><tr><th>書名</th><th>著者</th><th>ISBN</th><th>状態</th></tr></thead>
+            <thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th>Status</th></tr></thead>
             <tbody>
                 @foreach (var book in Model.Books.Items)
                 {
@@ -35,14 +35,14 @@ else
         </table>
     </div>
 }
-<nav aria-label="資料一覧のページ">
-    <span>@Model.Books.PageNo / @Model.Books.TotalPages ページ（全 @Model.Books.TotalCount 冊）</span>
+<nav aria-label="Pages of the book list">
+    <span>Page @Model.Books.PageNo / @Model.Books.TotalPages (@Model.Books.TotalCount books in total)</span>
     @if (Model.Books.HasPrevPage)
     {
-        <a asp-route-PageNo="@Model.Books.PrevPage" asp-route-Status="@Model.Status" class="btn btn-outline-secondary">前へ</a>
+        <a asp-route-PageNo="@Model.Books.PrevPage" asp-route-Status="@Model.Status" class="btn btn-outline-secondary">Previous</a>
     }
     @if (Model.Books.HasNextPage)
     {
-        <a asp-route-PageNo="@Model.Books.NextPage" asp-route-Status="@Model.Status" class="btn btn-outline-secondary">次へ</a>
+        <a asp-route-PageNo="@Model.Books.NextPage" asp-route-Status="@Model.Status" class="btn btn-outline-secondary">Next</a>
     }
 </nav>
