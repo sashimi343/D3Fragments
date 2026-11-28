@@ -86,10 +86,13 @@
     <value>リポジトリインターフェース {0} の実装が複数見つかりました: {1}, {2}</value>
   </data>
   <data name="InvalidOperationException_ValueObjectMappedAsEntity" xml:space="preserve">
-    <value>値オブジェクト {0} がエンティティ型としてマッピングされています。OnModelCreatingでプロパティ（{1}）をComplexValueObjectまたはHasValueObjectConversionでマッピングしてください。</value>
+    <value>値オブジェクト {0} がエンティティ型としてマッピングされています。OnModelCreatingでプロパティ（{1}）をComplexValueObjectまたはHasValueObjectConversionで、コレクションの場合はComplexValueObjectCollectionまたはHasValueObjectCollectionConversionでマッピングしてください。</value>
   </data>
   <data name="InvalidOperationException_NotValueObject" xml:space="preserve">
-    <value>型 {0} は自身をTSelfとしてIValueObject&lt;TSelf, TPrimitive&gt;を実装していません。HasValueObjectConversionは値オブジェクトのプロパティにだけ使用できます。</value>
+    <value>型 {0} は自身をTSelfとしてIValueObject&lt;TSelf, TPrimitive&gt;を実装していません。{1}は値オブジェクトにだけ使用できます。</value>
+  </data>
+  <data name="InvalidOperationException_CollectionPropertyNotWritable" xml:space="preserve">
+    <value>コレクションのプロパティ {0} にはsetterがなく、EF Coreがバッキングフィールドを見つけられませんでした。EF Coreの規約で見つけられる名前（例: プロパティAliasesに対して_aliases）をバッキングフィールドに付けるか、setterを追加してください。</value>
   </data>
   <data name="InvalidOperationException_ConventionsNotApplied" xml:space="preserve">
     <value>{0} にD3Fragmentsの規約が適用されていません。ConfigureConventionsでApplyD3FragmentsConventionsを呼び出すか、D3DbContextを継承してください。</value>

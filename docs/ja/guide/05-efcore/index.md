@@ -5,7 +5,7 @@
 
 | ページ | 主な型 |
 |---|---|
-| [DbContext とマッピング](01-dbcontext.md) | `D3DbContext`、`ApplyD3FragmentsConventions`、`ComplexValueObject`、`HasValueObjectConversion`、`AddD3FragmentsEFCore` |
+| [DbContext とマッピング](01-dbcontext.md) | `D3DbContext`、`ApplyD3FragmentsConventions`、`ComplexValueObject`、`HasValueObjectConversion`、`ComplexValueObjectCollection`、`HasValueObjectCollectionConversion`、`AddD3FragmentsEFCore` |
 | [リポジトリとページング](02-repositories.md) | `RepositoryBase<TContext, TAggregate>`、`ToPagedListAsync`、`Pager<T>` |
 
 ## サービスの登録

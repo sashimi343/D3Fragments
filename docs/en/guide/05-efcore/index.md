@@ -5,7 +5,7 @@ Use it in the infrastructure layer.
 
 | Page | Main types |
 |---|---|
-| [DbContext and mapping](01-dbcontext.md) | `D3DbContext`, `ApplyD3FragmentsConventions`, `ComplexValueObject`, `HasValueObjectConversion`, `AddD3FragmentsEFCore` |
+| [DbContext and mapping](01-dbcontext.md) | `D3DbContext`, `ApplyD3FragmentsConventions`, `ComplexValueObject`, `HasValueObjectConversion`, `ComplexValueObjectCollection`, `HasValueObjectCollectionConversion`, `AddD3FragmentsEFCore` |
 | [Repositories and paging](02-repositories.md) | `RepositoryBase<TContext, TAggregate>`, `ToPagedListAsync`, `Pager<T>` |
 
 ## Service registration

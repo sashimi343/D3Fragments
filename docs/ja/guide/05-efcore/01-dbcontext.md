@@ -140,6 +140,43 @@ var member = await DbContext.Members
 
 一意制約に違反した場合、保存時に `DbUpdateException` がスローされます。
 
+### 値オブジェクトのコレクションをマッピングする
+
+`List<Email>` のような値オブジェクトのコレクションは、単一の値オブジェクトと同じく2つの方法でマッピングできます。
+どちらもコレクション全体をプロパティ名の JSON 列1つに保存します。
+通常は `ComplexValueObjectCollection` を使い、列をラップしている値だけの配列にしたい場合（既存のスキーマに合わせる場合など）は `HasValueObjectCollectionConversion` を使います。
+
+| | `ComplexValueObjectCollection`（通常） | `HasValueObjectCollectionConversion` |
+|---|---|---|
+| マッピング | Complex Collection | 要素の値コンバーター |
+| 保存される JSON | `[{"Value":"a@example.com"}]` | `["a@example.com"]` |
+| 値オブジェクトどうしの比較（`x.Aliases.Contains(email)`） | できる | できる |
+| クエリでラップしている値を使う（`x.Aliases.Any(a => a.Value.EndsWith(...))`） | できる | できない |
+
+```csharp
+public sealed class Mailbox : AggregateRoot
+{
+    private readonly List<Email> _aliases = [];
+
+    public IReadOnlyList<Email> Aliases => _aliases;
+}
+
+modelBuilder.Entity<Mailbox>(builder =>
+{
+    builder.ComplexValueObjectCollection(x => x.Aliases);
+    // または
+    // builder.PrimitiveCollection(x => x.Aliases).HasValueObjectCollectionConversion();
+});
+```
+
+コレクションは `IReadOnlyList<T>` などの読み取り専用の型で公開できます。
+その場合、EF Core はプロパティではなくバッキングフィールドを通して読み書きします。
+
+- バッキングフィールドは EF Core の命名規約で探されます（プロパティ `Aliases` なら `_aliases`、`_Aliases`、`m_aliases` など）。規約に合わない名前で setter もない場合は、構成時に `InvalidOperationException` がスローされます
+- `ComplexValueObjectCollection` では、バッキングフィールドを `List<T>` にしてください
+
+どちらの方法でも、DB から読み込むときは要素ごとに値オブジェクトの検証が行われ、`ValidateValue` を満たさない値は例外になります。
+
 ### マッピングを忘れた場合
 
 値オブジェクトのマッピングを忘れると、EF Core は値オブジェクトをエンティティとして扱おうとします。

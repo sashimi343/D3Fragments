@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 namespace D3Fragments.EFCore;
 
 /// <summary>
-///     <para xml:lang="en">A convention that fails model building with a clear message when a value object is mapped as an entity type, which happens when the property is mapped with neither <see cref="ValueObjectComplexTypeExtensions.ComplexValueObject{TEntity, TValueObject}"/> nor <see cref="ValueObjectConversionExtensions.HasValueObjectConversion{TValueObject}"/>.</para>
-///     <para xml:lang="ja">値オブジェクトがエンティティ型としてマッピングされている場合（<see cref="ValueObjectComplexTypeExtensions.ComplexValueObject{TEntity, TValueObject}"/>・<see cref="ValueObjectConversionExtensions.HasValueObjectConversion{TValueObject}"/>でのマッピング漏れ）に、原因の分かるメッセージでモデル構築を失敗させる規約。</para>
+///     <para xml:lang="en">A convention that fails model building with a clear message when a value object is mapped as an entity type, which happens when the property is mapped with none of <see cref="ValueObjectComplexTypeExtensions.ComplexValueObject{TEntity, TValueObject}"/>, <see cref="ValueObjectConversionExtensions.HasValueObjectConversion{TValueObject}"/>, <see cref="ValueObjectComplexTypeExtensions.ComplexValueObjectCollection{TEntity, TValueObject}"/>, and <see cref="ValueObjectConversionExtensions.HasValueObjectCollectionConversion{TProperty}"/>.</para>
+///     <para xml:lang="ja">値オブジェクトがエンティティ型としてマッピングされている場合（<see cref="ValueObjectComplexTypeExtensions.ComplexValueObject{TEntity, TValueObject}"/>・<see cref="ValueObjectConversionExtensions.HasValueObjectConversion{TValueObject}"/>・<see cref="ValueObjectComplexTypeExtensions.ComplexValueObjectCollection{TEntity, TValueObject}"/>・<see cref="ValueObjectConversionExtensions.HasValueObjectCollectionConversion{TProperty}"/>でのマッピング漏れ）に、原因の分かるメッセージでモデル構築を失敗させる規約。</para>
 /// </summary>
 internal sealed class UnmappedValueObjectConvention : IModelFinalizingConvention
 {

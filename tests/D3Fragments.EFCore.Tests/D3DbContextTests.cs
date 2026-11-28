@@ -143,6 +143,11 @@ public class D3DbContextTests
     }
 
     [Fact]
+    public void ComplexValueObjectのbuilderがnullの場合はArgumentNullExceptionを送出する() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            ValueObjectComplexTypeExtensions.ComplexValueObject<Member, Email>(null!, x => x.Email));
+
+    [Fact]
     public async Task UuidV7_TypeSafeEnum_ValueObjectを保存して復元できる()
     {
         using var database = new SqliteTestDatabase();
