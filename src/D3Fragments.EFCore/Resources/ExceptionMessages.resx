@@ -86,7 +86,10 @@
     <value>Multiple implementations were found for the repository interface {0}: {1}, {2}.</value>
   </data>
   <data name="InvalidOperationException_ValueObjectMappedAsEntity" xml:space="preserve">
-    <value>The value object {0} is mapped as an entity type. Register the property ({1}) with ComplexValueObject in OnModelCreating.</value>
+    <value>The value object {0} is mapped as an entity type. Map the property ({1}) with ComplexValueObject or HasValueObjectConversion in OnModelCreating.</value>
+  </data>
+  <data name="InvalidOperationException_NotValueObject" xml:space="preserve">
+    <value>The type {0} does not implement IValueObject&lt;TSelf, TPrimitive&gt; with itself as TSelf. HasValueObjectConversion can be used only for value object properties.</value>
   </data>
   <data name="InvalidOperationException_ConventionsNotApplied" xml:space="preserve">
     <value>The D3Fragments conventions are not applied to {0}. Call ApplyD3FragmentsConventions in ConfigureConventions, or derive the context from D3DbContext.</value>

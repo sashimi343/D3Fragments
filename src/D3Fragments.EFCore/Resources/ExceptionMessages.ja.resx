@@ -86,7 +86,10 @@
     <value>リポジトリインターフェース {0} の実装が複数見つかりました: {1}, {2}</value>
   </data>
   <data name="InvalidOperationException_ValueObjectMappedAsEntity" xml:space="preserve">
-    <value>値オブジェクト {0} がエンティティ型としてマッピングされています。OnModelCreatingでプロパティ（{1}）をComplexValueObjectで登録してください。</value>
+    <value>値オブジェクト {0} がエンティティ型としてマッピングされています。OnModelCreatingでプロパティ（{1}）をComplexValueObjectまたはHasValueObjectConversionでマッピングしてください。</value>
+  </data>
+  <data name="InvalidOperationException_NotValueObject" xml:space="preserve">
+    <value>型 {0} は自身をTSelfとしてIValueObject&lt;TSelf, TPrimitive&gt;を実装していません。HasValueObjectConversionは値オブジェクトのプロパティにだけ使用できます。</value>
   </data>
   <data name="InvalidOperationException_ConventionsNotApplied" xml:space="preserve">
     <value>{0} にD3Fragmentsの規約が適用されていません。ConfigureConventionsでApplyD3FragmentsConventionsを呼び出すか、D3DbContextを継承してください。</value>
