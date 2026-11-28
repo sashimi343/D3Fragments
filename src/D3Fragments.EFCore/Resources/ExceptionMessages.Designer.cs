@@ -147,7 +147,7 @@ namespace D3Fragments.EFCore.Resources {
         }
 
         /// <summary>
-        ///   The value object {0} is mapped as an entity type. Map the property ({1}) with ComplexValueObject or HasValueObjectConversion in OnModelCreating. に類似しているローカライズされた文字列を検索します。
+        ///   The value object {0} is mapped as an entity type. In OnModelCreating, map the property ({1}) with ComplexValueObject or HasValueObjectConversion, or with ComplexValueObjectCollection or HasValueObjectCollectionConversion for a collection. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string InvalidOperationException_ValueObjectMappedAsEntity {
             get {
@@ -156,11 +156,20 @@ namespace D3Fragments.EFCore.Resources {
         }
 
         /// <summary>
-        ///   The type {0} does not implement IValueObject&lt;TSelf, TPrimitive&gt; with itself as TSelf. HasValueObjectConversion can be used only for value object properties. に類似しているローカライズされた文字列を検索します。
+        ///   The type {0} does not implement IValueObject&lt;TSelf, TPrimitive&gt; with itself as TSelf. {1} can be used only for value objects. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string InvalidOperationException_NotValueObject {
             get {
                 return ResourceManager.GetString("InvalidOperationException_NotValueObject", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   The collection property {0} has no setter, and EF Core found no backing field for it. Name the backing field so that EF Core can find it by convention (e.g. _aliases for a property named Aliases), or add a setter. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string InvalidOperationException_CollectionPropertyNotWritable {
+            get {
+                return ResourceManager.GetString("InvalidOperationException_CollectionPropertyNotWritable", resourceCulture);
             }
         }
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace D3Fragments.EFCore;
 
 // 値オブジェクトとラップしている値を相互に変換する。読み込み時は TValueObject.Create を通すため ValidateValue で検証される。
-// 書き方を1つにするため公開せず、ValueObjectConversionExtensions.HasValueObjectConversion からだけ使う
+// 書き方を1つにするため公開せず、ValueObjectConversionExtensions の HasValueObjectConversion / HasValueObjectCollectionConversion からだけ使う
 internal sealed class ValueObjectConverter<TValueObject, TPrimitive>()
     : ValueConverter<TValueObject, TPrimitive>(value => value.Value, value => Create(value))
     where TValueObject : IValueObject<TValueObject, TPrimitive>

@@ -140,6 +140,43 @@ var member = await DbContext.Members
 
 When the unique constraint is violated, `DbUpdateException` is thrown on save.
 
+### Mapping a collection of value objects
+
+A collection of value objects, such as `List<Email>`, can be mapped in two ways, like a single value object.
+Both store the whole collection in a single JSON column named after the property.
+Use `ComplexValueObjectCollection` in most cases, and use `HasValueObjectCollectionConversion` when the column should be an array of only the wrapped values (for example, to match an existing schema).
+
+| | `ComplexValueObjectCollection` (usual) | `HasValueObjectCollectionConversion` |
+|---|---|---|
+| Mapping | Complex collection | Value converter for the elements |
+| Stored JSON | `[{"Value":"a@example.com"}]` | `["a@example.com"]` |
+| Comparing value objects (`x.Aliases.Contains(email)`) | Supported | Supported |
+| Using the wrapped value in queries (`x.Aliases.Any(a => a.Value.EndsWith(...))`) | Supported | Not supported |
+
+```csharp
+public sealed class Mailbox : AggregateRoot
+{
+    private readonly List<Email> _aliases = [];
+
+    public IReadOnlyList<Email> Aliases => _aliases;
+}
+
+modelBuilder.Entity<Mailbox>(builder =>
+{
+    builder.ComplexValueObjectCollection(x => x.Aliases);
+    // or
+    // builder.PrimitiveCollection(x => x.Aliases).HasValueObjectCollectionConversion();
+});
+```
+
+You can expose the collection as a read-only type such as `IReadOnlyList<T>`.
+In that case, EF Core reads and writes the backing field instead of the property.
+
+- The backing field is found by the EF Core naming convention (`_aliases`, `_Aliases`, `m_aliases`, and so on for a property named `Aliases`). If the field does not follow the convention and the property has no setter, an `InvalidOperationException` is thrown when the mapping is configured.
+- With `ComplexValueObjectCollection`, make the backing field a `List<T>`.
+
+With either method, each element is validated when read from the database, and a value that fails `ValidateValue` throws an exception.
+
 ### When you forget to map a value object
 
 If you forget to map a value object, EF Core tries to treat it as an entity.

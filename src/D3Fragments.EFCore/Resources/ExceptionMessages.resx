@@ -86,10 +86,13 @@
     <value>Multiple implementations were found for the repository interface {0}: {1}, {2}.</value>
   </data>
   <data name="InvalidOperationException_ValueObjectMappedAsEntity" xml:space="preserve">
-    <value>The value object {0} is mapped as an entity type. Map the property ({1}) with ComplexValueObject or HasValueObjectConversion in OnModelCreating.</value>
+    <value>The value object {0} is mapped as an entity type. In OnModelCreating, map the property ({1}) with ComplexValueObject or HasValueObjectConversion, or with ComplexValueObjectCollection or HasValueObjectCollectionConversion for a collection.</value>
   </data>
   <data name="InvalidOperationException_NotValueObject" xml:space="preserve">
-    <value>The type {0} does not implement IValueObject&lt;TSelf, TPrimitive&gt; with itself as TSelf. HasValueObjectConversion can be used only for value object properties.</value>
+    <value>The type {0} does not implement IValueObject&lt;TSelf, TPrimitive&gt; with itself as TSelf. {1} can be used only for value objects.</value>
+  </data>
+  <data name="InvalidOperationException_CollectionPropertyNotWritable" xml:space="preserve">
+    <value>The collection property {0} has no setter, and EF Core found no backing field for it. Name the backing field so that EF Core can find it by convention (e.g. _aliases for a property named Aliases), or add a setter.</value>
   </data>
   <data name="InvalidOperationException_ConventionsNotApplied" xml:space="preserve">
     <value>The D3Fragments conventions are not applied to {0}. Call ApplyD3FragmentsConventions in ConfigureConventions, or derive the context from D3DbContext.</value>
