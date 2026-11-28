@@ -1,49 +1,4 @@
-using D3Fragments.Application;
-using D3Fragments.EFCore.DomainEvents;
-using D3Fragments.Testing;
-
-using Microsoft.EntityFrameworkCore;
-
 namespace D3Fragments.EFCore.Tests;
-
-internal sealed record TestDomainEvent(DateTimeOffset OccurredAt) : IDomainEvent;
-
-internal sealed class TestEntity : AggregateRoot
-{
-    public TestEntity(int value)
-    {
-        Value = value;
-    }
-
-    public int Value { get; private set; }
-
-    public void RaiseTestEvent(DateTimeOffset occurredAt) => AddDomainEvent(new TestDomainEvent(occurredAt));
-
-    public void Raise(IDomainEvent domainEvent) => AddDomainEvent(domainEvent);
-
-    public void ChangeValue(int value) => Value = value;
-}
-
-internal sealed class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
-{
-    public DbSet<TestEntity> Entities => Set<TestEntity>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<TestEntity>(builder =>
-        {
-            builder.Property(x => x.Id).HasConversion(x => x.Value, x => UuidV7.FromGuid(x));
-        });
-    }
-}
-
-internal static class TestDbContextFactory
-{
-    public static TestDbContext Create() =>
-        new(new DbContextOptionsBuilder<TestDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options);
-}
 
 public class PagingExtensionsTests
 {
@@ -76,12 +31,7 @@ public class PagingExtensionsTests
     [Fact]
     public async Task ToPagedListAsync_指定したページのデータを返す()
     {
-        await using var dbContext = TestDbContextFactory.Create();
-        for (var i = 0; i < 5; i++)
-        {
-            dbContext.Entities.Add(new TestEntity(i));
-        }
-        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        await using var dbContext = await CreateWithValuesAsync(5);
 
         var result = await dbContext.Entities.OrderBy(x => x.Value).ToPagedListAsync(pageNo: 2, pageSize: 2, CancellationToken.None);
 
@@ -165,26 +115,5 @@ public class PagingExtensionsTests
         Assert.Equal(3, result.PageNo);
         Assert.Equal(10, result.PageSize);
         Assert.Equal(0, result.TotalCount);
-    }
-}
-
-public sealed class TestColor : TypeSafeEnum<TestColor, int>
-{
-    public static readonly TestColor Red = new(1);
-
-    private TestColor(int key) : base(key)
-    {
-    }
-}
-
-public class TypeSafeEnumConverterTests
-{
-    [Fact]
-    public void キーと相互変換する()
-    {
-        var converter = new TypeSafeEnumConverter<TestColor, int>();
-
-        Assert.Equal(1, converter.ConvertToProvider(TestColor.Red));
-        Assert.Same(TestColor.Red, converter.ConvertFromProvider(1));
     }
 }
