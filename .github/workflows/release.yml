@@ -52,7 +52,7 @@ jobs:
 
       - run: dotnet nuget push "artifacts/*.nupkg" --api-key ${{ steps.nuget.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
-      - run: gh release create "$GITHUB_REF_NAME" artifacts/*.nupkg --draft --generate-notes $([[ "$VERSION" == *-* ]] && echo --prerelease)
+      - run: gh release create "$GITHUB_REF_NAME" --draft --generate-notes $([[ "$VERSION" == *-* ]] && echo --prerelease)
         env:
           GH_TOKEN: ${{ github.token }}
 
