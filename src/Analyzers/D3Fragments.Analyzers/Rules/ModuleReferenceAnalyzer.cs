@@ -47,6 +47,9 @@ public sealed class ModuleReferenceAnalyzer : DiagnosticAnalyzer
             [.. ApplicationLayers, ModuleLayerType.Presentation_Controller, ModuleLayerType.Infrastructure_RepositoryImplementation],
         [ModuleLayerType.Domain_DomainRule] =
             [.. ApplicationLayers, ModuleLayerType.Presentation_Controller, ModuleLayerType.Domain_RepositoryInterface, ModuleLayerType.Infrastructure_RepositoryImplementation],
+        // ドメインサービス等。I/O を伴う処理は Command Handler に置く
+        [ModuleLayerType.Domain_Other] =
+            [.. ApplicationLayers, ModuleLayerType.Presentation_Controller, ModuleLayerType.Domain_RepositoryInterface, ModuleLayerType.Infrastructure_RepositoryImplementation],
     };
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(DiagnosticDescriptors.DFR0002);

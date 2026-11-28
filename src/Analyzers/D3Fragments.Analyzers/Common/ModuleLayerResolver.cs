@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace D3Fragments.Analyzers.Common;
 
-// クラス・インターフェースのモジュールレイヤーを判定する。判定規則は docs/ja/architecture.md の「モジュールレイヤー」を参照
+// クラス・インターフェースのモジュールレイヤーを判定する。判定規則は docs/ja/guide/01-architecture.md の「モジュールレイヤー」を参照
 internal sealed class ModuleLayerResolver
 {
     private readonly ArchitectureLayerResolver _architectureLayers;

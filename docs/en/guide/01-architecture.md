@@ -182,6 +182,8 @@ A class that directly or indirectly implements the `D3Fragments.IDomainRule<in T
 
 A class or interface in the domain layer that does not fall under any of the above.
 
+Domain services belong here. A domain service must not reference repository interfaces ([DFR0002](../analyzers/DFR0002.md)); place processing that involves I/O in a command handler, and pass the retrieved aggregates or values to the domain service.
+
 ### Infrastructure layer
 
 #### Infrastructure_RepositoryImplementation
