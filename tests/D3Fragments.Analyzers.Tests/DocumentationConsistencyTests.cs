@@ -8,7 +8,9 @@ namespace D3Fragments.Analyzers.Tests;
 // 規則の仕様（docs/{lang}/analyzers/DFRxxxx.md）と診断記述子の整合性を検証する
 public sealed partial class DocumentationConsistencyTests
 {
-    public static TheoryData<string> Languages => ["en", "ja"];
+    private static readonly string[] LanguageCodes = ["en", "ja"];
+
+    public static TheoryData<string> Languages => new(LanguageCodes);
 
     private static readonly DiagnosticDescriptor[] Descriptors = typeof(DiagnosticDescriptors)
         .GetFields(BindingFlags.Public | BindingFlags.Static)
@@ -16,23 +18,24 @@ public sealed partial class DocumentationConsistencyTests
         .Select(f => (DiagnosticDescriptor)f.GetValue(null)!)
         .ToArray();
 
-    [Theory]
-    [MemberData(nameof(Languages))]
-    public void EveryDescriptor_HasMatchingDocument(string language)
-    {
-        var culture = CultureInfo.GetCultureInfo(language);
-        foreach (var descriptor in Descriptors)
-        {
-            var path = Path.Combine(AnalyzersDocsDirectory(language), descriptor.Id + ".md");
-            Assert.True(File.Exists(path), $"{path} does not exist.");
+    // 規則ごとに別のテストケースにして、不整合のある規則をすべて報告させる
+    public static TheoryData<string, string> LanguagesAndRuleIds =>
+        new(from language in LanguageCodes from descriptor in Descriptors select (language, descriptor.Id));
 
-            var lines = File.ReadAllLines(path);
-            var title = descriptor.Title.ToString(culture);
-            Assert.Equal($"# {descriptor.Id}: {title}", lines[0]);
-            Assert.Equal(descriptor.Id, TableValue(lines, 0));
-            Assert.Equal(title, TableValue(lines, 1));
-            Assert.Equal(descriptor.DefaultSeverity.ToString(), TableValue(lines, 2));
-        }
+    [Theory]
+    [MemberData(nameof(LanguagesAndRuleIds))]
+    public void EveryDescriptor_HasMatchingDocument(string language, string ruleId)
+    {
+        var descriptor = Descriptors.Single(d => d.Id == ruleId);
+        var path = Path.Combine(AnalyzersDocsDirectory(language), ruleId + ".md");
+        Assert.True(File.Exists(path), $"{path} does not exist.");
+
+        var lines = File.ReadAllLines(path);
+        var title = descriptor.Title.ToString(CultureInfo.GetCultureInfo(language));
+        Assert.Equal($"# {ruleId}: {title}", lines[0]);
+        Assert.Equal(ruleId, TableValue(lines, 0));
+        Assert.Equal(title, TableValue(lines, 1));
+        Assert.Equal(descriptor.DefaultSeverity.ToString(), TableValue(lines, 2));
     }
 
     [Theory]
@@ -48,15 +51,12 @@ public sealed partial class DocumentationConsistencyTests
     }
 
     [Theory]
-    [MemberData(nameof(Languages))]
-    public void Readme_ListsEveryRule(string language)
+    [MemberData(nameof(LanguagesAndRuleIds))]
+    public void Readme_ListsEveryRule(string language, string ruleId)
     {
-        var culture = CultureInfo.GetCultureInfo(language);
+        var title = Descriptors.Single(d => d.Id == ruleId).Title.ToString(CultureInfo.GetCultureInfo(language));
         var readme = File.ReadAllText(Path.Combine(AnalyzersDocsDirectory(language), "index.md"));
-        foreach (var descriptor in Descriptors)
-        {
-            Assert.Contains($"[{descriptor.Id}: {descriptor.Title.ToString(culture)}]({descriptor.Id}.md)", readme, StringComparison.Ordinal);
-        }
+        Assert.Contains($"[{ruleId}: {title}]({ruleId}.md)", readme, StringComparison.Ordinal);
     }
 
     // プロパティ表の行（規則 ID / タイトル / 既定の重大度 の順）の値を取得する
