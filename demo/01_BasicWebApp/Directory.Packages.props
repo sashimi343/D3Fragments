@@ -5,11 +5,11 @@
 
   <ItemGroup>
     <!-- D3Fragments -->
-    <PackageVersion Include="Sashimi343.D3Fragments" Version="0.2.0" />
-    <PackageVersion Include="Sashimi343.D3Fragments.Application" Version="0.2.0" />
-    <PackageVersion Include="Sashimi343.D3Fragments.AspNetCore" Version="0.2.0" />
-    <PackageVersion Include="Sashimi343.D3Fragments.EFCore" Version="0.2.0" />
-    <PackageVersion Include="Sashimi343.D3Fragments.Analyzers" Version="0.2.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments" Version="0.4.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.Application" Version="0.4.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.AspNetCore" Version="0.4.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.EFCore" Version="0.4.0" />
+    <PackageVersion Include="Sashimi343.D3Fragments.Analyzers" Version="0.4.0" />
 
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.7" />
     <!-- Avoids the vulnerability (GHSA-2m69-gcr7-jv3q) in version 2.1.11 referenced transitively by Microsoft.EntityFrameworkCore.Sqlite -->
