@@ -61,6 +61,7 @@ public static class D3FragmentsModelConfigurationBuilderExtensions
         configurationBuilder.Properties<UuidV7>().HaveConversion<UuidV7Converter>();
         configurationBuilder.Conventions.Add(_ => new VersionConcurrencyTokenConvention());
         configurationBuilder.Conventions.Add(_ => new UnmappedValueObjectConvention());
+        configurationBuilder.Conventions.Add(_ => new ValueObjectColumnNameConvention());
         configurationBuilder.Conventions.Add(_ => new ConventionsAppliedConvention());
 
         foreach (var type in extension?.DomainAssemblies.SelectMany(x => x.GetTypes()) ?? [])

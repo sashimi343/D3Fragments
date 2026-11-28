@@ -16,6 +16,10 @@ public static class ValueObjectComplexTypeExtensions
     ///     <para xml:lang="en">Maps a value object property as a complex type stored in a single column named after the property (e.g. <c>Email</c> instead of EF Core's default <c>Email_Value</c>). Use the returned builder to override the column name, length, and so on.</para>
     ///     <para xml:lang="ja">値オブジェクトのプロパティを、プロパティ名の単一列（EF Core既定の<c>Email_Value</c>ではなく<c>Email</c>）に格納するComplex Typeとしてマッピングする。列名・長さ等は戻り値のビルダーで上書きできる。</para>
     /// </summary>
+    /// <remarks>
+    ///     <para xml:lang="en">The column name follows the naming convention of the context in the same way as <see cref="ValueObjectConversionExtensions.HasValueObjectConversion{TValueObject}"/> (e.g. <c>email_address</c> instead of <c>email_address_value</c> with a snake case naming convention). The trailing <c>_value</c> (case-insensitive) is removed from the column name converted by the naming convention, so a naming convention that changes the separator keeps the converted name. The column name is set by a convention that is added by <see cref="D3DbContext"/> or <see cref="D3FragmentsModelConfigurationBuilderExtensions.ApplyD3FragmentsConventions"/>.</para>
+    ///     <para xml:lang="ja">列名は<see cref="ValueObjectConversionExtensions.HasValueObjectConversion{TValueObject}"/>と同じくコンテキストの命名規約に従う（例: snake caseの命名規約では<c>email_address_value</c>ではなく<c>email_address</c>）。命名規約が変換した列名の末尾から<c>_value</c>（大文字小文字は区別しない）を取り除くため、区切り文字を変える命名規約では変換した名前のまま残る。列名は<see cref="D3DbContext"/>または<see cref="D3FragmentsModelConfigurationBuilderExtensions.ApplyD3FragmentsConventions"/>が追加する規約で設定される。</para>
+    /// </remarks>
     /// <typeparam name="TEntity">
     ///     <para xml:lang="en">The type of the entity.</para>
     ///     <para xml:lang="ja">エンティティの型。</para>
@@ -61,8 +65,10 @@ public static class ValueObjectComplexTypeExtensions
         ValueObjectMapping.GetValueObjectInterface(typeof(TValueObject), nameof(ComplexValueObject));
 
         var complexProperty = builder.ComplexProperty(propertyExpression);
+        // 列名は命名規約を適用できるよう ValueObjectColumnNameConvention が決める
+        complexProperty.Metadata.SetAnnotation(ValueObjectColumnNameConvention.ComplexValueObjectAnnotation, true);
         // TPrimitive は型推論できないため、IValueObject<,>.Value を名前で指定する
-        complexProperty.Property(nameof(IValueObject<,>.Value)).HasColumnName(complexProperty.Metadata.Name);
+        complexProperty.Property(nameof(IValueObject<,>.Value));
         return complexProperty;
     }
 

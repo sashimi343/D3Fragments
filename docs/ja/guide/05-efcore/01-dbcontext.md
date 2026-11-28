@@ -81,7 +81,7 @@ Identity と組み合わせる方法は [ASP.NET Core Identity 連携](../07-ide
 | 使う場面 | インデックスのない値オブジェクト | 一意制約・インデックスのある値オブジェクト |
 | インデックス | 定義できない | 定義できる |
 | クエリでラップしている値を使う（`x.Email.Value.EndsWith(...)`） | できる | できない（`x.Email == email` のように値オブジェクトどうしで比較する） |
-| 列名 | プロパティ名（命名規約は適用されない） | 命名規約に従う |
+| 列名 | 命名規約に従う | 命名規約に従う |
 
 ### Complex Type としてマッピングする
 
@@ -106,12 +106,15 @@ var members = await DbContext.Members
     .ToListAsync(cancellationToken);
 ```
 
-列名はプロパティ名で明示的に設定するため、`UseSnakeCaseNamingConvention()` などの命名規約は適用されません。
-命名規約に合わせた列名にするには、プロパティごとに列名を指定します。
+列名は `HasValueObjectConversion` と同じく、DbContext に設定した命名規約に従います。
+例えば EFCore.NamingConventions の `UseSnakeCaseNamingConvention()` を使うと、列名は `email_address_value` ではなく `email_address` になります。
+これは、命名規約が変換した列名の末尾から `_value`（大文字小文字は区別しない）を取り除いているためです。
+そのため、区切り文字を変えるような独自の命名規約では、末尾が取り除かれず変換した列名のまま残ります。
+その場合は、戻り値のビルダーで列名を指定します。
 
 ```csharp
 builder.ComplexValueObject(x => x.EmailAddress)
-    .Property(x => x.Value).HasColumnName("email_address");
+    .Property(x => x.Value).HasColumnName("email-address");
 ```
 
 ### 値コンバーターでマッピングする
